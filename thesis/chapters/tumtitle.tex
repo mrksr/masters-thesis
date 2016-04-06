@@ -1,0 +1,46 @@
+% correct BCOR - undo at the end !!!
+%\def\bcorcor{0.15cm}
+%\addtolength{\hoffset}{\bcorcor}
+
+\thispagestyle{empty}
+
+\makeatletter
+\vspace{10mm}
+\begin{center}
+    %\oTUM{4cm}
+    \includegraphics[height=3cm,keepaspectratio]{figures/tum.eps}
+
+    \vspace{5mm}
+    \huge FAKULT{\"A}T F{\"U}R INFORMATIK\\
+    \vspace{0.5cm}
+    \large DER TECHNISCHEN UNIVERSIT{\"A}T M{\"U}NCHEN\\
+\end{center}
+
+%\vspace{10mm}
+\begin{center}
+    {\Large \thesisTypeText}
+
+    \vspace{10mm}
+    {\LARGE Kamera-Flugbahn Optimierung für Multikopter}\\
+    \vspace{10mm}
+    {\Large Camera Flight Trajectory Optimization for Multicopters}\\
+
+    \vfill
+
+    %\hfill
+    \begin{tabular}{ll}
+        \Large Author:     & \Large \@author \\[2mm]
+        \Large Supervisor:    & \Large \advisorText \\[2mm]
+        \Large Advisors:  & \Large Dipl.-Ing. Daniel Gurdan\\[2mm]
+        \Large  & \Large Dipl.-Inf. Sebastian Klose\\[2mm]
+        \Large Date:       & \Large \@date
+    \end{tabular}
+
+    \vspace{5mm}
+
+    \includegraphics[height=2cm]{figures/tum_info.eps}
+\end{center}
+\makeatother
+
+% undo BCOR correction
+%\addtolength{\hoffset}{\bcorcor}

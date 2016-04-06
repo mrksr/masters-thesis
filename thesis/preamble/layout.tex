@@ -1,0 +1,212 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                               Colors                                %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Base Colors Corporate Design
+\definecolor{tumblue}{HTML}{0065BD}
+\definecolor{tumgreen}{HTML}{A2AD00}
+\definecolor{tumorange}{HTML}{E37222}
+\definecolor{tumivory}{HTML}{DAD7CB}
+\definecolor{tumred}{HTML}{E53418} % not in Styleguide
+
+% Derived Colors
+% https://kuler.adobe.com/create/color-wheel/
+% https://portal.mytum.de/corporatedesign/print/styleguide/
+% Grays - TUM
+\definecolor{tumgray0}{HTML}{000000}
+\definecolor{tumgray1}{HTML}{58585A}
+\definecolor{tumgray2}{HTML}{9C9D9F}
+\definecolor{tumgray3}{HTML}{D9DADB}
+\definecolor{tumgray4}{HTML}{FFFFFF}
+
+% Blues - TUM
+\definecolor{tumblue0}{HTML}{003359}
+\definecolor{tumblue1}{HTML}{005293}
+\definecolor{tumblue2}{HTML}{0073CF}
+\definecolor{tumblue3}{HTML}{64A0C8}
+\definecolor{tumblue4}{HTML}{98C6EA}
+
+% Greens - Adobe
+\definecolor{tumgreen0}{HTML}{EAF900}
+\definecolor{tumgreen1}{HTML}{AEBA00}
+\definecolor{tumgreen2}{HTML}{8A9300}
+\definecolor{tumgreen3}{HTML}{525800}
+
+% Reds - Adobe
+\definecolor{tumred0}{HTML}{F23719}
+\definecolor{tumred1}{HTML}{CB2E15}
+\definecolor{tumred2}{HTML}{90210F}
+\definecolor{tumred3}{HTML}{65170B}
+
+% Oranges - Adobe
+\definecolor{tumorange0}{HTML}{F07824}
+\definecolor{tumorange1}{HTML}{C9651E}
+\definecolor{tumorange2}{HTML}{8E4715}
+\definecolor{tumorange3}{HTML}{63320F}
+
+% Color Aliases
+\definecolor{clCommon}{named}{tumblue0}
+
+\definecolor{layoutTitle}{named}{tumblue}
+\definecolor{layoutChap}{named}{clCommon}
+\definecolor{layoutSec}{named}{clCommon}
+\definecolor{layoutSubSec}{named}{clCommon}
+\definecolor{layoutSubSubSec}{named}{clCommon}
+\definecolor{layoutParagraph}{named}{clCommon}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                         Frames and Theorems                         %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%
+%  Boxes  %
+%%%%%%%%%%%
+\newenvironment{defaultColourFrame}[2]
+{
+\vspace*{\parskip}
+    \begin{mdframed}[innerleftmargin=4pt, innerrightmargin=4pt, innertopmargin=4pt, innerbottommargin=4pt, linecolor=#1, middlelinewidth=0.5pt, backgroundcolor=#2, splitbottomskip=4pt, splittopskip=12pt, innermargin=4pt]
+}
+{
+    \end{mdframed}
+}
+
+%%%%%%%%%%%%%%%%%%%
+%  Code Listings  %
+%%%%%%%%%%%%%%%%%%%
+% Allow local minted styles
+\usemintedstyle{tum}
+\newminted{c}{bgcolor=tumgreen!20, linenos}
+\newminted{yaml}{bgcolor=tumgreen!20, linenos}
+
+%%%%%%%%%%%%%%
+%  Theorems  %
+%%%%%%%%%%%%%%
+\theoremstyle{break}
+\theoremheaderfont{\rmfamily\bfseries\boldmath}
+\theorembodyfont{\normalfont}
+\theoremseparator{}
+\theorempreskipamount 0pt
+\theorempostskipamount 0pt
+%\theoremprework{\vspace*{-\parskip}}
+
+\newtheorem{DefBox}[Definition]{Definition}
+\newtheorem{TheoBox}[Definition]{Satz}
+\newtheorem{LemBox}[Definition]{Lemma}
+\newtheorem{ProbBox}[Definition]{Problem}
+
+\renewenvironment{definition}
+{
+    \begin{defaultColourFrame}{tumblue!20}{tumblue!20}
+    \begin{DefBox}
+}
+{
+    \end{DefBox}
+    \end{defaultColourFrame}
+}
+\renewenvironment{Definition}{\begin{definition}}{\end{definition}}
+
+\newenvironment{problem}
+{
+    \begin{defaultColourFrame}{tumgreen!20}{tumgreen!20}
+    \begin{ProbBox}
+}
+{
+    \end{ProbBox}
+    \end{defaultColourFrame}
+}
+\newenvironment{Problem}{\begin{problem}}{\end{problem}}
+
+\renewenvironment{theorem}
+{
+    \begin{defaultColourFrame}{tumgreen!20}{tumgreen!20}
+    \begin{TheoBox}
+}
+{
+    \end{TheoBox}
+    \end{defaultColourFrame}
+}
+\renewenvironment{Theorem}{\begin{theorem}}{\end{theorem}}
+
+\renewenvironment{lemma}%
+{
+    \begin{defaultColourFrame}{tumgreen!20}{tumgreen!20}
+    \begin{LemBox}
+}
+{
+    \end{LemBox}
+    \end{defaultColourFrame}
+}
+\renewenvironment{Lemma}{\begin{lemma}}{\end{lemma}}
+
+\makeatletter
+\renewenvironment{proof}
+{\textbf{\proofname}\par\nobreak\@afterheading\vspace*{-\parskip}}
+{\qed}
+
+\renewenvironment{Proof}
+{\textbf{\proofname}\par\nobreak\@afterheading\vspace*{-\parskip}}
+{\qed}
+\makeatother
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                              Pictures                               %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\graphicspath{{figures/}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                           Layout Elements                           %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%
+%  Sections  %
+%%%%%%%%%%%%%%
+\addtokomafont{chapter}{\color{layoutChap}}
+\addtokomafont{section}{\color{layoutSec}}
+\addtokomafont{subsection}{\color{layoutSubSec}}
+\addtokomafont{subsubsection}{\color{layoutSubSubSec}}
+\addtokomafont{paragraph}{\color{layoutParagraph}}
+\addtokomafont{disposition}{\boldmath}
+
+%%%%%%%%%%%%%%
+%  Abstract  %
+%%%%%%%%%%%%%%
+\makeatletter
+\newenvironment{abstractFrame}
+{
+    \null\vfil
+    \@beginparpenalty\@lowpenalty
+}
+{\par\null}
+
+\newenvironment{deAbstract}
+{
+    \begin{otherlanguage}{ngerman}
+        \begin{center}%
+            {\bfseries\rmfamily \abstractname\vspace{-.5em}\vspace{\z@}}%
+        \end{center}%
+    \end{otherlanguage}
+}
+{\par\vfil}
+
+\newenvironment{svAbstract}
+{%
+    \begin{otherlanguage}{swedish}
+        \begin{center}%
+            {\bfseries\rmfamily \abstractname\vspace{-.5em}\vspace{\z@}}%
+        \end{center}%
+    \end{otherlanguage}
+}%
+{\par\vfil}
+
+\newenvironment{enAbstract}
+{%
+    \begin{otherlanguage}{english}
+        \begin{center}%
+            {\bfseries\rmfamily \abstractname\vspace{-.5em}\vspace{\z@}}%
+        \end{center}%
+    \end{otherlanguage}
+}%
+{\par\vfil}
+\makeatother
+
+%%%%%%%%%%
+%  Math  %
+%%%%%%%%%%
+\mathtoolsset{showonlyrefs}
