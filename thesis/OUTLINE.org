@@ -23,7 +23,7 @@
      + Long-Term Predictions (Linearization)
      + Policy Optimization (not here) or Model Predictive Control (PSO)
    - We use uncertainties in all three
-** Gaussian Processes
+** Dynamics: Gaussian Processes
 *** Definition
     - Gaussian processes as Stochastic processes
     - Every subset of which is Gaussian
@@ -43,22 +43,19 @@
     - Derive the likelihood?
     - Implementation??
     - Mention variational approaches
-*** Linearization as a way to propagate uncertainties through time
-    - GPs (or some oder model) give posterior uncertainties
-    - But only for single points
-    - How to get a posterior distribution given a prior one?
-    - Maybe mention moment matching?
-** PSO
-*** Non-Linear optimization problems
-    - Problem statement
-    - Brief overview over approaches
-      + Gradient-Based
-      + Hessian-Based
-      + Gradient-Free
-*** PSO is Gradient-Free
+** Long-Term: Linearization
+   - GPs (or some oder model) give posterior uncertainties
+   - But only for single points
+   - How to get a posterior distribution given a prior one?
+   - Maybe mention moment matching?
+** Model-Predictive-Control: PSO
+   - Optimization of value function
+   - Why we do not use gradient-based approaches
+*** Basic PSO
     - Positions, Velocities
     - Neighborhoods
     - Update-Step
+*** Improvements
     - Velocity clamping
     - Values for omega and gammas
 
@@ -69,7 +66,7 @@
    - Actions
    - Boundaries
    - Derivatives
-** Modelling of the Bicycle Benchmark
+** Our Approach
    - GP Models
      + Model the deltas
      + One model per dimension
