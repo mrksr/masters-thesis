@@ -2,15 +2,15 @@
   - Rather philosophical
   - Machine Learning, Machine Intelligence
   - Why do we have uncertainties? Why are they important?
-  - Current examples (AlphaGo?)
+  - Current examples (AlphaGo? Robotics? Cars?)
 
 * Theory
 ** Reinforcement Learning
 *** Problem statement
    - Agent and environment
-   - Similarities to "traditional" controllers
+   - Similarities to "traditional" controllers (like Kalman filters)
    - States and Actions
-   - Markov-Property of the state
+   - Markov-Property of the state, Problem is a (continuous) Markov-Decision-Process
    - Reward functions
    - Return and Value functions
    - Online vs. Offline
@@ -23,34 +23,39 @@
      + Long-Term Predictions (Linearization)
      + Policy Optimization (not here) or Model Predictive Control (PSO)
    - We use uncertainties in all three
+   - Should we introduce it without uncertainties?
 ** Dynamics: Gaussian Processes
 *** Definition
     - Gaussian processes as Stochastic processes
     - Every subset of which is Gaussian
     - Distribution over functions rather than vectors
+    - Probably only the function-space view
 *** Kernel functions
     - General properties
-    - RBF as an example
-    - Matern, Neural Network?
+    - Simple Example like linear
+    - Stationary Kernels: RBF
+    - Maybe hint to Non-Stationary: Neural Network
 *** Regression with GPs
     - Predictive posterior
     - Marginal likelihood for finding hyperparameters
+    - Those are the basis for SPGP
 *** Sparse Approximations (SPGP)
-    - Inverting K_NN is expensive
+    - Inverting K_NN is O(N^3)
     - Approximate in smaller subspace
     - Formulation of SPGP
-    - Interpretation as GP with specific Kernel function
+    - Interpretation as GP with specific Kernel function, therefore O(NM^2)
     - Derive the likelihood?
     - Implementation??
-    - Mention variational approaches
+    - Mention variational approaches for likelihood optimization
 ** Long-Term: Linearization
-   - GPs (or some oder model) give posterior uncertainties
+   - Starting point: Model that gives posterior uncertainties
    - But only for single points
    - How to get a posterior distribution given a prior one?
+   - Derive formulae for GPs via Taylor expansion
    - Maybe mention moment matching?
 ** Model-Predictive-Control: PSO
    - Optimization of value function
-   - Why we do not use gradient-based approaches
+   - Why do we not use gradient-based approaches
 *** Basic PSO
     - Positions, Velocities
     - Neighborhoods
@@ -67,29 +72,29 @@
    - Boundaries
    - Derivatives
 ** Our Approach
-   - GP Models
-     + Model the deltas
-     + One model per dimension
-     + Implicit assumption that outputs are independent
-   - Reward function
-     + Definition without uncertainties
-     + Extension with probabilities
-     + "Stop Probabilities" and Bimodality
-     + Extension of PILCO, truncated gaussians
+*** Dynamics and Long-Term: GP Models
+    - Model the deltas
+    - One model per dimension
+    - Implicit assumption that outputs are independent
+*** MPC: Reward function
+    - Definition without uncertainties
+    - Extension with probabilities
+    - "Stop Probabilities" and Bimodality
+    - Extension of PILCO, truncated gaussians
 ** Results
-   - Data Sets
-     + Random exploration
-     + Random sampling
-     + Size of data sets
-   - Technical choices
-     + Values for N, M, Kernel in GPs
-     + PSO parameters
-   - Evaluation loop
-     + Create data set
-     + Train models
-     + ~15 PSO runs
-   - Mean-Mean Reward over multiple runs
-   - Some interesting single trajectories
+*** Choice of Data Sets
+    - Random exploration
+    - Random sampling
+    - Size of data sets
+*** Choices in Approach
+    - Values for N, M, Kernel in GPs
+    - PSO parameters
+*** Evaluation
+    - Create data set
+    - Train models
+    - ~15 PSO runs
+    - Mean-Mean Reward over multiple runs
+    - Some interesting single trajectories
 
 * Conclusion
   - Using uncertainties seems to help
