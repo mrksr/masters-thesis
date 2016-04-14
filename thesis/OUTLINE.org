@@ -1,29 +1,39 @@
 * Introduction
-  - Rather philosophical
   - Machine Learning, Machine Intelligence
+  - High-Level Idea of "Learning to control systems" or "Making Decisions"
   - Why do we have uncertainties? Why are they important?
-  - Current examples (AlphaGo? Robotics? Cars?)
+  - Current examples (AlphaGo? Humans in Robotics? Cars?)
 
-* Theory
+* Definition of the Bicycle Benchmark
+  - Hands-On example of a control problem
+  - State variables
+  - Dynamics
+  - Actions
+  - Boundaries
+  - Derivatives
+
+* State of the Art
 ** Reinforcement Learning
 *** Problem statement
+   - "Generalization" of Bicycle Benchmark
    - Agent and environment
    - Similarities to "traditional" controllers (like Kalman filters)
    - States and Actions
    - Markov-Property of the state, Problem is a (continuous) Markov-Decision-Process
    - Reward functions
    - Return and Value functions
-   - Online vs. Offline
 *** Model-Based Reinforcement Learning
    - Interaction vs. Simulation
    - Interaction is expensive but makes the model better
-   - Use uncertainties to reduce model bias
+   - Online vs. Offline: We gather all data first
    - Three layers
      + Learning the dynamics (GP)
-     + Long-Term Predictions (Linearization)
+     + Long-Term Predictions (Trivial summation vs. Linearization)
      + Policy Optimization (not here) or Model Predictive Control (PSO)
-   - We use uncertainties in all three
-   - Should we introduce it without uncertainties?
+     + NOTE: We are not quite happy with using the term Model Predictive
+       Control here
+   - Use uncertainties to reduce model bias
+   - We can use uncertainties in all three
 ** Dynamics: Gaussian Processes
 *** Definition
     - Gaussian processes as Stochastic processes
@@ -44,16 +54,10 @@
     - Approximate in smaller subspace
     - Formulation of SPGP
     - Interpretation as GP with specific Kernel function, therefore O(NM^2)
-    - Derive the likelihood?
-    - Implementation??
+    - Probably skip the concrete likelihood and implementation details
+      (matrix inversion lemma)
     - Mention variational approaches for likelihood optimization
-** Long-Term: Linearization
-   - Starting point: Model that gives posterior uncertainties
-   - But only for single points
-   - How to get a posterior distribution given a prior one?
-   - Derive formulae for GPs via Taylor expansion
-   - Maybe mention moment matching?
-** Model-Predictive-Control: PSO
+** PSO
    - Optimization of value function
    - Why do we not use gradient-based approaches
 *** Basic PSO
@@ -64,39 +68,46 @@
     - Velocity clamping
     - Values for omega and gammas
 
-* Experiments
-** Definition of the Bicycle Benchmark
-   - State variables
-   - Dynamics
-   - Actions
-   - Boundaries
-   - Derivatives
-** Our Approach
-*** Dynamics and Long-Term: GP Models
-    - Model the deltas
-    - One model per dimension
-    - Implicit assumption that outputs are independent
-*** MPC: Reward function
-    - Definition without uncertainties
-    - Extension with probabilities
-    - "Stop Probabilities" and Bimodality
-    - Extension of PILCO, truncated gaussians
-** Results
-*** Choice of Data Sets
-    - Random exploration
-    - Random sampling
-    - Size of data sets
-*** Choices in Approach
-    - Values for N, M, Kernel in GPs
-    - PSO parameters
-*** Evaluation
-    - Create data set
-    - Train models
-    - ~15 PSO runs
-    - Mean-Mean Reward over multiple runs
-    - Some interesting single trajectories
+* Solution of the Bicycle Benchmark
+** Standard Approach: Means Only
+*** Dynamics: with GP Models
+   - Model the deltas
+   - One model per dimension
+   - Implicit assumption that outputs are independent
+   - Choice of Data Sets
+     + Random exploration
+     + Random sampling
+     + Size of data sets
+   - Values for N, M, Kernel
+*** MPC/Unrolling: PSO-Optimization of Value Function
+   - Reward function: Non-Probabilistic
+   - PSO Parameters
+*** Results and Discussion of Problems
+   - Evaluation
+     + Create data set
+     + Train models
+     + ~15 PSO runs
+     + Mean-Mean Reward over multiple runs
+     + Some interesting single trajectories
+   - Actual results
+** Our first Approach: One-Step Uncertainties
+*** New Reward Function Reward function
+   - Definition without uncertainties
+   - Extension with probabilities
+   - "Stop Probabilities" and Bimodality
+   - Extension of PILCO, truncated gaussians
+** Our second Approach: Linearization
+   - Now we do proper long-term predictions
+   - Starting point: Model that gives posterior uncertainties
+   - But only for single points
+   - How to get a posterior distribution given a prior one?
+   - Derive formulae for GPs via Taylor expansion
+   - Maybe mention moment matching?
 
 * Conclusion
-  - Using uncertainties seems to help
-  - But does not combine so well with PSO
+** Discussion of the Approaches
+  - Does it actually help?
+  - Comparative Plots
+** Possible Improvements
+  - Linearization does not combine so well with PSO
   - Can we do better with closed policies?
