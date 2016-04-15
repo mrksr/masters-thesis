@@ -91,18 +91,22 @@
      + Some interesting single trajectories
    - Actual results
 ** Our first Approach: One-Step Uncertainties
-*** New Reward Function Reward function
-   - Definition without uncertainties
+*** New Reward Function
    - Extension with probabilities
-   - "Stop Probabilities" and Bimodality
-   - Extension of PILCO, truncated gaussians
+   - Folding of gaussians
+*** Results
 ** Our second Approach: Linearization
+*** New propagation method
    - Now we do proper long-term predictions
    - Starting point: Model that gives posterior uncertainties
    - But only for single points
    - How to get a posterior distribution given a prior one?
    - Derive formulae for GPs via Taylor expansion
    - Maybe mention moment matching?
+*** Further extension of the reward function
+   - "Stop Probabilities" and Bimodality
+   - Extension of PILCO, truncated gaussians
+*** Results
 
 * Conclusion
 ** Discussion of the Approaches
