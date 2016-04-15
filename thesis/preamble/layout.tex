@@ -175,46 +175,26 @@
 }
 {}
 
-\makeatletter
-\newenvironment{abstractFrame}
-{
-    \null\vfil
-    \@beginparpenalty\@lowpenalty
-}
-{\par\null}
-
-\newenvironment{deAbstract}
-{
-    \begin{otherlanguage}{ngerman}
-        \begin{center}%
-            {\bfseries\rmfamily \abstractname\vspace{-.5em}\vspace{\z@}}%
-        \end{center}%
-    \end{otherlanguage}
-}
-{\par\vfil}
-
-\newenvironment{svAbstract}
-{%
-    \begin{otherlanguage}{swedish}
-        \begin{center}%
-            {\bfseries\rmfamily \abstractname\vspace{-.5em}\vspace{\z@}}%
-        \end{center}%
-    \end{otherlanguage}
-}%
-{\par\vfil}
-
-\newenvironment{enAbstract}
-{%
-    \begin{otherlanguage}{english}
-        \begin{center}%
-            {\bfseries\rmfamily \abstractname\vspace{-.5em}\vspace{\z@}}%
-        \end{center}%
-    \end{otherlanguage}
-}%
-{\par\vfil}
-\makeatother
-
 %%%%%%%%%%
 %  Math  %
 %%%%%%%%%%
 \mathtoolsset{showonlyrefs}
+
+\DeclareRobustCommand{\qed}{%
+  \ifmmode \square%\mathqed
+  \else
+    \leavevmode\unskip\penalty9999 \hbox{}\nobreak\hfill
+    \quad\hbox{$\square$}%
+  \fi
+}
+% Fix \pi in mathpazo
+% See http://tex.stackexchange.com/a/33141
+\renewcommand{\pi}{\mathchar"119}
+
+\sisetup{per-mode=symbol}
+
+
+%%%%%%%%%%%%
+%  Tables  %
+%%%%%%%%%%%%
+\newcommand{\tablewidth}{.95 \textwidth}

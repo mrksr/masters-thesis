@@ -1,9 +1,57 @@
 \chapter{The Bicycle Benchmark}
 \label{cha:the_bicycle_benchmark}
 
-\section{hio!}
-\label{sec:hio_}
-\blindtext
-\blindtext
+\begin{table}[htpb]
+    \centering
+    \caption{Physical constants and their values in the bicycle system \cite{randlov_learning_1998}.}
+    \label{tab:bicycle_constants}
+    \begin{tabularx}{\tablewidth}{cXr}
+        \toprule
+        Notation & Description & Value \\
+        \midrule
+        $c$ & Horizontal distance between the point where the front tyre touches the ground and the CM & \SI{66}{\cm} \\
+        \CM & Center of mass of the bicycle and cyclist in total & \\
+        $d_{\CM}$ & Vertical distance between the \CM of the bicycle and the cyclist & \SI{30}{\cm} \\
+        $h$ & Vertical distance between the \CM and the ground & \SI{94}{\cm} \\
+        $l$ & Distance between the points where the front and back tyres touch the ground & \SI{111}{\cm} \\
+        $M_c$ & Mass of the bicycle & \SI{15}{\kg} \\
+        $M_d$ & Mass of a tyre & \SI{1.7}{\kg} \\
+        $M_p$ & Mass of the cyclist & \SI{60}{\kg} \\
+        $r$ & Radius of a tyre & \SI{34}{\cm} \\
+        $v$ & Velocity of the bicycle & \SI{10}{\km\per\hour} \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
 
-\blindtext
+\begin{table}[htbp]
+    \centering
+    \caption{Variables which define the current state in the bicycle system.}
+    \label{tab:bicycle_variables}
+    \begin{tabularx}{\tablewidth}{cXcc}
+        \toprule
+        Notation & Description & Value range & Unit \\
+        \midrule
+        $\omega$ & Tilt of the bike & \numrange[parse-numbers=false]{-\sfrac{\pi}{15}}{\sfrac{\pi}{15}} & \si{\radian} \\
+        $\dot{\omega}$ & Tilting speed of the bike & \numrange{-10}{10} & \si{\radian\per\second} \\
+        $\theta$ & Angle of the handlebar and the front tyre & \numrange[parse-numbers=false]{-\sfrac{\pi}{2}}{\sfrac{\pi}{2}} & \si{\radian} \\
+        $\dot{\theta}$ & Rotational speed of the handlebars & \numrange{-10}{10} & \si{\radian\per\second} \\
+        $x$ & Global $x$-position of front tyre & \numrange{-100}{100} & \si{\metre} \\
+        $y$ & Global $y$-position of front tyre & \numrange{-100}{100} & \si{\metre} \\
+        $\psi$ & Global orientation of the bike & \numrange[parse-numbers=false]{-\pi}{\pi} & \si{\radian} \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+
+\begin{table}[htbp]
+    \centering
+    \caption{Actions which can be applied to the bicycle system.}
+    \label{tab:bicycle_actions}
+    \begin{tabularx}{\tablewidth}{cXcc}
+        \toprule
+        Notation & Description & Value range & Unit \\
+        \midrule
+        $d$ & The distance the agent leans sideways by displacing the center of mass & \numrange{-0.02}{0.02} & \si{\metre} \\
+        $T$ & The torque the agent applies on handlebars & \numrange{-2}{2} & \si{\N} \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
