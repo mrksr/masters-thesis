@@ -1,7 +1,60 @@
 \chapter{The Bicycle Benchmark}
 \label{cha:the_bicycle_benchmark}
 
-\begin{table}[htpb]
+An example of a system which a computer should learn to control is the bicycle benchmark originally defined by \Randlov and \Alstrom in 1998 \cite{randlov_learning_1998}.
+The task introduced in this benchmark is to balance a simulated bicycle which travels at constant speed.
+
+The computer, or agent, takes the place of the rider of the bicycle.
+After fixed time intervals, the controller has to decide how to influence the bicycle by applying some torque $T$ on the handle bars to steer, by displacing the center of mass of the bicycle via leaning over the bicycle by some distance $d$ or both (see \cref{tab:bicycle_actions}).
+Besides the short-term goal of preventing the bicycle from falling over, there is also the long-term one of navigating to some predefined goal position.
+To make its decision, the controller is given perfect information about the internal state of the simulation.
+
+The bicycle is modelled by non-linear differential equations which describe the steering behaviour and the leaning behaviour of the bicycle.
+The speed of the back tyre is considered constant and independent of the actions of the agent.
+This results in two important angles to describe the system.
+The angle $\theta$ is measured between the front tyre and the frame of the bicycle and describes the straightness of the bicycles path.
+The angle $\omega$ measures the amount of tilt of the bicycle's frame from standing upright.
+If the absolute value of $\omega$ is greater than \ang{12}, the bicycle has fallen over.
+In addition to the two angles, their time-derivatives $\dot{\theta}$ and $\dot{\omega}$ define the current state of the dynamics of the bicycle.
+Together with the bicycle's position and rotation in euclidean space, this completely describes the current state of one instance of the bicycle benchmark and is summarized in \cref{tab:bicycle_variables}.
+
+The conservations of angular momentum of the tyres results in interactions between $\theta$ and $\omega$ and their derivatives.
+The equations presented in the following describe the dynamics of the system as introduced in \cite{randlov_learning_1998}.
+Two simplifying assumptions have been made:
+Firstly, the front fork is assumed to be vertical, which makes balancing the bicycle more difficult but is not physically impossible.
+And secondly, the equations are not an exact analytical descriptions, as some second and higher order terms have been ignored.
+\begin{table}[p]
+    \centering
+    \caption{Variables which define the current state in the bicycle system.}
+    \label{tab:bicycle_variables}
+    \begin{tabularx}{\tablewidth}{cXcc}
+        \toprule
+        Notation & Description & Value range & Unit \\
+        \midrule
+        $\theta$ & Angle of the handlebar and the front tyre & \numrange[parse-numbers=false]{-\sfrac{\pi}{2}}{\sfrac{\pi}{2}} & \si{\radian} \\
+        $\dot{\theta}$ & Rotational speed of the handlebars & \numrange{-10}{10} & \si{\radian\per\second} \\
+        $\omega$ & Tilt of the bike & \numrange[parse-numbers=false]{-\sfrac{\pi}{15}}{\sfrac{\pi}{15}} & \si{\radian} \\
+        $\dot{\omega}$ & Tilting speed of the bike & \numrange{-10}{10} & \si{\radian\per\second} \\
+        $x$ & Global $x$-position of front tyre & \numrange{-100}{100} & \si{\metre} \\
+        $y$ & Global $y$-position of front tyre & \numrange{-100}{100} & \si{\metre} \\
+        $\psi$ & Global orientation of the bike & \numrange[parse-numbers=false]{-\pi}{\pi} & \si{\radian} \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+\begin{table}[p]
+    \centering
+    \caption{Actions which can be applied to the bicycle system.}
+    \label{tab:bicycle_actions}
+    \begin{tabularx}{\tablewidth}{cXcc}
+        \toprule
+        Notation & Description & Value range & Unit \\
+        \midrule
+        $d$ & The distance the agent leans sideways by displacing the center of mass & \numrange{-0.02}{0.02} & \si{\metre} \\
+        $T$ & The torque the agent applies on handlebars & \numrange{-2}{2} & \si{\N} \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+\begin{table}[p]
     \centering
     \caption{Physical constants and their values in the bicycle system \cite{randlov_learning_1998}.}
     \label{tab:bicycle_constants}
@@ -19,39 +72,66 @@
         $M_p$ & Mass of the cyclist & \SI{60}{\kg} \\
         $r$ & Radius of a tyre & \SI{34}{\cm} \\
         $v$ & Velocity of the bicycle & \SI{10}{\km\per\hour} \\
+        $\dot{\sigma}$ & The angular velocity of a tyre & $\dot{\sigma} = \sfrac{v}{r}$ \\
         \bottomrule
     \end{tabularx}
 \end{table}
 
-\begin{table}[htbp]
+\begin{figure}[p]
     \centering
-    \caption{Variables which define the current state in the bicycle system.}
-    \label{tab:bicycle_variables}
-    \begin{tabularx}{\tablewidth}{cXcc}
-        \toprule
-        Notation & Description & Value range & Unit \\
-        \midrule
-        $\omega$ & Tilt of the bike & \numrange[parse-numbers=false]{-\sfrac{\pi}{15}}{\sfrac{\pi}{15}} & \si{\radian} \\
-        $\dot{\omega}$ & Tilting speed of the bike & \numrange{-10}{10} & \si{\radian\per\second} \\
-        $\theta$ & Angle of the handlebar and the front tyre & \numrange[parse-numbers=false]{-\sfrac{\pi}{2}}{\sfrac{\pi}{2}} & \si{\radian} \\
-        $\dot{\theta}$ & Rotational speed of the handlebars & \numrange{-10}{10} & \si{\radian\per\second} \\
-        $x$ & Global $x$-position of front tyre & \numrange{-100}{100} & \si{\metre} \\
-        $y$ & Global $y$-position of front tyre & \numrange{-100}{100} & \si{\metre} \\
-        $\psi$ & Global orientation of the bike & \numrange[parse-numbers=false]{-\pi}{\pi} & \si{\radian} \\
-        \bottomrule
-    \end{tabularx}
-\end{table}
+    \begin{subfigure}{.45\textwidth}
+        \missingfigure[figheight=.35\textheight]{Bicycle as seen from behind}
+        \caption{Bicycle as seen from behind.}
+        \label{fig:bicycle:behind}
+    \end{subfigure}
+    \begin{subfigure}{.45\textwidth}
+        \missingfigure[figheight=.35\textheight]{Moments of inertia}
+        \caption{Moments of inertia.}
+        \label{fig:bicycle:inertia}
+    \end{subfigure}
+    \bigskip
+    \begin{subfigure}{.9\textwidth}
+        \missingfigure[figheight=.5\textheight]{Bicycle as seen from above}
+        \caption{Bicycle as seen from above}
+        \label{fig:bicycle:above}
+    \end{subfigure}
+    \caption{Bicycle dynamics}
+    \label{fig:bicycle}
+\end{figure}
 
-\begin{table}[htbp]
-    \centering
-    \caption{Actions which can be applied to the bicycle system.}
-    \label{tab:bicycle_actions}
-    \begin{tabularx}{\tablewidth}{cXcc}
-        \toprule
-        Notation & Description & Value range & Unit \\
-        \midrule
-        $d$ & The distance the agent leans sideways by displacing the center of mass & \numrange{-0.02}{0.02} & \si{\metre} \\
-        $T$ & The torque the agent applies on handlebars & \numrange{-2}{2} & \si{\N} \\
-        \bottomrule
-    \end{tabularx}
-\end{table}
+An overview of the geometric interpretations of the state variables can be seen in \cref{fig:bicycle}.
+The interactions between tilt and lean are based on the conservation of angular momentum which is heavily influenced by the moments of inertia of the system.
+The moments of the tyre as displayed in \cref{fig:bicycle:inertia} and the moment of the bicycle and cyclist combined $I_{\text{BC}}$ were estimated by \cite{randlov_learning_1998} as
+\begin{align}
+    I_{dc} &\coloneqq \hphantom{\frac{1}{2}}M_d r^2\\
+    I_{dv} &\coloneqq \frac{3}{2}M_d r^2\\
+    I_{dl} &\coloneqq \frac{1}{2}M_d r^2\\
+    I_{\text{BC}} &\coloneqq \frac{13}{3} M_c h^2 + M_p(h + d_\CM)^2.
+\end{align}
+The dynamics also depend on multiple constants which are detailed in \cref{tab:bicycle_constants}.
+
+The angular acceleration $\ddot{\omega}$ of the lean of the bicycle consists of three terms.
+Firstly, the gravitation acting on the bicycle and cyclist which pulls the bicycle in the direction it is already leaning.
+Secondly, there are effects based on the conservation of angular momentum introduced via a cross-term dependent on \todo{interpretation?} $\dot{\theta}$ and lastly the centrifugal force applied because of the curved movement of the bicycle.
+The center of mass can be displaced horizontally by the agent via the choice of $d$.
+The combination $\varphi$ of this displacement and the lean angle of the bicycle is defined as
+\begin{align}
+    \varphi &\coloneqq \omega + \arctan \left( \frac{d}{h} \right).
+\end{align}
+With this, the angular acceleration $\ddot{\omega}$ can be calculated as
+\begin{align}
+    \ddot{\omega} \coloneqq \frac{1}{I_{\text{BC}}} \left(
+        \sin \varphi \cdot Mgh - \cos \varphi \cdot \left(
+            I_{dc}\dot{\sigma}\cdot\dot{\theta} +
+            \sgn(\theta) \cdot v^2 \left(
+                \frac{M_dr}{r_f} + \frac{M_d r}{r_b} + \frac{Mh}{r_\CM}
+            \right)
+        \right)
+    \right).
+\end{align}
+
+The angular acceleration $\ddot{\theta}$ of the orientation of the front tyre and the handlebars is equal by definition.
+It is dependent on the torque $T$ applied to the handlebars and the conservation of angular momentum introduced via a cross-term dependent on $\dot{\omega}$ and is defined as
+\begin{align}
+    \ddot{\theta} \coloneqq \frac{T - I_{dv}\dot{\sigma}\cdot\dot{\omega}}{I_{dl}}.
+\end{align}
