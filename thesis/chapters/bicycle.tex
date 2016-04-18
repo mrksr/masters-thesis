@@ -2,7 +2,7 @@
 \label{cha:the_bicycle_benchmark}
 
 An example of a system which a computer should learn to control is the bicycle benchmark originally defined by \Randlov and \Alstrom in 1998 \cite{randlov_learning_1998}.
-The task introduced in this benchmark is to balance a simulated bicycle which travels at constant speed.
+The task introduced in this benchmark is to balance a simulated bicycle which travels at a constant speed.
 
 The computer, or agent, takes the place of the rider of the bicycle.
 After fixed time intervals, the controller has to decide how to influence the bicycle by applying some torque $T$ on the handle bars to steer, by displacing the center of mass of the bicycle via leaning over the bicycle by some distance $d$ or both (see \cref{tab:bicycle_actions}).
@@ -79,6 +79,11 @@ And secondly, the equations are not an exact analytical descriptions, as some se
 
 \begin{figure}[p]
     \centering
+    \begin{subfigure}{.9\textwidth}
+        \missingfigure[figheight=.5\textheight]{Bicycle as seen from above}
+        \caption{Bicycle as seen from above}
+        \label{fig:bicycle:above}
+    \end{subfigure}
     \begin{subfigure}{.45\textwidth}
         \missingfigure[figheight=.35\textheight]{Bicycle as seen from behind}
         \caption{Bicycle as seen from behind.}
@@ -88,12 +93,6 @@ And secondly, the equations are not an exact analytical descriptions, as some se
         \missingfigure[figheight=.35\textheight]{Moments of inertia}
         \caption{Moments of inertia.}
         \label{fig:bicycle:inertia}
-    \end{subfigure}
-    \bigskip
-    \begin{subfigure}{.9\textwidth}
-        \missingfigure[figheight=.5\textheight]{Bicycle as seen from above}
-        \caption{Bicycle as seen from above}
-        \label{fig:bicycle:above}
     \end{subfigure}
     \caption{Bicycle dynamics}
     \label{fig:bicycle}
@@ -135,3 +134,42 @@ It is dependent on the torque $T$ applied to the handlebars and the conservation
 \begin{align}
     \ddot{\theta} \coloneqq \frac{T - I_{dv}\dot{\sigma}\cdot\dot{\omega}}{I_{dl}}.
 \end{align}
+
+These differential equations describe the internal dynamics of the bicycle benchmark, namely how leaning and turning the handlebars interact with each other.
+What remains is the movement of the bicycle in space.
+The bicycle state contains three variables which locate the bicycle in space.
+The position of the bicycle is defined by the point where the front tyre touches the ground.
+This point is independent of the orientation of the handlebars (given by the angle $\theta$) and identified via the two euclidean coordinates $x$ and $y$.
+The last state variable, $\psi$, describes the orientation of the bicycle frame relative to this point as shown in \cref{fig:bicycle:above}.
+If $\psi$ is equal to zero, the back tyre points in to $x$-direction if viewed from the point $(x, y)$ and a positive $\psi$ denotes a counter-clockwise rotation\todo{$\psi$ rotation direction correct?}.
+
+The back tyre of the bicycle moves at the constant speed $v$.
+The front and back tyre follow two circular paths with different radii but the same center as can be seen in \cref{fig:bicycle:above} with the front tyre following the longer path.
+The radii $r_f$ and $r_b$ can be calculated as
+\begin{align}
+    r_f &= \frac{l}{\abs{\sin \theta}}\\
+    r_b &= \frac{l}{\abs{\tan \theta}}
+\end{align}
+respectively for $\theta$ not equal to zero.
+The singularity of $\theta$ approaching zero yields radii of arbitrary size as the bicycle's path becomes more and more straight.
+If $\theta$ is equal to zero, the bicycle's orientation does not change and it moves along a straight line.
+This case will be ignored below.
+
+Since the two tyres are connected with a rigid frame and the front tyre travels on a longer path, it has to do so at a higher speed.
+They do share the same angular velocity $v_\circ$ on their respective circular paths however, since if $\theta$ was constant, the bicycle would rotate around the common center point.
+This angular velocity can be derived from the constant speed of the back tyre and is given by
+\begin{align}
+    v_\circ = \frac{v}{r_b}.
+\end{align}
+Combined with the direction of rotation on the circle defined by the sign of $\theta$, this directly yields the derivative of the world orientation $\psi$:
+\begin{align}
+    \dot{\psi} = \sgn(\theta) \cdot v_\circ
+\end{align}
+
+The actual speed of the front tyre can be obtained from the common angular velocity $v_\circ$ and the radius of its path $r_f$.
+Together with the orientation of the front tyre, this gives the derivatives
+\begin{align}
+    \dot{x} &= v_\circ \cdot r_f \cdot \cos(\psi + \theta) \\
+    \dot{y} &= v_\circ \cdot r_f \cdot \sin(\psi + \theta)
+\end{align}
+of the position of the bicycle.
