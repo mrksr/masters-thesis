@@ -19,7 +19,7 @@
 
 \addbibresource{sources.bib}
 
-\includeonly{chapters/bicycle}
+\includeonly{chapters/bicycle,chapters/theory}
 
 \begin{document}
 \frontmatter
@@ -35,18 +35,7 @@
 \chapter{Introduction}
 
 \include{chapters/bicycle}
-
-\chapter{State of the Art}
-\section{Reinforcement Learning}
-\subsection{Problem statement}
-\section{Dynamics: Gaussian Processes}
-\subsection{Definition}
-\subsection{Kernel functions}
-\subsection{Regression with GPs}
-\subsection{Sparse Approximations (SPGP)}
-\section{Particle Swarm Optimization}
-\subsection{Basic PSO}
-\subsection{Improvements}
+\include{chapters/theory}
 
 \chapter{Solution of the Bicycle Benchmark}
 \section{Standard Approach: Means Only}

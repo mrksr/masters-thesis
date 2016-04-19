@@ -1,0 +1,32 @@
+\chapter{State of the Art}
+\label{cha:state_of_the_art}
+The bicycle benchmark is an instance of a problem in a branch of machine learning called reinforcement learning.
+In reinforcement learning, the task is to learn controlling some system by deciding on which actions to take given some information about its current state.
+In contrast to other aspects of machine learning such as supervised learning, there is no expert knowledge available about which actions are good or bad to perform.
+Instead, the agent receives feedback from the environment in form of a numerical reward.
+
+Based on this feedback, the agent must typically build up some understanding of the modelled system in order to reach a higher level goal.
+In the case of the bicycle benchmark, this higher level goal is to avoid falling over, but also be able to control the path bicycle is taking in such a way that it reaches the goal.
+These two aspects might contradict each other, since it could be necessary to increase the risk of falling in the short term by driving along a curve in order to increase the chance of reaching the goal in the long term.
+
+This chapter introduces the notation of reinforcement learning necessary to reason about the bicycle benchmark and similar problems in a mathematical way.
+The approach used in this thesis to solve this problem is called model-based reinforcement learning and is discussed next.
+These models are used to learn the dynamics of the system to be controlled in order to be able to make predictions about its future development.
+The remainder of the chapter will be concerned with introducing two tools used in this approach.
+
+Gaussian Processes provide a framework to learn dynamics in a way which adds information about the uncertainty of a prediction.
+This is achieved by learning a distribution over possible models rather than deciding on one single model.
+The choice of which action to take will then be made via optimization over the space of all possible actions for certain amount of decisions in the future.
+Since this problem is highly non-linear and hard to describe analytically, the gradient-free heuristic method of particle swarm optimization is used to solve it.
+
+\section{Reinforcement Learning}
+\subsection{Problem statement}
+\subsection{Model Based Reinforcement Learning}
+\section{Gaussian Processes}
+\subsection{Definition}
+\subsection{Kernel functions}
+\subsection{Regression with GPs}
+\subsection{Sparse Approximations (SPGP)}
+\section{Particle Swarm Optimization}
+\subsection{Basic PSO}
+\subsection{Improvements}

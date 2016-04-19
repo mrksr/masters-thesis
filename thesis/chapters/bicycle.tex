@@ -1,11 +1,10 @@
 \chapter{The Bicycle Benchmark}
 \label{cha:the_bicycle_benchmark}
-
 An example of a system which a computer should learn to control is the bicycle benchmark originally defined by \Randlov{} and \Alstrom{} in 1998~\cite{randlov_learning_1998}.
 The task introduced in this benchmark is to balance a simulated bicycle which travels at a constant speed.
 
 The computer, or agent, takes the place of the rider of the bicycle.
-After fixed time intervals, the controller has to decide how to influence the bicycle by applying some torque $T$ on the handle bars to steer, by displacing the center of mass of the bicycle via leaning over the bicycle by some distance $d$ or both (see \cref{tab:bicycle_actions}).
+After fixed time intervals, the controller has to decide how to influence the bicycle by applying some torque $T$ on the handle bars to steer, by displacing the center of mass of the bicycle via leaning over the bicycle by some distance $d$ or both.
 Besides the short-term goal of preventing the bicycle from falling over, there is also the long-term one of navigating to some predefined goal position.
 To make its decision, the controller is given perfect information about the internal state of the simulation.
 
