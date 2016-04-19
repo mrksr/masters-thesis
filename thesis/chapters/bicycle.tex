@@ -1,7 +1,7 @@
 \chapter{The Bicycle Benchmark}
 \label{cha:the_bicycle_benchmark}
 
-An example of a system which a computer should learn to control is the bicycle benchmark originally defined by \Randlov and \Alstrom in 1998 \cite{randlov_learning_1998}.
+An example of a system which a computer should learn to control is the bicycle benchmark originally defined by \Randlov{} and \Alstrom{} in 1998~\cite{randlov_learning_1998}.
 The task introduced in this benchmark is to balance a simulated bicycle which travels at a constant speed.
 
 The computer, or agent, takes the place of the rider of the bicycle.
@@ -19,7 +19,7 @@ In addition to the two angles, their time-derivatives $\dot{\theta}$ and $\dot{\
 Together with the bicycle's position and rotation in euclidean space, this completely describes the current state of one instance of the bicycle benchmark and is summarized in \cref{tab:bicycle_variables}.
 
 The conservations of angular momentum of the tyres results in interactions between $\theta$ and $\omega$ and their derivatives.
-The equations presented in the following describe the dynamics of the system as introduced in \cite{randlov_learning_1998}.
+The equations presented in the following describe the dynamics of the system as introduced in~\cite{randlov_learning_1998}.
 Two simplifying assumptions have been made:
 Firstly, the front fork is assumed to be vertical, which makes balancing the bicycle more difficult but is not physically impossible.
 And secondly, the equations are not an exact analytical descriptions, as some second and higher order terms have been ignored.
@@ -56,16 +56,16 @@ And secondly, the equations are not an exact analytical descriptions, as some se
 \end{table}
 \begin{table}[p]
     \centering
-    \caption{Physical constants and their values in the bicycle system \cite{randlov_learning_1998}.}
+    \caption{Physical constants and their values in the bicycle system~\cite{randlov_learning_1998}.}
     \label{tab:bicycle_constants}
     \begin{tabularx}{\tablewidth}{cXr}
         \toprule
         Notation & Description & Value \\
         \midrule
+        CM & Center of mass of the bicycle and cyclist in total & \\
         $c$ & Horizontal distance between the point where the front tyre touches the ground and the CM & \SI{66}{\cm} \\
-        \CM & Center of mass of the bicycle and cyclist in total & \\
-        $d_{\CM}$ & Vertical distance between the \CM of the bicycle and the cyclist & \SI{30}{\cm} \\
-        $h$ & Vertical distance between the \CM and the ground & \SI{94}{\cm} \\
+        $d_{\CM}$ & Vertical distance between the CM of the bicycle and the cyclist & \SI{30}{\cm} \\
+        $h$ & Vertical distance between the CM and the ground & \SI{94}{\cm} \\
         $l$ & Distance between the points where the front and back tyres touch the ground & \SI{111}{\cm} \\
         $M_c$ & Mass of the bicycle & \SI{15}{\kg} \\
         $M_d$ & Mass of a tyre & \SI{1.7}{\kg} \\
@@ -100,7 +100,7 @@ And secondly, the equations are not an exact analytical descriptions, as some se
 
 An overview of the geometric interpretations of the state variables can be seen in \cref{fig:bicycle}.
 The interactions between tilt and lean are based on the conservation of angular momentum which is heavily influenced by the moments of inertia of the system.
-The moments of the tyre as displayed in \cref{fig:bicycle:inertia} and the moment of the bicycle and cyclist combined $I_{\text{BC}}$ were estimated by \cite{randlov_learning_1998} as
+The moments of the tyre as displayed in \cref{fig:bicycle:inertia} and the moment of the bicycle and cyclist combined $I_{\text{BC}}$ were estimated by the original definition~\cite{randlov_learning_1998} as
 \begin{align}
     I_{dc} &\coloneqq \hphantom{\frac{1}{2}}M_d r^2\\
     I_{dv} &\coloneqq \frac{3}{2}M_d r^2\\
@@ -173,3 +173,21 @@ Together with the orientation of the front tyre, this gives the derivatives
     \dot{y} &= v_\circ \cdot r_f \cdot \sin(\psi + \theta)
 \end{align}
 of the position of the bicycle.
+
+The original implementation of \Randlov{} and \Alstrom{} uses an explicit Euler scheme to evolve the dynamics of the system for a time step.
+The changes of position and orientation are calculated using the exact analytical solution of moving the tyres along their circular paths.
+To improve accuracy, the implementation developed for this thesis implements a standard Runge-Kutta-Scheme as described in Numerical Recipies~\cite[908]{press_numerical_2007}.
+For ease of implementation, the exact solutions for the orientation and position are also evaluate using Runge-Kutta.
+
+The goal of the bicycle benchmark is to drive the bicycle to the goal area which is assumed to be a circle at the origin of the coordinate system with a radius of 5.
+The bicycle starts in a position which is almost upright, with the state variables $\theta$, $\dot{\theta}$, $\omega$, $\dot{\omega}$ being sampled with from Gaussian noise with a standard deviation of one percent of their value range.
+
+The agent has to choose the two actions $d$ and $T$ (see \cref{tab:bicycle_actions}) every 0.01 seconds, after which they are assumed constant for this time interval.
+After this time, the controller is presented with the current and exact values of the state variables and has to make a new decision.
+The bicycle system is therefore a benchmark which creates time series data.
+Every such time series or episode starts with some predefined start state and consists of pairs of states and the actions chosen by the agent for this state.
+The episode ends in failure if either the bicycle falls over and it ends in success if the bicycle reaches the goal.
+Since it is possible for the bicycle to drive in circles indefinitely, the episode also ends in failure after a certain amount of time has passed.
+
+The next chapter will introduce the current state of the art of solving problems such as the bicycle benchmark using model based reinforcement learning.
+These standard methods will then be applied to the benchmark, followed by approaches incorporating information about uncertainties.
