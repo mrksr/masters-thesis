@@ -1,26 +1,86 @@
 \chapter{State of the Art}
 \label{cha:state_of_the_art}
 The bicycle benchmark is an instance of a problem in a branch of machine learning called reinforcement learning.
-In reinforcement learning, the task is to learn controlling some system by deciding on which actions to take given some information about its current state.
-In contrast to other aspects of machine learning such as supervised learning, there is no expert knowledge available about which actions are good or bad to perform.
-Instead, the agent receives feedback from the environment in form of a numerical reward.
-
-Based on this feedback, the agent must typically build up some understanding of the modelled system in order to reach a higher level goal.
-In the case of the bicycle benchmark, this higher level goal is to avoid falling over, but also be able to control the path bicycle is taking in such a way that it reaches the goal.
-These two aspects might contradict each other, since it could be necessary to increase the risk of falling in the short term by driving along a curve in order to increase the chance of reaching the goal in the long term.
-
-This chapter introduces the notation of reinforcement learning necessary to reason about the bicycle benchmark and similar problems in a mathematical way.
+This chapter gives a brief introduction into reinforcement learning necessary and defines the notation necessary to reason about the bicycle benchmark and similar problems in a mathematical way.
 The approach used in this thesis to solve this problem is called model-based reinforcement learning and is discussed next.
 These models are used to learn the dynamics of the system to be controlled in order to be able to make predictions about its future development.
 The remainder of the chapter will be concerned with introducing two tools used in this approach.
 
 Gaussian Processes provide a framework to learn dynamics in a way which adds information about the uncertainty of a prediction.
 This is achieved by learning a distribution over possible models rather than deciding on one single model.
-The choice of which action to take will then be made via optimization over the space of all possible actions for certain amount of decisions in the future.
+The choice of which action to take will then be made via optimization over the space of all possible actions for a certain amount of decisions into the future.
 Since this problem is highly non-linear and hard to describe analytically, the gradient-free heuristic method of particle swarm optimization is used to solve it.
 
 \section{Reinforcement Learning}
-\subsection{Problem statement}
+\label{sec:reinforcement_learning}
+Consider an agent who wants to learn how to learn how to drive a bicycle to a certain position.
+In the case of a supervised learning environment, an expert who already knows how to solve the problem could tell this agent which actions lead to success.
+In the absence of such a teacher however, the agent must learn from interaction with the bicycle.
+
+An agent might start by applying random actions to the system and quickly fall down, making it impossible to ever reach the goal.
+This gives the agent an opportunity to learn:
+It has to avoid falling down in order to have the chance of achieving its objective.
+Such a feedback is called a reward (or in this case, a punishment) and is the basis on which the agent can learn to judge the viability of actions in a certain state.
+
+After multiple trials, the agent might be able to avoid falling an be able to stabilize the bicycle.
+To achieve this, the agent may have built a basic understanding of how the bicycle system behaves.
+It might have recognized that a bicycle which is already leaning on one side if left alone will fall down because of the gravitational pull or driving in a curve means that the centrifugal force pushes the bicycle to the outside.
+Note that to gain these insights, it is not necessary for the agent to have an understanding of the underlying physics.
+It is enough to observe situations in which the effects play out and generalize from there.
+
+When the agent has learnt how to stabilize the bicycle by driving small corrective curves, it has not yet solved the original task of navigating the bicycle to a specific position.
+It will have to shift its focus from the short-term goal of avoiding falling over to the more high-level and long-term task of following a targeted trajectory.
+Following this trajectory might require some compromises, since driving along a very sharp curve requires the cyclist to lean very precisely.
+In the case that reaching the goal is time-critical, the optimal trajectory would be constrained by the minimum radius of a curve and therefore by the amount the bicycle is allowed to be leaning before falling over.
+
+The requirements an agent faces when solving the bicycle benchmark can however be understood in a more general sense, leading to the problem statement of reinforcement learning.
+In the following, it will be formulated in a mathematical way to allow a principled approach to a solution.
+
+\subsection{Problem Statement}
+\label{sub:problem_statement}
+
+\begin{itemize}
+    \item State and Action Space
+    \item Markov Property
+    \item Which things are Probabilities?
+    \item Episodes and summation to $T$
+    \item Reward shaping (and lack thereof)
+\end{itemize}
+\begin{figure}[htb]
+    \centering
+    \missingfigure[figheight=0.25\textheight]{Agent-Environment-Interaction}
+    \caption{Agent-Environment-Interaction}
+    \label{fig:agent_environment_interaction}
+\end{figure}
+\begin{definition}[Policy]
+    The \emph{policy $\pi$} an agent follows maps states to probability distributions over the action space, i.e.
+    \begin{align}
+        \pi : \Es \to \Pr \left( \Ah \right).
+    \end{align}
+    It encodes the choice an agent makes when faced with a decision.
+\end{definition}
+
+\begin{definition}[Reward Function]
+    The \emph{reward function $\Rwd$} assigns a quality to each state in the state space extended with terminal states:
+    \begin{align}
+        \Rwd : \Es^+ \to \R
+    \end{align}
+    This quality is the immediate feedback an agent receives when interacting with the system.
+\end{definition}
+
+\begin{definition}[Value Function]
+    Given a policy $\pi$, a time horizon $T \in \N \cup \left\{ \infty \right\}$ and a discount factor $0 \leq \gamma \leq 1$, the \emph{value function $\Vlu^\pi$} denotes the expected long-term reward of a state and is given by
+    \begin{align}
+        \Vlu^\pi : \left\{
+            \begin{aligned}
+                \Es^+ &\to \R \\
+                s &\mapsto \E \cond*{\sum_{t=0}^T \gamma^t \Rwd \left( \rv{s_t} \right) \given \pi, \rv{s_0} = s }.
+            \end{aligned}
+        \right.
+    \end{align}
+    If the time horizon is infinite, $\gamma$ must be smaller than 1.
+\end{definition}
+
 \subsection{Model Based Reinforcement Learning}
 \section{Gaussian Processes}
 \subsection{Definition}
