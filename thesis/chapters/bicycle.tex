@@ -1,6 +1,6 @@
 \chapter{The Bicycle Benchmark}
 \label{cha:the_bicycle_benchmark}
-An example of a system which a computer should learn to control is the bicycle benchmark originally defined by \Randlov{} and \Alstrom{} in 1998~\cite{randlov_learning_1998}.
+An example of a system which a computer should learn to control is the bicycle benchmark originally defined by \citeauthor{randlov_learning_1998} in 1998~\cite{randlov_learning_1998}.
 The task introduced in this benchmark is to balance a simulated bicycle which travels at a constant speed.
 
 The computer, or agent, takes the place of the rider of the bicycle.
@@ -173,7 +173,7 @@ Together with the orientation of the front tyre, this gives the derivatives
 \end{align}
 of the position of the bicycle.
 
-The original implementation of \Randlov{} and \Alstrom{} uses an explicit Euler scheme to evolve the dynamics of the system for a time step.
+The original implementation of \citeauthor{randlov_learning_1998} uses an explicit Euler scheme to evolve the dynamics of the system for a time step.
 The changes of position and orientation are calculated using the exact analytical solution of moving the tyres along their circular paths.
 To improve accuracy, the implementation developed for this thesis implements a standard Runge-Kutta-Scheme as described in Numerical Recipies~\cite[908]{press_numerical_2007}.
 For ease of implementation, the exact solutions for the orientation and position are also evaluate using Runge-Kutta.

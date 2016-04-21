@@ -38,35 +38,75 @@ In the following, it will be formulated in a mathematical way to allow a princip
 
 \subsection{Problem Statement}
 \label{sub:problem_statement}
-
-\begin{itemize}
-    \item State and Action Space
-    \item Markov Property
-    \item Which things are Probabilities?
-    \item Episodes and summation to $T$
-    \item Reward shaping (and lack thereof)
-\end{itemize}
+Reinforcement learning is meant to catch the general problem of learning by interaction to control a system in order to achieve a predefined goal.
+In order to achieve this goal, the learning entity or \emph{agent} has to decide on specific actions to influence its \emph{environment}, which is everything outside of the agent.
+The boundary between agent and environment is a well-defined and narrow interface illustrated in \cref{fig:agent_environment_interaction}.
+They interact via this interface at specific discrete \emph{time steps}, usually indexed with the natural numbers.
 \begin{figure}[htb]
     \centering
     \missingfigure[figheight=0.25\textheight]{Agent-Environment-Interaction}
     \caption{Agent-Environment-Interaction}
     \label{fig:agent_environment_interaction}
 \end{figure}
+
+At every such time step $t$, the agent can observe the environment and receives some information in form of its \emph{state} $s_t \in \Es$, where $\Es$ is the space of all possible states and will for the remainder of the thesis be assumed to be a finite-dimensional vector space over the real numbers.
+Based on this information, the agent has to decide on which action $a_t \in \Ah$ to perform.
+The space of all possible actions $\Ah$ is also assumed to be a finite-dimensional vector space over the real numbers and is the same for all time steps and states.
+
+The decision-process an agent employs in order to choose an action is called the agent's \emph{policy}.
+A policy is a function which maps states to actions.
+Policies are often encoded in closed forms such as linear functions \cite{deisenroth_efficient_2010}.
 \begin{definition}[Policy]
-    The \emph{policy $\pi$} an agent follows maps states to probability distributions over the action space, i.e.
+    A \emph{policy $\pi$} an agent follows encodes the choice an agent makes when faced with a decision.
+    It is a function
     \begin{align}
-        \pi : \Es \to \Pr \left( \Ah \right).
+        \pi : \Es \to \Ah
     \end{align}
-    It encodes the choice an agent makes when faced with a decision.
+    which maps the state the system currently is in to the action the agent will perform.
 \end{definition}
 
-\begin{definition}[Reward Function]
-    The \emph{reward function $\Rwd$} assigns a quality to each state in the state space extended with terminal states:
+Once the agent has chosen an action for time step $t$, the \emph{transition dynamics} of the system determine the state $s_{t+1}$.
+These dynamics are unknown to the agent and can be subject to probabilistic factors such as noise.
+While the agent will always observe one single element $s_{t+1} \in \Es$ when prompted for the next decision, the transition dynamics return a probability distribution over the possible next states.
+
+Many problems like the bicycle benchmark have a natural notion of states which are \emph{terminal}.
+If the cyclist falls down or reaches the goal, the interaction between the agent and the environment comes to an end and there are no more decisions to make.
+Such tasks are called \emph{episodic} and one sequence from a start state to a terminal state is called an \emph{episode}.
+Notationally, $\Tee$ is defined to be the set of all terminal states with $\Tee \cap \Es = \emptyset$.
+An episode ends when the transition dynamics return a state which is in $\Tee$.
+The set $\Es \cup \Tee$ is called the \emph{extended state space $\Es^+$} and combines both non-terminal and terminal states.
+A task which does not have terminal states is called \emph{continuous} and has episodes of infinite length.
+
+\begin{definition}[Transition Dynamics]
+    The \emph{transition dynamics $\Dyn$} of a system encode the physical behaviour of a system.
+    These dynamics
     \begin{align}
-        \Rwd : \Es^+ \to \R
+        \Dyn : \Es \times \Ah \to \Dists(\Es^+)
     \end{align}
-    This quality is the immediate feedback an agent receives when interacting with the system.
+    mapping a state and an action to a distribution over possibly terminal states stay constant over time but can be probabilistic in nature.
 \end{definition}
+An important observation following from this definition is that the transition dynamics fulfill the Markov property \cite{sutton_reinforcement_1998}.
+This means that the distribution of the state $s_{t+1}$ is independent of all states before $s_t$ given $s_t$.
+In other words, the transition dynamics only depend on the present state of the system and are conditionally independent of the past.
+
+At time step $t+1$, the agent observes the environment again in the form of the state $s_{t+1}$.
+Additionally, it also receives immediate feedback about this new state called the \emph{reward $r_{t+1}$}.
+The reward is a quality assigned to each state and serves as a measure of how good a state to be in it is.
+This measure is independent of future or past development.
+It is obtained from a real-valued \emph{reward function $\Rwd$} such that $r_{t+1} = \Rwd(s_{t+1})$.
+\begin{definition}[Reward Function]
+    The \emph{reward function $\Rwd$} assigns a quality to each state in the extended state space and has the signature
+    \begin{align}
+        \Rwd : \Es^+ \to \R.
+    \end{align}
+    This reward is the immediate feedback an agent receives when interacting with the system.
+\end{definition}
+
+The goal of the agent is to maximize the sum of all rewards earned throughout an episode.
+A greedy agent which is only concerned about the next immediate reward might not be the most successful, since it may be necessary to make a decision which is bad in the short term to gain an advantage in the long term, such as sacrificing a piece in chess to end up in a better position overall.
+
+The \emph{value function} is a measure for how good a policy behaves in the long-run.
+Given a policy and a start state, it is defined as the expected sum of rewards earned in a time horizon $T$.
 
 \begin{definition}[Value Function]
     Given a policy $\pi$, a time horizon $T \in \N \cup \left\{ \infty \right\}$ and a discount factor $0 \leq \gamma \leq 1$, the \emph{value function $\Vlu^\pi$} denotes the expected long-term reward of a state and is given by
