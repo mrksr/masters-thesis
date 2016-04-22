@@ -107,6 +107,25 @@ A greedy agent which is only concerned about the next immediate reward might not
 
 The \emph{value function} is a measure for how good a policy behaves in the long-run.
 Given a policy and a start state, it is defined as the expected sum of rewards earned in a time horizon $T$.
+Since the transition dynamics are assumed to be probabilistic, the states at all time steps greater than zero are random variables.
+Given a distribution of the state $\rv{s_t}$, the distribution for the next state $\rv{s_{t+1}}$ for all $t \in \N_{>0}$ can be calculated as
+\begin{align}
+    \Prob{\rv{s_{t+1}}} &= \int \Prob{\rv{s_{t+1}} \given \rv{s_t}, \pi}\Prob{\rv{s_t}} \diff \rv{s_t} \\
+    \intertext{where}
+    \Prob{\rv{s_{t+1}} \given \rv{s_t}, \pi} &= \begin{cases}
+        \delta_{\rv{s_t}, \rv{s_{t+1}}} & \text{ if $\rv{s_t} \in \Tee$} \\
+        \Dyn\Cond{\rv{s_{t+1}} \given \rv{s_t}, \pi(\rv{s_t})} & \text{ otherwise.}
+    \end{cases}
+\end{align}
+Here, $\delta$ denotes the Dirac-delta-function and the notation $\Dyn\Cond{\rv{s_{t+1}} \given \rv{s_t}, \pi(\rv{s_t})}$ means the probability of $\rv{s_{t+1}}$ under the distribution $\Dyn(\rv{s_t}, \pi(\rv{s_t}))$.
+Once the dynamics have reached a terminal state, all future states will be this same state.
+This extends all episodes to potentially infinite length.
+
+The time horizon $T$ can be chosen freely but does not depend on either the current policy or state.
+The larger the time horizon, the more far-sighted a agent has to be to be successful.
+For large values of $T$, it can be helpful to focus to weigh potential rewards further into the future less.
+This can be achieved using the discount factor $\gamma$ which is a constant real number between zero and one.
+In the case of an infinite time horizon, $\gamma$ must be chosen smaller than one to ensure the well-definedness of the function.
 
 \begin{definition}[Value Function]
     Given a policy $\pi$, a time horizon $T \in \N \cup \left\{ \infty \right\}$ and a discount factor $0 \leq \gamma \leq 1$, the \emph{value function $\Vlu^\pi$} denotes the expected long-term reward of a state and is given by
@@ -114,12 +133,22 @@ Given a policy and a start state, it is defined as the expected sum of rewards e
         \Vlu^\pi : \left\{
             \begin{aligned}
                 \Es^+ &\to \R \\
-                s &\mapsto \E \cond*{\sum_{t=0}^T \gamma^t \Rwd \left( \rv{s_t} \right) \given \pi, \rv{s_0} = s }.
+                s &\mapsto \Moment*{\E}{\sum_{t=0}^T \gamma^t \Rwd \left( \rv{s_t} \right) \given \pi, \rv{s_0} = s }.
             \end{aligned}
         \right.
     \end{align}
     If the time horizon is infinite, $\gamma$ must be smaller than 1.
 \end{definition}
+
+Assume now a known distribution of possible start states $\Prob{\rv{s_0}}$.
+The sets $\Es^+$ and $\Ah$ of states and actions together with the transition dynamics $\Dyn$, the reward function $\Rwd$ and this distribution $\Prob{\rv{s_0}}$ defines a fully observable Markov decision process (MDP) \cite{sutton_reinforcement_1998,murphy_machine_2012}.
+
+The objective of the reinforcement learning problem stated here is to find the most successful policy to control this decision process under the assumption that no expert knowledge about the transition dynamics is available.
+This optimal policy $\pi^*$ maximizes the expected value for all start states, that is it solves the optimization problem
+\begin{align}
+    \pi^* &= \argmax_{\pi} \Moment*{\E_{\rv{s_0}}}{V^\pi} \\
+    &= \argmax_{\pi} \int V^\pi(\rv{s_0}) \Prob{\rv{s_0}} \diff \rv{s_0}.
+\end{align}
 
 \subsection{Model Based Reinforcement Learning}
 \section{Gaussian Processes}

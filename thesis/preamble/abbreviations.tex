@@ -10,16 +10,21 @@
 \newcommand{\mat}[1]{\mathbf{#1}}
 \renewcommand{\emptyset}{\varnothing}
 
+\DeclareMathOperator*{\argmax}{argmax}
+\DeclareMathOperator*{\argmin}{argmin}
 \DeclareMathOperator{\sgn}{sgn}
 \DeclareMathOperator{\E}{\mathbb{E}}
 \DeclareMathOperator{\Dists}{\mathcal{P}}
 \DeclareMathOperator{\Rwd}{\mathbf{R}}
 \DeclareMathOperator{\Vlu}{\mathbf{V}}
-\DeclareMathOperator{\Dyn}{\Pi}
+\DeclareMathOperator{\Dyn}{f}
+\DeclareMathOperator{\p}{p}
+\newcommand*\diff{\mathop{}\!\mathrm{d}}
 
 \DeclarePairedDelimiter{\abs}{\vert}{\vert}
+% Probabilities
 \providecommand\given{}
-\DeclarePairedDelimiterX{\cond}[1]{[}{]}{
+\DeclarePairedDelimiterX{\Cond}[1]{(}{)}{
 \renewcommand\given{%
   \nonscript\:
   \delimsize\vert
@@ -27,6 +32,17 @@
   \mathopen{}
   \allowbreak}
 #1
+}
+\newcommand{\Prob}{\p\Cond}
+
+\DeclarePairedDelimiterXPP{\Moment}[2]{#1}{[}{]}{}{
+\renewcommand\given{%
+  \nonscript\:
+  \delimsize\vert
+  \nonscript\:
+  \mathopen{}
+  \allowbreak}
+#2
 }
 
 % Constants
