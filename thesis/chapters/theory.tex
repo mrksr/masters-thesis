@@ -146,16 +146,49 @@ The sets $\Es^+$ and $\Ah$ of states and actions together with the transition dy
 The objective of the reinforcement learning problem stated here is to find the most successful policy to control this decision process under the assumption that no expert knowledge about the transition dynamics is available.
 This optimal policy $\pi^*$ maximizes the expected value for all start states, that is it solves the optimization problem
 \begin{align}
-    \pi^* &= \argmax_{\pi} \Moment*{\E_{\rv{s_0}}}{V^\pi} \\
+    \label{eq:optimal_policy}
+    \pi^* &= \argmax_{\pi} \Moment*{\E_{\rv{s_0}}}{V^\pi(\rv{s_0})} \\
     &= \argmax_{\pi} \int V^\pi(\rv{s_0}) \Prob{\rv{s_0}} \diff \rv{s_0}.
 \end{align}
 
-\subsection{Model Based Reinforcement Learning}
-\section{Gaussian Processes}
+There is a multitude of different approaches of arriving at such an optimal policy.
+The following will introduce the important distinction of model-based and model-free methods and give a high level view of how the former will be used within this thesis.
+
+\subsection{Model-Based Reinforcement Learning}
+To find a good policy, an agent has to gain experience about its environment via interaction.
+In \emph{direct reinforcement learning} \cite{sutton_reinforcement_1998}, or model-free methods, this experience is used to update the current policy or its value function directly.
+After enough time spent with the system, iteratively improving the current policy can converge to the optimal policy.
+
+In \emph{model-based} reinforcement learning, the experience is used to learn an internal representation of the transition dynamics $\Dyn$.
+This allows the agent to make predictions about the future behaviour of the system and therefore approximatively evaluate the value function without actually interacting with the system.
+A closed-form policy can then be found by solving the non-linear optimization problem proposed in \cref{eq:optimal_policy}.
+
+\citeauthor{deisenroth_efficient_2010} \cite{deisenroth_efficient_2010} describes an algorithmic scheme called PILCO in which phases of exploration on the real system to gather more data to improve the internal model alternate with phases of improvement of the current policy based on this internal simulation.
+This iteration allows the agent to explore promising directions in the state space using intermediate policies.
+
+In this thesis however, it is assumed that all interaction with the system has to happen before any learning can take place.
+This assumption is sensible in the context of industrial applications where interactions with a system can be very expensive and dangerous and where a possibly bad agent cannot be allowed to choose actions to perform.
+Instead of allowing interaction, the agent is presented with a data set of observations of the transition dynamics in the form of tuples $(\mat{s_t}, \mat{a_t}, \mat{s_{t+1}})$.
+These observations can be obtained via a mix of random exploration and actions chosen by a sub-optimal controller.
+
+Using an internal representation instead of the real transition dynamics to choose actions leads to one of the major drawbacks of model-based reinforcement learning.
+If this representation does not capture the important characteristics of the original system well, a policy found to be optimal on the simulation might not lead to good results on the correct dynamics.
+This effect is called the \emph{model bias} of a policy.
+
+Reducing this model bias is the main goal of explicitly representing uncertainties within this thesis.
+Instead of focusing on one single dynamics model, a probabilistic representation of all plausible models to explain the observed data will be considered.
+This yields a measure of uncertainty of predictions one step into the future and can be extended to long-term predictions as required in the value function.
+Assuming deterministic transition dynamics such as the bicycle benchmark, this measure does not describe a property of the system but rather the uncertainty about the model itself.
+
+Gaussian Processes provide a framework to represent such a distribution over possible dynamic models.
+The following will introduce their definition and how they can be used to solve regression problems.
+The last part of this chapter will be concerned with introducing a policy-representation based on these results which does not depend on a closed-form solution.
+
+\section{Gaussian Process Regression}
 \subsection{Definition}
 \subsection{Kernel functions}
-\subsection{Regression with GPs}
-\subsection{Sparse Approximations (SPGP)}
+\subsection{Inference and Prediction}
+\subsection{Sparse Approximations using Inducing Inputs}
 \section{Particle Swarm Optimization}
 \subsection{Basic PSO}
 \subsection{Improvements}

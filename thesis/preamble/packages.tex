@@ -35,7 +35,7 @@
 %%%%%%%%%%%%
 \usepackage{xcolor}
 \usepackage{graphicx}
-\usepackage[framemethod=TikZ]{mdframed}
+\usepackage[framemethod=TikZ, nobreak]{mdframed}
 \usepackage[font=small, labelfont=bf, format=plain, indention=1em]{caption}
 \usepackage{subcaption}
 \usepackage{scrpage2}
@@ -63,6 +63,9 @@
 \usepackage[pdftex, hypertexnames=false, unicode]{hyperref}
 \usepackage[nameinlink, noabbrev]{cleveref}
 \usepackage[style=alphabetic, backend=biber]{biblatex}
+% Fix for autonum
+\let\globcount\newcount
+\usepackage{autonum}
 
 %%%%%%%%%%
 %  KOMA  %
