@@ -185,10 +185,108 @@ The following will introduce their definition and how they can be used to solve 
 The last part of this chapter will be concerned with introducing a policy-representation based on these results which does not depend on a closed-form solution.
 
 \section{Gaussian Process Regression}
+\begin{itemize}
+    \item Modelling $\Dyn$ is a regression problem
+    \item Define regression Problem
+    \item Solution in classical control context
+\end{itemize}
 \subsection{Definition}
-\subsection{Kernel functions}
-\subsection{Inference and Prediction}
+\begin{itemize}
+    \item High-level intro to Stochastic processes
+\end{itemize}
+\begin{definition}[Stochastic Process]
+    \label{def:stochastic_process}
+    Given a probability space $(\Omega, \mathcal{F}, P)$, an index set $T$ and a measurable space $Y$, a \emph{stochastic process $\rv{X}$} is a function
+    \begin{align}
+        \rv{X} : \left\{\begin{aligned}
+            T \times \Omega &\to Y \\
+            (t, \omega) &\mapsto \rv{X_t}(\omega)
+        \end{aligned}\right.
+    \end{align}
+    mapping indices $t$ to $Y$-valued random-variables.
+    For a fixed $\omega \in \Omega$, $\rv{X}(\cdot, \omega)$ is called a \emph{trajectory} of the process \cite{astrom_introduction_1971}.
+\end{definition}
+\begin{definition}[Gaussian Process]
+    \label{def:gaussian_process}
+    A stochastic process $\rv{X}$ is called a \emph{Gaussian process} if for any finite subset $\tau \subseteq T$ of its index set, the random variables $\rv{X}_\tau$ have a joint Gaussian distribution \cite{astrom_introduction_1971}.
+\end{definition}
+\begin{itemize}
+    \item Mean-Function, Covariance-Function
+    \item Notational things $\Dyn \sim \GP\Cond*{0, \K(\cdot, \cdot)}$
+\end{itemize}
+
+\subsection{Prior: Kernels}
+\begin{definition}[Gram Matrix]
+    Given a non-empty set $M$, a function $\K : M^2 \to \R$ and two sets $X = \Set*{x_i \in M \with i \in [n]}$ and $Y = \Set*{y_j \in M \with j \in [m]}$.
+    The $n \times m$ matrix
+    \begin{align}
+        \K(X, Y) \coloneqq \bigg( \K(x_i, y_j) \bigg)_{\substack{i \in [n], \\ j \in [m]}}
+    \end{align}
+    is called the \emph{Gram matrix} of $\K$ with respect to $X$ and $Y$ \cite{scholkopf_learning_2002}.
+\end{definition}
+\begin{definition}[Kernel]
+    Given a non-empty set $M$, a function
+    \begin{align}
+        \K : M^2 \to \R
+    \end{align}
+    is called a \emph{(positive definite) kernel} or \emph{covariance function}, if for any subset $X \subseteq M$, the Gram matrix $\K(X, X)$ is positive definite \cite{scholkopf_learning_2002}.
+\end{definition}
+\begin{definition}[Linear Kernel]
+    For a finite dimensional euclidean vector space $\R^d$, the \emph{linear kernel} is defined as
+    \begin{align}
+        \K_{\text{linear}}(\mat{x}, \mat{y}) \coloneqq \sigma_f^2 \cdot \mat{x}^T \mat{y} = \sigma_f^2 \left\langle \mat{x}, \mat{y}\right\rangle.
+    \end{align}
+    The parameter $\sigma_f^2 \in \R_{>0}$ is called the \emph{signal variance}.
+\end{definition}
+\begin{definition}[White Noise Kernel]
+    The \emph{white noise kernel} is defined as
+    \begin{align}
+        \K_{\text{noise}}(\mat{x}, \mat{y}) \coloneqq \begin{cases}
+            \sigma_n^2 & \text{ if $\mat{x} = \mat{y}$} \\
+            0 & \text{ otherwise.}
+        \end{cases}
+    \end{align}
+    The parameter $\sigma_n^2 \in \R_{>0}$ is called the \emph{signal variance}.
+\end{definition}
+\begin{definition}[Squared Exponential Kernel]
+    For a finite dimensional euclidean vector space $\R^d$, the \emph{squared exponential kernel} (or \emph{RBF kernel}) is defined as
+    \begin{align}
+        \K_{\text{SE}} \coloneqq \sigma_f^2 \cdot \exp \left( -\frac{1}{2} (\mat{x} - \mat{y})^T \mat{\Lambda}^{-1} (\mat{x} - \mat{y}) \right).
+    \end{align}
+    The parameter $\sigma_f^2 \in \R_{>0}$ is called the \emph{signal variance} and $\mat{\Lambda} = \diag(l_1^2, \dots, l_d^2)$ is a diagonal matrix of the squared \emph{lengthscales} $l_i \in \R_{>0}$.
+\end{definition}
+\begin{itemize}
+    \item Sampling from Kernels without any data
+\end{itemize}
+
+\subsection{Posterior: Bayesian Inference}
+\begin{itemize}
+    \item Description of Data Set
+    \item Description of hyperparameters
+    \item Comparison of hyperparameter values
+    \item Likelihood Function
+    \item Maximum Likelihood optimization
+\end{itemize}
+
+\subsection{Predictions}
+\begin{lemma}[GP predictive posterior]
+    content
+\end{lemma}
+
 \subsection{Sparse Approximations using Inducing Inputs}
+\begin{itemize}
+    \item Definition of Pseudo-Inputs
+    \item Common Distribution
+    \item Likelihood Function
+    \item Special Kernel Function
+    \item Predictive Posterior
+    \item Asymptotic behviour
+    \item Differences of Titsias approach
+\end{itemize}
+\begin{lemma}[SPGP predictive posterior]
+    content
+\end{lemma}
+
 \section{Particle Swarm Optimization}
 \subsection{Basic PSO}
 \subsection{Improvements}

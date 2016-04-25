@@ -1,4 +1,4 @@
-% Mathematical things
+% Sets
 \newcommand{\N}{\mathbb{N}}
 \newcommand{\Z}{\mathbb{Z}}
 \newcommand{\R}{\mathbb{R}}
@@ -6,22 +6,37 @@
 \newcommand{\Ah}{\mathcal{A}}
 \newcommand{\Tee}{\mathcal{T}}
 
-\newcommand{\rv}[1]{\mathbf{#1}}
-\newcommand{\mat}[1]{\mathbf{#1}}
+% Random Variable
+\newcommand{\rv}[1]{\bm{#1}}
+% Matrix
+\newcommand{\mat}[1]{\bm{#1}}
+% Pseudo Inputs
+\newcommand{\ps}[1]{\bar{#1}}
+\newcommand{\psmat}[1]{\ps{\mat{#1}}}
+
+% Nicer empty set
 \renewcommand{\emptyset}{\varnothing}
 
+% Math operators
 \DeclareMathOperator*{\argmax}{argmax}
 \DeclareMathOperator*{\argmin}{argmin}
 \DeclareMathOperator{\sgn}{sgn}
-\DeclareMathOperator{\E}{\mathbb{E}}
+\DeclareMathOperator{\diag}{diag}
+
 \DeclareMathOperator{\D}{\mathcal{D}}
 \DeclareMathOperator{\Dists}{\mathcal{P}}
 \DeclareMathOperator{\Rwd}{\mathbf{R}}
 \DeclareMathOperator{\Vlu}{\mathbf{V}}
 \DeclareMathOperator{\Dyn}{f}
-\DeclareMathOperator{\p}{p}
 \newcommand*\diff{\mathop{}\!\mathrm{d}}
 
+\DeclareMathOperator{\E}{\mathbb{E}}
+\DeclareMathOperator{\p}{p}
+\DeclareMathOperator{\K}{\mathcal{K}}
+\DeclareMathOperator{\Q}{\mathcal{Q}}
+\DeclareMathOperator{\GP}{\mathcal{GP}}
+
+% Functions
 \DeclarePairedDelimiter{\abs}{\vert}{\vert}
 % Probabilities
 \providecommand\given{}
@@ -46,5 +61,15 @@
 #2
 }
 
+\providecommand\with{}
+\DeclarePairedDelimiterX{\Set}[1]{\{}{\}}{
+\renewcommand\with{%
+  \nonscript\:
+  \delimsize\vert
+  \nonscript\:
+  \mathopen{}
+  \allowbreak}
+#1
+}
 % Constants
 \newcommand{\CM}{\text{CM}}
