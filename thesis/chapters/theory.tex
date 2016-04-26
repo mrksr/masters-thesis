@@ -147,7 +147,7 @@ The objective of the reinforcement learning problem stated here is to find the m
 This optimal policy $\pi^*$ maximizes the expected value for all start states, that is it solves the optimization problem
 \begin{align}
     \label{eq:optimal_policy}
-    \pi^* &= \argmax_{\pi} \Moment*{\E_{\rv{s_0}}}{V^\pi(\rv{s_0})} \\
+    \pi^* &\in \argmax_{\pi} \Moment*{\E_{\rv{s_0}}}{V^\pi(\rv{s_0})} \\
     &= \argmax_{\pi} \int V^\pi(\rv{s_0}) \Prob{\rv{s_0}} \diff \rv{s_0}.
 \end{align}
 
@@ -212,15 +212,16 @@ The last part of this chapter will be concerned with introducing a policy-repres
 \end{definition}
 \begin{itemize}
     \item Mean-Function, Covariance-Function
+    \item Assumption of mean function equal to zero
     \item Notational things $\Dyn \sim \GP\Cond*{0, \K(\cdot, \cdot)}$
 \end{itemize}
 
-\subsection{Prior: Kernels}
+\subsection{Kernels}
 \begin{definition}[Gram Matrix]
     Given a non-empty set $M$, a function $\K : M^2 \to \R$ and two sets $X = \Set*{x_i \in M \with i \in [n]}$ and $Y = \Set*{y_j \in M \with j \in [m]}$.
     The $n \times m$ matrix
     \begin{align}
-        \K(X, Y) \coloneqq \bigg( \K(x_i, y_j) \bigg)_{\substack{i \in [n], \\ j \in [m]}}
+        \K(X, Y) = \mat{K_{XY}} \coloneqq \bigg( \K(x_i, y_j) \bigg)_{\substack{i \in [n], \\ j \in [m]}}
     \end{align}
     is called the \emph{Gram matrix} of $\K$ with respect to $X$ and $Y$ \cite{scholkopf_learning_2002}.
 \end{definition}
@@ -234,19 +235,8 @@ The last part of this chapter will be concerned with introducing a policy-repres
 \begin{definition}[Linear Kernel]
     For a finite dimensional euclidean vector space $\R^d$, the \emph{linear kernel} is defined as
     \begin{align}
-        \K_{\text{linear}}(\mat{x}, \mat{y}) \coloneqq \sigma_f^2 \cdot \mat{x}^T \mat{y} = \sigma_f^2 \left\langle \mat{x}, \mat{y}\right\rangle.
+        \K_{\text{linear}}(\mat{x}, \mat{y}) \coloneqq \mat{x}^T \mat{y} = \left\langle \mat{x}, \mat{y}\right\rangle.
     \end{align}
-    The parameter $\sigma_f^2 \in \R_{>0}$ is called the \emph{signal variance}.
-\end{definition}
-\begin{definition}[White Noise Kernel]
-    The \emph{white noise kernel} is defined as
-    \begin{align}
-        \K_{\text{noise}}(\mat{x}, \mat{y}) \coloneqq \begin{cases}
-            \sigma_n^2 & \text{ if $\mat{x} = \mat{y}$} \\
-            0 & \text{ otherwise.}
-        \end{cases}
-    \end{align}
-    The parameter $\sigma_n^2 \in \R_{>0}$ is called the \emph{signal variance}.
 \end{definition}
 \begin{definition}[Squared Exponential Kernel]
     For a finite dimensional euclidean vector space $\R^d$, the \emph{squared exponential kernel} (or \emph{RBF kernel}) is defined as
@@ -257,21 +247,82 @@ The last part of this chapter will be concerned with introducing a policy-repres
 \end{definition}
 \begin{itemize}
     \item Sampling from Kernels without any data
-\end{itemize}
-
-\subsection{Posterior: Bayesian Inference}
-\begin{itemize}
-    \item Description of Data Set
     \item Description of hyperparameters
     \item Comparison of hyperparameter values
-    \item Likelihood Function
-    \item Maximum Likelihood optimization
 \end{itemize}
 
-\subsection{Predictions}
+\subsection{Predictions and Posterior}
+We observe some data
+$\D = \left\{ \mat{X}, \mat{y} \right\}$ with $\mat{y} = f(\mat{X}) + \Gaussian{\mat{0}, \sigma_n^2 \Eye}$
+where the noise assumption means that for $\mat{X}$ there is a slightly different covariance
+\begin{align}
+    \mat{\Sigma_y} = \K(\mat{X}, \mat{X}) + \sigma_n^2 \Eye
+\end{align}
+other than thet, the definition directly yields for some new points $\mat{X_\ast}$ that
+\begin{align}
+    \begin{pmatrix}
+        \mat{y} \\
+        \mat{f_\ast}
+    \end{pmatrix} &\sim \Gaussian*{\mat{0}, \begin{bmatrix}
+        \K(\mat{X}, \mat{X}) + \sigma_n^2 \Eye & \K(\mat{X}, \mat{X_\ast}) \\
+        \K(\mat{X_\ast}, \mat{X}) & \K(\mat{X_\ast}, \mat{X_\ast})
+    \end{bmatrix}} \\
+    &= \Gaussian*{\mat{0}, \begin{bmatrix}
+        \mat{K_N} + \sigma_n^2 \Eye & \mat{K_{N\ast}} \\
+        \mat{K_{\ast N}} & \mat{K_{\ast}}
+    \end{bmatrix}}
+\end{align}
+
+Using operations on Gaussians this gives us
 \begin{lemma}[GP predictive posterior]
-    content
+    Given a latent function with a Gaussian process distribution $f \sim \GP(\mat{0}, \K)$ and training points $\mat{X}$ with noisy observations of the form $\mat{y} = f(\mat{X}) + \Gaussian{\mat{0}, \sigma_n^2 \Eye}$.
+    The predictive posterior $\mat{f_\ast}$ of the test points $\mat{X_\ast}$ is then given by
+    \begin{align}
+        \Prob{\mat{f_\ast} \given \mat{X}, \mat{y}, \mat{X_\ast}} &= \Gaussian*{\mat{f_\ast} \given \mat{\mu_\ast}, \mat{\Sigma_\ast}} \text{, where} \\
+        \mat{\mu_\ast} &= \mat{K_{\ast N}} \left( \mat{K_N} + \sigma_n^2 \Eye \right)^{-1} \mat{y} \\
+        \mat{\Sigma_\ast} &= \mat{K_\ast} - \mat{K_{\ast N}} \left( \mat{K_N} + \sigma_n^2 \Eye \right)^{-1} \mat{K_{N\ast}}.
+    \end{align}
 \end{lemma}
+
+Lastly, we can interpret this in terms of Gaussian posteriors: The posterior distribution $\Prob{f \given \mat{X}, \mat{y}, \mat{\theta}}$ is a GP with new mean and covariance-functions stated above.
+
+\subsection{Choosing hyperparameters}
+Proper Bayesian way means choosing a prior for $\mat{\theta}$.
+\begin{align}
+    \Prob{f} &= \int \Prob{f \given \mat{\theta}} \Prob{\mat{\theta}} \diff \theta \\
+    \Prob{\mat{y} \given \mat{X}} &= \int \Prob{\mat{y} \given \mat{X}, \mat{\theta}} \Prob{\mat{\theta}} \diff \mat{\theta}
+\end{align}
+But this is not doable since we cannot solve the integral \cite[109]{rasmussen_gaussian_2006}. <Good Argument here>.
+
+Instead: Do a point estimate. Next best thing would be a MAP estimate:
+\begin{align}
+    \Prob{\mat{\theta} \given \mat{X}, \mat{y}} &= \frac{\Prob{\mat{y} \given \mat{X}, \mat{\theta}} \Prob{\mat{\theta}}}{\Prob{\mat{y} \given \mat{X}}} \\ &= \frac{\Prob{\mat{y} \given \mat{X}, \mat{\theta}} \Prob{\mat{\theta}}}{\int \Prob{\mat{y} \given \mat{X}, \mat{\theta}} \Prob{\mat{\theta}} \diff \theta}
+\end{align}
+But again: Solving this in general is hard.
+If we assume a flat prior for $\mat{\theta}$ (i.e. a "uniform" distribution), then we have that
+\begin{align}
+    \Prob{\mat{\theta} \mid \mat{X}, \mat{y}} \propto \Prob{\mat{y} \given \mat{X}, \mat{\theta}}
+\end{align}
+and we can do maximum (marginal) likelihood:
+\begin{align}
+    \mat{\theta}^\ast &\in \argmax_{\mat{\theta}} \Prob{\mat{y} \given \mat{X}, \mat{\theta}}
+\end{align}
+
+This one we can solve, since with $\mat{f} \coloneqq f(\mat{X})$ we have
+\begin{align}
+    \Prob{\mat{y} \given \mat{X}, \mat{\theta}} &= \int \Gaussian{\mat{y} \given \mat{f}, \sigma_n^2 \Eye} \Prob{\mat{f} \given \mat{X}, \mat{\theta}} \diff \mat{f} \\
+    &= \int \Gaussian{\mat{y} \given \mat{f}, \sigma_n^2 \Eye} \cdot \Gaussian{\mat{f} \given \mat{0}, \mat{K_N}} \diff \mat{f}
+\end{align}
+Using standard results about Gaussians we have
+\begin{align}
+-\log\Prob{\mat{y} \given \mat{X}, \mat{\theta}} = 
+    \underbracket[1pt]{\frac{1}{2} \mat{y^T} \left( \mat{K_N} + \sigma_n^2 \Eye \right)^{-1} \mat{y}}_{\text{data-fit term}} +
+    \underbracket[1pt]{\frac{1}{2} \log \abs{\mat{K_N} + \sigma_n^2 \Eye}}_{\text{complexity term}} +
+    \frac{N}{2} \log(2\pi)
+\end{align}
+which can be solved using nonlinear optimization.
+This is called a \emph{type II maximum likelihood estimate (ML-II)} since it optimizes over the marginal likelihood.
+This implements Occam's razor by the way. Which we should maybe skip.
 
 \subsection{Sparse Approximations using Inducing Inputs}
 \begin{itemize}
