@@ -199,7 +199,7 @@ While the physics of driving a bicycle is understood quite well and can be descr
 In this setting, solving the regression problem corresponds to a choice of parameters $\gamma^\ast$ which explain the observations of the true system best.
 
 In a Bayesian context, instead of deciding on one specific vector of parameters, it might be more interesting to derive a distribution $\Prob{\gamma^*}$ of probable parameter values which then represents the uncertainty about their true value.
-When making a prediction for a new input point $\mat{x_\ast}$, this uncertainty can be used to derive a joint distribution $\Prob{y_\ast \given \mat{x_\ast}, \mat{\gamma^\ast}}$, which propagates this uncertainty through the model to the prediction.
+When making a prediction for a new input point $\mat{x_\ast}$, this uncertainty can be used to derive a predictive distribution $\Prob{y_\ast \given \mat{x_\ast}, \mat{\gamma^\ast}}$, which propagates this uncertainty through the model to the prediction.
 
 This approach represents uncertainty about the correct choice of parameters but assumes that the predefined structure of the function is correct, making it a \emph{parametric model}.
 Such structure has the advantage of making it easier to find the best set of parameters, since the search space is relatively limited.
@@ -214,13 +214,18 @@ Instead of modelling a distribution of parameter values, a Bayesian non-parametr
 \emph{Gaussian Processes (GPs)} are a state-of-the-art framework for non-parametric regression.
 They are a way of representing a probability distribution over functions in a way which is both computationally feasible and allows for Bayesian inference.
 This section introduces Gaussian Processes and describes how to encode a prior distribution over functions to represent preference in the space of all possible functions $f$.
-Based on observed data, GPs can be used make predictions about the joint distribution $\Prob{y_\ast \given \mat{x_\ast}, \mat{f^\ast}}$ taking all functions in the distribution $\Prob{f^\ast}$ into account.
+Based on observed data, GPs can be used make predictions about the predictive distribution $\Prob{y_\ast \given \mat{x_\ast}, f^\ast}$ taking all functions in the distribution $\Prob{f^\ast}$ into account.
 Since these predictions are not computationally cheap, an extension of Gaussian Processes for large data sets, sparse Gaussian processes using pseudo-inputs \cite{snelson_sparse_2005}, is introduced last.
 
 \subsection{Definition}
-\begin{itemize}
-    \item High-level intro to Stochastic processes
-\end{itemize}
+Gaussian processes are a generalization of the Gaussian distribution to function spaces.
+A multivariate Gaussian $\mat{x} \sim \Gaussian{\mat{\mu}, \mat{\Sigma}}$ describes a distribution over the finitely many elements in the vector $\mat{x}$.
+Every such element $x_i$ is normally distributed according to $x_i \sim \Gaussian{\mu_i, \Sigma_{ii}}$ with a particular dependency structure between them.
+For every pair $x_i, x_j$, their covariance is given by $\Moment{\cov}{x_i, x_j} = \mat{\Sigma}_{ij}$.
+
+Modelling functions in general requires an infinite number of random variables, one for every function value.
+An infinite number of possibly dependent random variables mapping from the same probability space to the same value space is called a \emph{stochastic process} and is represented via a function.
+
 \begin{definition}[Stochastic Process]
     \label{def:stochastic_process}
     Given a probability space $(\Omega, \mathcal{F}, P)$, an index set $T$ and a measurable space $Y$, a \emph{stochastic process $\rv{X}$} is a function
@@ -233,15 +238,29 @@ Since these predictions are not computationally cheap, an extension of Gaussian 
     mapping indices $t$ to $Y$-valued random-variables.
     For a fixed $\omega \in \Omega$, $\rv{X}(\cdot, \omega)$ is called a \emph{trajectory} of the process \cite{astrom_introduction_1971}.
 \end{definition}
+
+The index set of a stochastic process can be an arbitrary set.
+It is often interpreted as a time index which can be both discrete and continuous.
+A Gaussian process is a particular stochastic process.
 \begin{definition}[Gaussian Process]
     \label{def:gaussian_process}
     A stochastic process $\rv{X}$ is called a \emph{Gaussian process} if for any finite subset $\tau \subseteq T$ of its index set, the random variables $\rv{X}_\tau$ have a joint Gaussian distribution \cite{astrom_introduction_1971}.
 \end{definition}
-\begin{itemize}
-    \item Mean-Function, Covariance-Function
-    \item Assumption of mean function equal to zero
-    \item Notational things $\Dyn \sim \GP\Cond*{0, \K(\cdot, \cdot)}$
-\end{itemize}
+When using a Gaussian process $\rv{X}$ to model a function $f : A \to B$, the index set $T$ is assumed to be $A$ and all random variables are $B$-valued.
+The random variable $\rv{X_a}$ then models the function value $f(a)$ for all $a \in A$.
+Sampling a trajectory from $\rv{X}$ corresponds to sampling one possible function $f^\ast$.
+
+Similar to the finite case, the random variables have a dependency structure.
+Instead of a mean vector $\mat{\mu}$ and a covariance matrix $\mat{\Sigma}$, a Gaussian process is completely determined by a \emph{mean function} $\mu_f(a) = \Moment{\E}{f(a)}$ and a \emph{covariance function}
+\begin{align}
+    \K(a, a^\prime) &\coloneqq \Moment{\E}{(f(a) - \mu_f(a))(f(a^\prime) - \mu_f(a^\prime)} \\
+    &= \Moment{\cov}{f(a), f(a^\prime)} \\
+    &= \Moment{\cov}{\rv{X_a}, \rv{X_{a^\prime}}}
+\end{align}
+with $a, a^\prime \in A$.
+The mean function contains the pointwise mean over all trajectories which could be sampled from $\rv{X}$.
+The covariance function is also called a \emph{kernel} and describes the interaction between different parts of the function.
+A function which is distributed according to a Gaussian process is denoted as $f \sim \GP\Cond{\mu(\cdot), \K(\cdot, \cdot)}$.
 
 \subsection{Kernels}
 \begin{definition}[Gram Matrix]
