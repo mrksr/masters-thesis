@@ -185,11 +185,38 @@ The following will introduce their definition and how they can be used to solve 
 The last part of this chapter will be concerned with introducing a policy-representation based on these results which does not depend on a closed-form solution.
 
 \section{Gaussian Process Regression}
-\begin{itemize}
-    \item Modelling $\Dyn$ is a regression problem
-    \item Define regression Problem
-    \item Solution in classical control context
-\end{itemize}
+The transition dynamics $\Dyn : \Es \times \Ah \to \Dists(\Es^+)$ are a function mapping states and actions to a probability distribution of following states.
+In order to estimate them using Gaussian Processes, some assumptions about the structure of this function are needed.
+First, it will be assumed that both the set of states $\Es$ and the set of actions $\Ah$ are euclidean real valued vector spaces and that the set of terminal states $\Tee$ is empty, that is, $\Es^+$ and $\Es$ are assumed equal, requiring that episode endings have to be modelled separately.
+And secondly, the probability distribution of the following state is assumed to be unimodal.
+This unimodality can result from deterministic transition functions, such as the one of the bicycle benchmark defined in \cref{cha:the_bicycle_benchmark}, being disturbed slightly by Gaussian noise.
+
+Estimating a function $f$ on the basis of observations $\mat{y_i} = f(\mat{x_i}) + \epsilon_i \in \R$ with input vectors $\mat{x_i} \in \R^d$ and a noise term $\epsilon_i$ is a \emph{regression problem}.
+Since the number of observations is finite and the function $f$ is an infinite object, the estimation of $f$ is uncertain and based on prior assumptions about its structure.
+
+In classic control scenarios, these prior assumptions often follow from physical descriptions of the system to be modelled.
+While the physics of driving a bicycle is understood quite well and can be described using differential equations, a controller for a specific bicycle depends on some parameters $\gamma$ such as the masses and measures detailed in \cref{tab:bicycle_constants}.
+In this setting, solving the regression problem corresponds to a choice of parameters $\gamma^\ast$ which explain the observations of the true system best.
+
+In a Bayesian context, instead of deciding on one specific vector of parameters, it might be more interesting to derive a distribution $\Prob{\gamma^*}$ of probable parameter values which then represents the uncertainty about their true value.
+When making a prediction for a new input point $\mat{x_\ast}$, this uncertainty can be used to derive a joint distribution $\Prob{y_\ast \given \mat{x_\ast}, \mat{\gamma^\ast}}$, which propagates this uncertainty through the model to the prediction.
+
+This approach represents uncertainty about the correct choice of parameters but assumes that the predefined structure of the function is correct, making it a \emph{parametric model}.
+Such structure has the advantage of making it easier to find the best set of parameters, since the search space is relatively limited.
+It does however limit the expressiveness of the model, which can lead to bad performance.
+A physical description of the system might be too idealized and not take account of all factors in reality, such as the assumptions of frictionless mechanics or limited turbulences in fluid mechanics.
+Accounting for all possible effects can make the model very complicated.
+This means that both the number of parameters becomes large and it may be hard to interpret the model in a physical sense.
+
+\emph{Non-parametric models} are not based on insights about the concrete structure of the function to be modelled but rather only make assumptions about properties of the function itself, such as smoothness or differentiability.
+Instead of modelling a distribution of parameter values, a Bayesian non-parametric model is concerned with finding a distribution $\Prob{f^\ast}$ of probable functions which represents the believe of the model about the function $f$ to be estimated.
+
+\emph{Gaussian Processes (GPs)} are a state-of-the-art framework for non-parametric regression.
+They are a way of representing a probability distribution over functions in a way which is both computationally feasible and allows for Bayesian inference.
+This section introduces Gaussian Processes and describes how to encode a prior distribution over functions to represent preference in the space of all possible functions $f$.
+Based on observed data, GPs can be used make predictions about the joint distribution $\Prob{y_\ast \given \mat{x_\ast}, \mat{f^\ast}}$ taking all functions in the distribution $\Prob{f^\ast}$ into account.
+Since these predictions are not computationally cheap, an extension of Gaussian Processes for large data sets, sparse Gaussian processes using pseudo-inputs \cite{snelson_sparse_2005}, is introduced last.
+
 \subsection{Definition}
 \begin{itemize}
     \item High-level intro to Stochastic processes
@@ -315,7 +342,7 @@ This one we can solve, since with $\mat{f} \coloneqq f(\mat{X})$ we have
 \end{align}
 Using standard results about Gaussians we have
 \begin{align}
--\log\Prob{\mat{y} \given \mat{X}, \mat{\theta}} = 
+-\log\Prob{\mat{y} \given \mat{X}, \mat{\theta}} =
     \underbracket[1pt]{\frac{1}{2} \mat{y^T} \left( \mat{K_N} + \sigma_n^2 \Eye \right)^{-1} \mat{y}}_{\text{data-fit term}} +
     \underbracket[1pt]{\frac{1}{2} \log \abs{\mat{K_N} + \sigma_n^2 \Eye}}_{\text{complexity term}} +
     \frac{N}{2} \log(2\pi)
