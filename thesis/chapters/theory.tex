@@ -220,8 +220,8 @@ Since these predictions are not computationally cheap, an extension of Gaussian 
 \subsection{Definition}
 Gaussian processes are a generalization of the Gaussian distribution to function spaces.
 A multivariate Gaussian $\mat{x} \sim \Gaussian{\mat{\mu}, \mat{\Sigma}}$ describes a distribution over the finitely many elements in the vector $\mat{x}$.
-Every such element $x_i$ is normally distributed according to $x_i \sim \Gaussian{\mu_i, \Sigma_{ii}}$ with a particular dependency structure between them.
-For every pair $x_i, x_j$, their covariance is given by $\Moment{\cov}{x_i, x_j} = \mat{\Sigma}_{ij}$.
+Every such element $\rv{x_i}$ is normally distributed according to $\rv{x_i} \sim \Gaussian{\mu_i, \Sigma_{ii}}$ with a particular dependency structure between them.
+For every pair $(\rv{x_i}, \rv{x_j})$, their covariance is given by $\Moment{\cov}{\rv{x_i}, \rv{x_j}} = \mat{\Sigma}_{ij}$.
 
 Modelling functions in general requires an infinite number of random variables, one for every function value.
 An infinite number of possibly dependent random variables mapping from the same probability space to the same value space is called a \emph{stochastic process} and is represented via a function.
@@ -262,7 +262,16 @@ The mean function contains the pointwise mean over all trajectories which could 
 The covariance function is also called a \emph{kernel} and describes the interaction between different parts of the function.
 A function which is distributed according to a Gaussian process is denoted as $f \sim \GP\Cond{\mu(\cdot), \K(\cdot, \cdot)}$.
 
+For convenience it is often assumed that the prior mean function $\mu(\cdot)$ is constant zero.
+This assumption is without loss of generality \cite{rasmussen_gaussian_2006} since in the case the mean function is known to be different to zero, the observations $\left( \mat{X}, \mat{y} \right)$ can be transformed to $\mat{y^\prime} = \mat{y} - \mu(\mat{X})$.
+The Gaussian process based on the observations $\left( \mat{X}, \mat{y^\prime} \right)$ then only models the differences to the mean function.
+It is the covariance functions which encode the assumptions about the underlying function.
+
 \subsection{Kernels}
+Gaussian processes are collections of random variables, any finite subset of which have a joint multivariate Gaussian distribution.
+For any pair $(\rv{X_i}, \mat{X_j})$ of these random variables, their covariance is given by the covariance function $\Moment{\cov}{\rv{X_i}, \rv{X_j}} = \K(\rv{X_i}, \rv{X_j})$.
+The pairwise covariances in a multivariate Gaussian $\Gaussian{\mat{\mu}, \mat{\Sigma}}$ are given by its \emph{covariance matrix} $\mat{\Sigma}$.
+For any finite set of random variables, the matrix obtained by pairwise application of the covariance function is called the \emph{Gram matrix}.
 \begin{definition}[Gram Matrix]
     Given a non-empty set $M$, a function $\K : M^2 \to \R$ and two sets $X = \Set*{x_i \in M \with i \in [n]}$ and $Y = \Set*{y_j \in M \with j \in [m]}$.
     The $n \times m$ matrix
@@ -271,6 +280,8 @@ A function which is distributed according to a Gaussian process is denoted as $f
     \end{align}
     is called the \emph{Gram matrix} of $\K$ with respect to $X$ and $Y$ \cite{scholkopf_learning_2002}.
 \end{definition}
+In order for the Gram matrix to be a valid covariance matrix $\mat{\Sigma}$ of a Gaussian distribution, it must be positive definite.
+\emph{Kernels} are functions which fulfill the property that for every possible subset of random variables, or more generally every set of elements in their domain, their induced Gram matrix is positive definite.
 \begin{definition}[Kernel]
     Given a non-empty set $M$, a function
     \begin{align}
@@ -278,24 +289,94 @@ A function which is distributed according to a Gaussian process is denoted as $f
     \end{align}
     is called a \emph{(positive definite) kernel} or \emph{covariance function}, if for any subset $X \subseteq M$, the Gram matrix $\K(X, X)$ is positive definite \cite{scholkopf_learning_2002}.
 \end{definition}
+The kernel is crucial in encoding the assumptions about the function a Gaussian process should estimate.
+It is a measure of \emph{similarity} of different points in the observed data and of new points to be predicted.
+A natural assumption to make is to assume that the closer together in the domain two points lie, the more similar their function values will be.
+Similarly, to predict a test point, trainings points close to it are probably more informative than those further away.
+
+But closeness is not the only possible reason two points could be similar.
+Assume a function to be modeled which is a possibly noisy sinusoidal wave with a known frequency.
+Then, two points which are a multiple of wavelengths apart should also have similar function values.
+A kernel which is not only dependent on the distance between two points but also their position in the input space is called \emph{non-stationary}.
+A simple example of such a non-stationary kernel is the linear kernel.
 \begin{definition}[Linear Kernel]
     For a finite dimensional euclidean vector space $\R^d$, the \emph{linear kernel} is defined as
     \begin{align}
         \K_{\text{linear}}(\mat{x}, \mat{y}) \coloneqq \mat{x}^T \mat{y} = \left\langle \mat{x}, \mat{y}\right\rangle.
     \end{align}
 \end{definition}
+Consider a function $f : \R \to \R$ which is distributed according to a Gaussian process with the linear kernel $f \sim \GP\Cond{0, \K_{\text{linear}}}$.
+According to the definition of Gaussian processes, for any two input numbers $x$, $y \in \R$ their corresponding random variables $\rv{f_x}$ and $\rv{f_y}$ have a joint Gaussian distribution
+\begin{align}
+    \begin{pmatrix}
+        \rv{f_x} \\ \rv{f_y}
+    \end{pmatrix} \sim \Gaussian*{\mat{0}, \begin{pmatrix}
+        \K(x, x) & \K(x, y) \\
+        \K(y, x) & \K(y, y)
+    \end{pmatrix}}
+\end{align}
+where $\K = \K_{\text{linear}}$.
+Assuming that both $x$ and $y$ are not equal to zero, the correlation coefficient of these two variables is given by
+\begin{align}
+    \Moment{\corr}{\rv{f_x}, \rv{f_y}} &= \frac{\Moment{\cov}{\rv{f_x}, \rv{f_y}}}{\sqrt{\Moment{\var}{\rv{f_x}}}\sqrt{\Moment{\var}{\rv{f_y}}}} \\
+    &= \frac{\K(x, y)}{\sqrt{\K(x, x)} \sqrt{\K(y, y)}} = \frac{xy}{\sqrt{x^2}\sqrt{y^2}} = 1.
+\end{align}
+A correlation coefficient of one implies that the value of one of the random variables is a linear function of the other.
+Any function drawn from this Gaussian process, such as the ones shown in \cref{fig:gp_samples:linear}, is therefore a linear function.
+This observation generalizes to higher dimensions \cite{rasmussen_gaussian_2006}.
+Gaussian process regression with a linear kernel is equivalent to Bayesian linear regression.
+\begin{figure}[htb]
+    \centering
+    \begin{subfigure}{.45\textwidth}
+        \missingfigure[figheight=.2\textheight]{Samples of Linear GP}
+        \caption{Samples of Linear GP}
+        \label{fig:gp_samples:rbf_normal}
+    \end{subfigure}
+    \begin{subfigure}{.45\textwidth}
+        \missingfigure[figheight=.2\textheight]{Samples of RBF GP, good hyperparameters}
+        \caption{Samples of RBF GP, good hyperparameters}
+        \label{fig:gp_samples:rbf_normal}
+    \end{subfigure}
+    \begin{subfigure}{.45\textwidth}
+        \missingfigure[figheight=.2\textheight]{Samples of RBF GP, noisy hyperparameters}
+        \caption{Samples of RBF GP, noisy hyperparameters}
+        \label{fig:gp_samples:rbf_noisy}
+    \end{subfigure}
+    \begin{subfigure}{.45\textwidth}
+        \missingfigure[figheight=.2\textheight]{Samples of RBF GP, short lengthscale hyperparameters}
+        \caption{Samples of RBF GP, short lengthscale hyperparameters}
+        \label{fig:gp_samples:rbf_noisy}
+    \end{subfigure}
+    \caption{GP samples}
+    \label{fig:gp_samples}
+\end{figure}
+
+Because of its restrictiveness, the linear kernel is not very relevant for real-world applications of Gaussian processes.
+As described above, the similarity of two data points $\mat{x}$ and $\mat{y}$ is often dependent on their relative position.
+A kernel which is a function of $\mat{x} - \mat{y}$ is called \emph{stationary} and is invariant to translations in the input space.
+The most important stationary kernel is the squared exponential kernel.
 \begin{definition}[Squared Exponential Kernel]
     For a finite dimensional euclidean vector space $\R^d$, the \emph{squared exponential kernel} (or \emph{RBF kernel}) is defined as
     \begin{align}
         \K_{\text{SE}} \coloneqq \sigma_f^2 \cdot \exp \left( -\frac{1}{2} (\mat{x} - \mat{y})^T \mat{\Lambda}^{-1} (\mat{x} - \mat{y}) \right).
     \end{align}
-    The parameter $\sigma_f^2 \in \R_{>0}$ is called the \emph{signal variance} and $\mat{\Lambda} = \diag(l_1^2, \dots, l_d^2)$ is a diagonal matrix of the squared \emph{lengthscales} $l_i \in \R_{>0}$.
+    The parameter $\sigma_f^2 \in \R_{>0}$ is called the \emph{signal variance} and $\mat{\Lambda} = \diag(l_1^2, \dots, l_d^2)$ is a diagonal matrix of the squared \emph{length scales} $l_i \in \R_{>0}$.
 \end{definition}
-\begin{itemize}
-    \item Sampling from Kernels without any data
-    \item Description of hyperparameters
-    \item Comparison of hyperparameter values
-\end{itemize}
+The similarity of two data points approaches one when they are close together and for larger distances approaches zero with exponential drop off.
+It can be shown that this kernel represents all infinitely differentiable functions \cite{rasmussen_gaussian_2006}.
+Gaussian processes with this covariance function are universal function approximators.
+
+The squared exponential kernel is dependent on multiple parameters which influence its behaviour.
+In contrast to weight parameters in linear regression or constants in physical models, these parameters do not specify the estimated function but rather the prior believe about this function.
+In order to separate the two, they are called \emph{hyperparameters}.
+
+The hyperparameters of the RBF kernel describe the expected dynamic range of the function.
+The signal variance $\sigma_f^2$ specifies the average distance of function values from the mean function.
+The different length scale parameters $l_i$ roughly specify the distance of data points along their respective axis required for the function values to change considerably.
+\Cref{fig:gp_samples} compares sample functions drawn from Gaussian processes with squared exponential kernels with different hyperparameters.
+
+These plots show smooth functions being drawn from their respective processes.
+It is however only possible to evaluate the Gaussian process at finitely many points and connect the resulting samples.
 
 \subsection{Predictions and Posterior}
 We observe some data
