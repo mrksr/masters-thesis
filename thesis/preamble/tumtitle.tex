@@ -1,34 +1,27 @@
-% correct BCOR - undo at the end !!!
-%\def\bcorcor{0.15cm}
-%\addtolength{\hoffset}{\bcorcor}
-
 \cleardoublepage
 \thispagestyle{empty}
-
+\newgeometry{hmargin=3cm}
 \makeatletter
 \vspace{10mm}
 \begin{center}
-    %\oTUM{4cm}
     \includegraphics[height=3cm,keepaspectratio]{figures/tum.eps}
 
-    \vspace{5mm}
-    \huge DEPARTMENT OF INFORMATICS\\
-    \vspace{0.5cm}
-    \Large TECHNISCHE UNIVERSITÄT MÜNCHEN\\
-\end{center}
+    {\huge DEPARTMENT OF INFORMATICS}
 
-%\vspace{10mm}
+    {\Large TECHNISCHE UNIVERSITÄT MÜNCHEN}
+\end{center}
+\vfill
 \begin{center}
     {\Large \thesisTypeText}
-
-    \vspace{10mm}
+\end{center}
+\vfill
+\begin{center}
     {\LARGE Incorporating Uncertainty into Reinforcement Learning through Gaussian Processes}\\
     \vspace{10mm}
-    {\Large Integration von Unsicherheit in das Reinforcement Learning mit Hilfe von Gaußprozessen}\\
-
-    \vfill
-
-    %\hfill
+    {\Large Integration von Unsicherheit in das Reinforcement Learning mit Hilfe von Gaußprozessen}
+\end{center}
+\vfill
+\begin{center}
     \begin{tabular}{ll}
         \Large Author:     & \Large \@author \\[2mm]
         \Large Supervisor:    & \Large \advisorText \\[2mm]
@@ -37,11 +30,7 @@
         \Large Date:       & \Large \@date
     \end{tabular}
 
-    \vspace{5mm}
-
     \includegraphics[height=2cm]{figures/tum_info.eps}
 \end{center}
 \makeatother
-
-% undo BCOR correction
-%\addtolength{\hoffset}{\bcorcor}
+\restoregeometry
