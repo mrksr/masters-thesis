@@ -477,45 +477,61 @@ Predicting the mean of a single test point is a weighted sum of $N$ basis functi
 This means the prediction of a single mean costs $\Oh(N)$.
 To predict the variance, it is still necessary to perform a matrix multiplication which costs $\Oh(N^2)$.
 Since all of these operations are dependent the number of training points, evaluating Gaussian processes on large data sets can be computationally expensive.
-Before introducing sparse approximations with better asymptotic complexity, the next section deals with choosing good values fot he vector of hyperparameters $\mat{\theta}$.
+Before introducing sparse approximations with better asymptotic complexity, the next section deals with choosing good values for the vector of hyperparameters $\mat{\theta}$.
 
 \subsection{Choosing hyperparameters}
-Proper Bayesian way means choosing a prior for $\mat{\theta}$.
+In the previous section, the hyperparameters $\mat{\theta}$ were assumed to be known and constant, that is, the prior assumptions about the function to be estimated were fixed.
+In this case, Gaussian processes do not have a training stage, since any test point can be predicted according to the predictive posterior.
+Usually however, the correct choice of hyperparameters is not clear a priori.
+A major advantage of Gaussian processes is the ability to select hyperparameters from training data directly instead of requiring a scheme such as cross validation.
+
+In a fully Bayesian setup, the correct way to model uncertainty about hyperparameters is to assign them a prior $\Prob{\mat{\theta}}$ and marginalize it to derive the dependent distributions
 \begin{align}
     \Prob{f} &= \int \Prob{f \given \mat{\theta}} \Prob{\mat{\theta}} \diff \theta \\
-    \Prob{\mat{y} \given \mat{X}} &= \int \Prob{\mat{y} \given \mat{X}, \mat{\theta}} \Prob{\mat{\theta}} \diff \mat{\theta}
+    \Prob{\mat{y} \given \mat{X}} &= \int \Prob{\mat{y} \given \mat{X}, \mat{\theta}} \Prob{\mat{\theta}} \diff \mat{\theta}. \label{eq:theta_posterior_integration}
 \end{align}
-But this is not doable since we cannot solve the integral \cite[109]{rasmussen_gaussian_2006}. <Good Argument here>.
-
-Instead: Do a point estimate. Next best thing would be a MAP estimate:
+Updating the believe about the distribution of the hyperparameters then becomes part of the process of obtaining a posterior model.
+A new distribution is obtained by combining the prior with the likelihood of the training data observed using Bayes' theorem:
 \begin{align}
     \Prob{\mat{\theta} \given \mat{X}, \mat{y}} &= \frac{\Prob{\mat{y} \given \mat{X}, \mat{\theta}} \Prob{\mat{\theta}}}{\Prob{\mat{y} \given \mat{X}}} \\ &= \frac{\Prob{\mat{y} \given \mat{X}, \mat{\theta}} \Prob{\mat{\theta}}}{\int \Prob{\mat{y} \given \mat{X}, \mat{\theta}} \Prob{\mat{\theta}} \diff \theta}
 \end{align}
-But again: Solving this in general is hard.
-If we assume a flat prior for $\mat{\theta}$ (i.e. a "uniform" distribution), then we have that
-\begin{align}
-    \Prob{\mat{\theta} \mid \mat{X}, \mat{y}} \propto \Prob{\mat{y} \given \mat{X}, \mat{\theta}}
-\end{align}
-and we can do maximum (marginal) likelihood:
-\begin{align}
-    \mat{\theta}^\ast &\in \argmax_{\mat{\theta}} \Prob{\mat{y} \given \mat{X}, \mat{\theta}}
-\end{align}
+The integration required in \cref{eq:theta_posterior_integration} is very hard in practice \todo{Is there an easy argument for this which does not rely on the likelihood?}\cite[109]{rasmussen_gaussian_2006}, since $\mat{y}$ is a complicated function of $\mat{\theta}$.
+Instead, a common approximation is to use a \emph{maximum-a-postiori (MAP)} estimate of the correct hyperparameters.
+This estimate is obtained by maximizing $\Prob{\mat{\theta} \given \mat{X}, \mat{y}}$ and does not require evaluation of the denominator since it is constant.
 
-This one we can solve, since with $\mat{f} \coloneqq f(\mat{X})$ we have
+For many choices of priors $\Prob{\mat{\theta}}$ this is still a hard problem.
+But assuming a flat prior which assigns almost equal probability to all choices of hyperparameters, it holds that
 \begin{align}
-    \Prob{\mat{y} \given \mat{X}, \mat{\theta}} &= \int \Gaussian{\mat{y} \given \mat{f}, \sigma_n^2 \Eye} \Prob{\mat{f} \given \mat{X}, \mat{\theta}} \diff \mat{f} \\
-    &= \int \Gaussian{\mat{y} \given \mat{f}, \sigma_n^2 \Eye} \cdot \Gaussian{\mat{f} \given \mat{0}, \mat{K_N}} \diff \mat{f}
+    \Prob{\mat{\theta} \mid \mat{X}, \mat{y}} &\propto \Prob{\mat{y} \given \mat{X}, \mat{\theta}} \\
+    &= \int \Prob{\mat{y} \given \mat{f}, \mat{\theta}} \Prob{\mat{f} \given \mat{\theta}} \diff \mat{f},
 \end{align}
-Using standard results about Gaussians we have
+that is, the posterior distribution is proportional to the likelihood term and can be obtained using a maximum likelihood estimate using the \emph{marginal likelihood} after integrating out the function values $\mat{f}$.
+Optimizing this term is called a \emph{type II maximum likelihood estimate (ML-II)}.
+
+The marginal likelihood is an integral over a product of Gaussians obtained from the noise model the distribution of function values according to the Gaussian process definition.
+It is given by
 \begin{align}
--\log\Prob{\mat{y} \given \mat{X}, \mat{\theta}} =
-    \underbracket[1pt]{\frac{1}{2} \mat{y^T} \left( \mat{K_N} + \sigma_n^2 \Eye \right)^{-1} \mat{y}}_{\text{data-fit term}} +
-    \underbracket[1pt]{\frac{1}{2} \log \abs{\mat{K_N} + \sigma_n^2 \Eye}}_{\text{complexity term}} +
-    \frac{N}{2} \log(2\pi)
+    \Prob{\mat{\theta} \mid \mat{X}, \mat{y}} &= \int \Prob{\mat{y} \given \mat{f}, \mat{\theta}} \Prob{\mat{f} \given \mat{\theta}} \diff \mat{f} \\
+    &= \int \Gaussian{\mat{y} \given \mat{f}, \sigma_n^2 \Eye} \cdot \Gaussian{\mat{f} \given \mat{0}, \mat{K_N}} \diff \mat{f}.
 \end{align}
-which can be solved using nonlinear optimization.
-This is called a \emph{type II maximum likelihood estimate (ML-II)} since it optimizes over the marginal likelihood.
-This implements Occam's razor by the way. Which we should maybe skip.
+The solution of this integral is a non-normalized Gaussian density function \cite{petersen_matrix_2008}.
+For practical reasons, it is convenient to minimize the negative logarithm of the likelihood which is given by
+\begin{align}
+    \Ell(\mat{\theta}) = -\log\Prob{\mat{y} \given \mat{X}, \mat{\theta}} =
+    \frac{1}{2} \mat{y^T} \left( \mat{K_N} + \sigma_n^2 \Eye \right)^{-1} \mat{y} +
+    \frac{1}{2} \log \abs{\mat{K_N} + \sigma_n^2 \Eye} +
+    \frac{N}{2} \log(2\pi).
+\end{align}
+The estimation of hyperparameters is the solution of the optimization problem
+\begin{align}
+    \mat{\theta}^\ast &\in \argmin_{\mat{\theta}} \Ell(\mat{\theta})
+\end{align}
+and is calculated using standard approaches to non-convex optimization such as scaled conjugate gradient (SCD) techniques, since deriving the derivatives of $\Ell$ is comparatively easy \cite{rasmussen_gaussian_2006}.
+The computational complexity of evaluating the likelihood term and its derivatives is dominated by the inversion of $\mat{K_N} + \sigma_n^2$.
+
+Since this optimization scheme does not choose parameters of the function approximation directly but rather changes a small number of broad and high-level assumptions about it, overfitting does not tend to be a problem for Gaussian processes in general \cite{rasmussen_gaussian_2006}.
+The sparse approximation of Gaussian processes presented in the next section chooses a small number of points in the input space to represent a large training set.
+The positions of these input points can be interpreted as hyperparameters to the original Gaussian process and induce a kernel function with many hyperparameters, where overfitting can become relevant.
 
 \subsection{Sparse Approximations using Inducing Inputs}
 \begin{itemize}
