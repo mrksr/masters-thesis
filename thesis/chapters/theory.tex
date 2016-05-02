@@ -318,8 +318,8 @@ According to the definition of Gaussian processes, for any two input numbers $x$
 where $\K = \K_{\text{linear}}$.
 Assuming that both $x$ and $y$ are not equal to zero, the correlation coefficient of these two variables is given by
 \begin{align}
-    \Moment{\corr}{\rv{f_x}, \rv{f_y}} &= \frac{\Moment{\cov}{\rv{f_x}, \rv{f_y}}}{\sqrt{\Moment{\var}{\rv{f_x}}}\sqrt{\Moment{\var}{\rv{f_y}}}} \\
-    &= \frac{\K(x, y)}{\sqrt{\K(x, x)} \sqrt{\K(y, y)}} = \frac{xy}{\sqrt{x^2}\sqrt{y^2}} = 1.
+    \Moment{\corr}{\rv{f_x}, \rv{f_y}} &= \frac{\Moment{\cov}{\rv{f_x}, \rv{f_y}}}{\sqrt{\Moment{\var}{\rv{f_x}\vphantom{\rv{f_y}}}}\sqrt{\Moment{\var}{\rv{f_y}}}} \\
+    &= \frac{\K(x, y)}{\sqrt{\K(x, x)} \sqrt{\K(y, y)}} = \frac{xy}{\sqrt{\vphantom{y^2}x^2}\sqrt{\vphantom{y^2}y^2}} = 1.
 \end{align}
 A correlation coefficient of one implies that the value of one of the random variables is a linear function of the other.
 Any function drawn from this Gaussian process, such as the ones shown in \cref{fig:gp_samples:linear}, is therefore a linear function.
@@ -527,7 +527,7 @@ The estimation of hyperparameters is the solution of the optimization problem
     \mat{\theta}^\ast &\in \argmin_{\mat{\theta}} \Ell(\mat{\theta})
 \end{align}
 and is calculated using standard approaches to non-convex optimization such as scaled conjugate gradient (SCD) techniques, since deriving the derivatives of $\Ell$ is comparatively easy \cite{rasmussen_gaussian_2006}.
-The computational complexity of evaluating the likelihood term and its derivatives is dominated by the inversion of $\mat{K_N} + \sigma_n^2$.
+The computational complexity of evaluating the likelihood term and its derivatives is dominated by the inversion of $\mat{K_N} + \sigma_n^2 \Eye$.
 
 Since this optimization scheme does not choose parameters of the function approximation directly but rather changes a small number of broad and high-level assumptions about it, overfitting does not tend to be a problem for Gaussian processes in general \cite{rasmussen_gaussian_2006}.
 The sparse approximation of Gaussian processes presented in the next section chooses a small number of points in the input space to represent a large training set.
