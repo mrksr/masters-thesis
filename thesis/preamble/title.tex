@@ -12,17 +12,34 @@
 \newcommand\eMailText{}
 \newcommand\eMail[1]{\renewcommand\eMailText{#1}}
 
-\newcommand\universityText{}
-\newcommand\university[1]{\renewcommand\universityText{#1}}
+\newcommand\FirstUniversityText{}
+\newcommand\university[1]{\renewcommand\FirstUniversityText{#1}}
+\newcommand\FirstChairText{}
+\newcommand\chair[1]{\renewcommand\FirstChairText{#1}}
+\newcommand\FirstUniversityLogo{}
+\newcommand\logo[1]{\renewcommand\FirstUniversityLogo{#1}}
 
-\newcommand\chairText{}
-\newcommand\chair[1]{\renewcommand\chairText{#1}}
+\newcommand\SecondUniversityText{}
+\newcommand\secondUniversity[1]{\renewcommand\SecondUniversityText{#1}}
+\newcommand\SecondChairText{}
+\newcommand\secondChair[1]{\renewcommand\SecondChairText{#1}}
+\newcommand\SecondUniversityLogo{}
+\newcommand\secondLogo[1]{\renewcommand\SecondUniversityLogo{#1}}
+
+\newcommand\CompanyText{}
+\newcommand\company[1]{\renewcommand\CompanyText{#1}}
+\newcommand\CompanyDepartmentText{}
+\newcommand\companyDepartment[1]{\renewcommand\CompanyDepartmentText{#1}}
+\newcommand\CompanyLogo{}
+\newcommand\companyLogo[1]{\renewcommand\CompanyLogo{#1}}
 
 \newcommand\advisorText{}
 \newcommand\advisor[1]{\renewcommand\advisorText{#1}}
 
 \newcommand\tutorText{}
 \newcommand\tutor[1]{\renewcommand\tutorText{#1}}
+
+\newcommand\TitleLogoHeight{2cm}
 
 \renewcommand\maketitle{
 
@@ -103,25 +120,46 @@
         %\vspace*{\fill}
 
         \hspace*{-.1\linewidth}
-        \parbox{1.2\linewidth}
-        {
-
+        \parbox{1.2\linewidth}{
             \begin{tabular}[c]{@{}l@{}r@{}}
-                \parbox[b][][b]{0.35\linewidth}
-                {
-                    \includegraphics[width=\linewidth,keepaspectratio]{figures/tum.eps}
-                }
-
-                &
-
-                \parbox[b][][b]{0.65\linewidth}
-                {
+                \parbox[b][][b]{0.35\linewidth}{
+                    \centering
+                    \includegraphics[height=\TitleLogoHeight,width=\linewidth,keepaspectratio]{\FirstUniversityLogo}
+                } &
+                \parbox[b][\TitleLogoHeight][c]{0.65\linewidth}{
                     \raggedleft
-                    \textbf{\rmfamily\chairText} \\
+                    \textbf{\rmfamily\FirstChairText} \\
                     \small
-                    \universityText
+                    \FirstUniversityText
                 }
-
+            \end{tabular}
+        }
+        \hspace*{-.1\linewidth}
+        \parbox{1.2\linewidth}{
+            \begin{tabular}[c]{@{}l@{}r@{}}
+                \parbox[b][][b]{0.35\linewidth}{%
+                    \centering
+                    \includegraphics[height=\TitleLogoHeight,width=\linewidth,keepaspectratio]{\SecondUniversityLogo}
+                } &
+                \parbox[b][\TitleLogoHeight][c]{0.65\linewidth}{%
+                    \raggedleft
+                    \textbf{\rmfamily\SecondChairText} \\
+                    \small\SecondUniversityText
+                }
+            \end{tabular}
+        }
+        \hspace*{-.1\linewidth}
+        \parbox{1.2\linewidth}{
+            \begin{tabular}[c]{@{}l@{}r@{}}
+                \parbox[b][][b]{0.35\linewidth}{%
+                    \centering
+                    \includegraphics[height=\TitleLogoHeight,width=\linewidth,keepaspectratio]{\CompanyLogo}
+                } &
+                \parbox[b][][c]{0.65\linewidth}{%
+                    \raggedleft
+                    \textbf{\rmfamily\CompanyDepartmentText} \\
+                    \small\CompanyText
+                }
             \end{tabular}
         }
 
