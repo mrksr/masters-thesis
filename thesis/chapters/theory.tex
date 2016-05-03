@@ -399,7 +399,7 @@ Given some vector of hyperparameters $\mat{\theta}$, the definition of Gaussian 
 where $\mat{K_N} = \K(\mat{X}, \mat{X})$ denotes the Gram matrix of the observed data.
 Combining the two distributions according to the law of total probability yields the probability distribution of the outputs conditioned on the inputs and is given by
 \begin{align}
-    \Prob{\mat{y} \given \mat{X}, \mat{\theta}} &= \int \Prob{\mat{y} \given \mat{f}} \Prob{\mat{f} \given \mat{X}, \mat{\theta}} \diff \mat{f} \\
+    \Prob{\mat{y} \given \mat{X}, \mat{\theta}} &= \int \Prob{\mat{y} \given \mat{f}} \Prob{\mat{f} \given \mat{X}, \mat{\theta}} \diff \mat{f}\label{eq:gp_marginal_likelihood} \\
     &= \int \Gaussian{\mat{y} \given \mat{f}, \sigma_n^2 \Eye} \Gaussian*{\mat{f} \given \mat{0}, \mat{K_N}} \diff \mat{f} \\
     &= \Gaussian{\mat{y} \given \mat{0}, \mat{K_N} + \sigma_n^2 \Eye}.
 \end{align}
@@ -438,7 +438,7 @@ Adding the noise model to this distribution gives the joint Gaussian of training
 In this distribution, the training outputs $\mat{y}$ are known.
 The predictive posterior for the test outputs $\mat{f_\ast}$ can be obtained by applying the rules for marginalization of multivariate Gaussians, yielding another Gaussian distribution.
 \begin{lemma}[GP predictive posterior]
-    Given a latent function with a Gaussian process distribution $f \sim \GP(\mat{0}, \K)$ and training points $\mat{X}$ with noisy observations of the form $\mat{y} = f(\mat{X}) + \Gaussian{\mat{0}, \sigma_n^2 \Eye}$.
+    Given a latent function with a Gaussian process distribution $f \sim \GP(\mat{0}, \K)$ and $N$ training points $\mat{X}$ with noisy observations of the form $\mat{y} = f(\mat{X}) + \Gaussian{\mat{0}, \sigma_n^2 \Eye}$.
     The predictive posterior $\mat{f_\ast}$ of the test points $\mat{X_\ast}$ is then given by
     \begin{align}
         \Prob{\mat{f_\ast} \given \mat{X}, \mat{y}, \mat{X_\ast}} &= \Gaussian*{\mat{f_\ast} \given \mat{\mu_\ast}, \mat{\Sigma_\ast}} \text{, where} \\
@@ -534,18 +534,85 @@ The sparse approximation of Gaussian processes presented in the next section cho
 The positions of these input points can be interpreted as hyperparameters to the original Gaussian process and induce a kernel function with many hyperparameters, where overfitting can become relevant.
 
 \subsection{Sparse Approximations using Inducing Inputs}
-\begin{itemize}
-    \item Definition of Pseudo-Inputs
-    \item Common Distribution
-    \item Likelihood Function
-    \item Special Kernel Function
-    \item Predictive Posterior
-    \item Asymptotic behviour
-    \item Differences of Titsias approach
-\end{itemize}
+We want to avoid learning complete GPs for large datasets since we have $\Oh(N^3)$ time and $\Oh(N^2)$ space requirements. Only taking a subset of the data is hard because how do you choose? Random sampling can work with highly redundant data, but it's not that great. You could optimize, but jointly optimizing hyper parameters and the set of inputs is hard because it is a combinatorical problem which is not smooth.
+
+We have some data set $\left( \mat{X}, \mat{y} \right)$ of noisy observations.
+Define Pseudo-Inputs $\left( \ps{\mat{X}}, \ps{\mat{f}} \right)$ of pseudo inputs $\ps{\mat{x_i}}$ and pseudo targets $\ps{f_i}$ which are assumed equal to the latent function. $\abs{\ps{\mat{f}}} = M \ll N$.
+
+Take this as the training set of a new (noise-free) GP $\GP(\mat{0}, \K)$ with known hyperparameters $\mat{\theta}$ and get the predictive distribution
+\begin{align}
+    \Prob{\mat{f_\ast} \given \mat{X_\ast}, \ps{\mat{X}}, \ps{\mat{f}}, \mat{\theta}} &= \Gaussian{\mat{K_{\ast M}}\mat{K_M}^{-1} \ps{\mat{f}}, \mat{K_\ast} - \mat{K_{\ast M}} \mat{K_M}^{-1} \mat{K_{M \ast}} + \sigma_n^2 \Eye}.
+\end{align}
+The additive noise comes from the noise assumption!
+We denote $\mat{K_M} = \K(\ps{\mat{X}}, \ps{\mat{X}})$ and $\mat{K_N} = \K(\mat{X}, \mat{X})$ as usual.
+We assume that the true data set is iid given the pseudo data set and take a look at the likelihood function:
+\begin{align}
+    \Prob{\mat{y} \given \mat{X}, \ps{\mat{X}}, \ps{\mat{f}}, \mat{\theta}} &= \prod_{i=1}^N \Prob{y_n \given \mat{x_n}, \ps{\mat{X}}, \ps{\mat{f}}, \mat{\theta}} \\
+    &= \prod_{i=1}^N \Gaussian*{y_n \given \mat{K_{n M}}\mat{K_M}^{-1} \ps{\mat{f}}, \mat{K_n} - \mat{K_{n M}} \mat{K_M}^{-1} \mat{K_{M n}} + \sigma_n^2} \\
+    &= \Gaussian*{\mat{y} \given \mat{K_{N M}}\mat{K_M}^{-1} \ps{\mat{f}}, \diag\left( \mat{K_N} - \mat{K_{N M}} \mat{K_M}^{-1} \mat{K_{M N}} \right) + \sigma_n^2 \Eye} \\
+    &= \Gaussian*{\mat{y} \given \mat{K_{N M}}\mat{K_M}^{-1} \ps{\mat{f}}, \diag\left( \mat{K_N} - \mat{Q_N} \right) + \sigma_n^2 \Eye}
+\end{align}
+with $\mat{Q_N} \coloneqq \mat{K_{N M}} \mat{K_M}^{-1} \mat{K_{M N}}$.
+We now marginalize the pseudo targets $\ps{\mat{f}}$ from the likelihood.
+We get the prior from the noise-free GP and use the result of the marginalization of the product of Gaussians.
+\begin{align}
+    \Prob{\mat{y} \given \mat{X}, \ps{\mat{X}}, \mat{\theta}} &= \int \Prob{\mat{y} \given \mat{X}, \ps{\mat{X}}, \ps{\mat{f}}, \mat{\theta}} \Prob{\ps{\mat{f}} \given \ps{\mat{X}}} \diff \ps{\mat{f}} \\
+    &= \int \Prob{\mat{y} \given \mat{X}, \ps{\mat{X}}, \ps{\mat{f}}, \mat{\theta}} \Gaussian{\mat{y}  \given \mat{0}, \mat{K_M}} \diff \ps{\mat{f}} \\
+    &= \Gaussian*{\mat{y} \given \mat{0}, \mat{K_{NM}} \mat{K_M}^{-1} \mat{K_M} \left( \mat{K_{NM}} \mat{K_M}^{-1} \right)^T + \diag\left( \mat{K_N} - \mat{Q_N} \right) + \sigma_n^2 \Eye} \\
+    &= \Gaussian*{\vphantom{\left( \mat{K_M}^{-1} \right)^T} \mat{y} \given \mat{0}, \mat{Q_N} + \diag\left( \mat{K_N} - \mat{Q_N} \right) + \sigma_n^2 \Eye}
+\end{align}
+
+This one we compare to the marginal likelihood of a normal GP in \cref{eq:gp_marginal_likelihood}.
+We observe that we can interpret the SPGP likelihood as a normal GP likelihood with a particular kernel $\K_{\text{SPGP}}$ given by
+\begin{align}
+    \Q(\mat{x}, \mat{y}) &\coloneqq \mat{K_{xM}} \mat{K_M}^{-1} \mat{K_{Mx}} \\
+    \K_{\text{SPGP}}(\mat{x}, \mat{y}) &\coloneqq \Q(\mat{x}, \mat{y}) + \delta_{\mat{x}, \mat{y}} \left( \K(\mat{x}, \mat{y}) - \Q(\mat{x}, \mat{y}) \right)
+\end{align}
+using the Kronecker-Delta $\delta$.
+This kernel function is equal to $\K$ for diagonal entries and equal to $\Q$ everywhere else.
+$\Q$ is a low rank covariance \cite{snelson_flexible_2007} since it approximates operations on $\mat{K_N}$ with operations on $\mat{K_M}$.
+An SPGP is a normal Gaussian Process with this kernel which has the pseudo-inputs $\ps{\mat{X}}$ hidden in $\mat{K_M}$ as additional hyperparameters.
+From this observation, we directly get the SPGP predictive posterior.
+
 \begin{lemma}[SPGP predictive posterior]
-    content
+    Given a latent function with a sparse pseudo-input Gaussian process distribution $f \sim \SPGP(\mat{0}, \K)$, $N$ training points $\mat{X}$ with noisy observations of the form $\mat{y} = f(\mat{X}) + \Gaussian{\mat{0}, \sigma_n^2 \Eye}$ and $M$ positions of pseudo-inputs $\ps{\mat{X}}$.
+    The predictive posterior $\mat{f_\ast}$ of the test points $\mat{X_\ast}$ is then given by
+    \begin{align}
+        \Prob{\mat{f_\ast} \given \mat{X_\ast}, \mat{X}, \mat{y}, \ps{\mat{X}}} &= \Gaussian*{\mat{f_\ast} \given \mat{\mu_\ast}, \mat{\Sigma_\ast}} \text{, where} \\
+        \mat{\mu_\ast} &= \mat{Q_{\ast N}} \left( \mat{Q_N} + \diag(\mat{K_N} - \mat{Q_N}) + \sigma_n^2 \Eye \right)^{-1} \mat{y} \\
+        \mat{\Sigma_\ast} &= \mat{K_\ast} - \mat{Q_{\ast N}} \left( \mat{Q_N} + \diag(\mat{K_N} - \mat{Q_N}) + \sigma_n^2 \Eye \right)^{-1} \mat{Q_{N \ast}}.
+    \end{align}
 \end{lemma}
+\begin{figure}[t]
+    \centering
+    \begin{subfigure}{\subfigurewidth}
+        \missingfigure[figheight=.25\textheight]{GP on some Data}
+        \caption{GP on some Data}
+        \label{fig:spgp_example:gp}
+    \end{subfigure}
+    \begin{subfigure}{\subfigurewidth}
+        \missingfigure[figheight=.25\textheight]{SPGP on some Data}
+        \caption{SPGP on some Data}
+        \label{fig:spgp_example:spgp}
+    \end{subfigure}
+    \caption{GP vs. SPGP}
+    \label{fig:spgp_example}
+\end{figure}
+
+Calculating this is still expensive, but we can use matrix inversion lemma \cite{petersen_matrix_2008}!
+
+\begin{align}
+    \mat{\mu_\ast} &= \mat{K_{\ast M}} \mat{B}^{-1} \mat{K_{MN}} \left( \diag(\mat{K_N} - \mat{Q_N}) + \sigma_n^2 \Eye \right)^{-1} \mat{y} \\
+    \mat{\Sigma_\ast} &= \mat{K_\ast} - \mat{K_{\ast M}} \left( \mat{K_M}^{-1} - \mat{B}^{-1} \right) \mat{K_{M \ast}} \\
+    \mat{B} &= \mat{K_M} + \mat{K_{MN}} \left( \diag(\mat{K_N} - \mat{Q_N}) + \sigma_n^2 \Eye \right)^{-1} \mat{K_NM}
+\end{align}
+
+This is great since we only have to inverte $M \times M$ and a diagonal $N \times N$ in $\mat{B}$. This gives $\Oh(NM^2)$ for the preprocessing, $\Oh(M)$ means and $\Oh(M^2)$ variances.
+
+We can learn this as usual via marginal likelihood which we do not show but we can still calculate derivatives.
+It does not always converge nicely though, which is why there are newer alternatives.
+\citeauthor{titsias_variational_2009} thought of a variational approach we would like to mention \cite{titsias_variational_2009}.
+The curse of dimensionality does not apply directly with SPGP, since marginal likelihood optimization puts the pseudo-inputs at \enquote{interesting places} and therefore we might not need so many.
 
 \section{Particle Swarm Optimization}
 \subsection{Basic PSO}
