@@ -1,5 +1,4 @@
-\chapter{State of the Art}
-\label{cha:state_of_the_art}
+\chapter{Theoretical Background}
 The bicycle benchmark is an instance of a problem in a branch of machine learning called reinforcement learning.
 This chapter gives a brief introduction into reinforcement learning necessary and defines the notation necessary to reason about the bicycle benchmark and similar problems in a mathematical way.
 The approach used in this thesis to solve this problem is called model-based reinforcement learning and is discussed next.
@@ -565,8 +564,8 @@ We get the prior from the noise-free GP and use the result of the marginalizatio
 This one we compare to the marginal likelihood of a normal GP in \cref{eq:gp_marginal_likelihood}.
 We observe that we can interpret the SPGP likelihood as a normal GP likelihood with a particular kernel $\K_{\text{SPGP}}$ given by
 \begin{align}
-    \Q(\mat{x}, \mat{y}) &\coloneqq \mat{K_{xM}} \mat{K_M}^{-1} \mat{K_{Mx}} \\
-    \K_{\text{SPGP}}(\mat{x}, \mat{y}) &\coloneqq \Q(\mat{x}, \mat{y}) + \delta_{\mat{x}, \mat{y}} \left( \K(\mat{x}, \mat{y}) - \Q(\mat{x}, \mat{y}) \right)
+    \Q(\mat{a}, \mat{b}) &\coloneqq \mat{K_{aM}} \mat{K_M}^{-1} \mat{K_{Mb}} \\
+    \K_{\text{SPGP}}(\mat{a}, \mat{b}) &\coloneqq \Q(\mat{a}, \mat{b}) + \delta_{\mat{a}, \mat{b}} \left( \K(\mat{a}, \mat{b}) - \Q(\mat{a}, \mat{b}) \right)
 \end{align}
 using the Kronecker-Delta $\delta$.
 This kernel function is equal to $\K$ for diagonal entries and equal to $\Q$ everywhere else.
