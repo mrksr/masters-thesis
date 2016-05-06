@@ -1,14 +1,15 @@
 \chapter{Theoretical Background}
-The bicycle benchmark is an instance of a problem in a branch of machine learning called reinforcement learning.
-This chapter gives a brief introduction into reinforcement learning necessary and defines the notation necessary to reason about the bicycle benchmark and similar problems in a mathematical way.
-The approach used in this thesis to solve this problem is called model-based reinforcement learning and is discussed next.
-These models are used to learn the dynamics of the system to be controlled in order to be able to make predictions about its future development.
-The remainder of the chapter will be concerned with introducing two tools used in this approach.
+The bicycle benchmark is a problem in a branch of machine learning called reinforcement learning.
+This chapter gives a brief introduction into reinforcement learning and defines the notation necessary to reason about the bicycle benchmark and similar problems in a mathematical way.
+The approach used in this thesis to solve it is called model-based reinforcement learning and is discussed next.
 
-Gaussian Processes provide a framework to learn dynamics in a way which adds information about the uncertainty of a prediction.
+The models in model-based reinforcement learning are used to learn the dynamics of the system to be controlled in order to be able to make predictions about its future development.
+Gaussian Processes provide a framework to learn such dynamics in a way which adds information about the uncertainty of a prediction.
 This is achieved by learning a distribution over possible models rather than deciding on one single model.
-The choice of which action to take will then be made via optimization over the space of all possible actions for a certain amount of decisions into the future.
-Since this problem is highly non-linear and hard to describe analytically, the gradient-free heuristic method of particle swarm optimization is used to solve it.
+The uncertainty about the development in a single time step can be used to reason about the uncertainty of predictions multiple steps into the future.
+
+Being able to make judgments about the future dependent on the next action to take allows the definition of a controller.
+Particle swarm optimization is introduced as a way to choose the best action to take based on a performance-measure of the predicted future states.
 
 \section{Reinforcement Learning}
 Consider an agent who wants to learn how to learn how to drive a bicycle to a certain position.
@@ -18,27 +19,29 @@ In the absence of such a teacher however, the agent must learn from interaction 
 An agent might start by applying random actions to the system and quickly fall down, making it impossible to ever reach the goal.
 This gives the agent an opportunity to learn:
 It has to avoid falling down in order to have the chance of achieving its objective.
-Such a feedback is called a reward (or in this case, a punishment) and is the basis on which the agent can learn to judge the viability of actions in a certain state.
+A human agent who falls down from a bicycle feels pain when hitting the asphalt which they will try to avoid.
+Such feedback is called a \emph{reward} (or in this case, a punishment) and is the basis on which the agent can learn to judge the viability of actions in a certain state.
 
-After multiple trials, the agent might be able to avoid falling an be able to stabilize the bicycle.
-To achieve this, the agent may have built a basic understanding of how the bicycle system behaves.
-It might have recognized that a bicycle which is already leaning on one side if left alone will fall down because of the gravitational pull or driving in a curve means that the centrifugal force pushes the bicycle to the outside.
+After multiple trials, the agent might be able to avoid falling and be able to stabilize the bicycle.
+To achieve this, it may have built a basic understanding of how the bicycle system behaves.
+It might have recognized that a bicycle which is already leaning on one side if left alone will fall down because of the gravitational pull or that driving in a curve means that the centrifugal force pushes the bicycle to the outside.
 Note that to gain these insights, it is not necessary for the agent to have an understanding of the underlying physics.
 It is enough to observe situations in which the effects play out and generalize from there.
 
 When the agent has learnt how to stabilize the bicycle by driving small corrective curves, it has not yet solved the original task of navigating the bicycle to a specific position.
 It will have to shift its focus from the short-term goal of avoiding falling over to the more high-level and long-term task of following a targeted trajectory.
-Following this trajectory might require some compromises, since driving along a very sharp curve requires the cyclist to lean very precisely.
-In the case that reaching the goal is time-critical, the optimal trajectory would be constrained by the minimum radius of a curve and therefore by the amount the bicycle is allowed to be leaning before falling over.
+Following this trajectory might require some compromises concerning the previous step of avoiding to fall down, since it is easier to drive straight than it is to drive along a specific curve.
+In the case that reaching the goal is time-critical, the optimal trajectory would be constrained by the minimum radius of a curve the agent can handle.
+In the case of a perfect controller, it is constrained by the maximum lean angle $\omega$.
 
-The requirements an agent faces when solving the bicycle benchmark can however be understood in a more general sense, leading to the problem statement of reinforcement learning.
-In the following, it will be formulated in a mathematical way to allow a principled approach to a solution.
+The requirements an agent faces when solving the bicycle benchmark can be understood in a more general sense, which is formulated in the problem statement of reinforcement learning.
+It formalizes the ideas of and agent, it's interaction with a system and the positive or negative feedback it receives.
 
 \subsection{Problem Statement}
-Reinforcement learning is meant to catch the general problem of learning by interaction to control a system in order to achieve a predefined goal.
+Reinforcement learning is meant to describe the general problem of learning to control a system by interaction in order to achieve a predefined goal.
 In order to achieve this goal, the learning entity or \emph{agent} has to decide on specific actions to influence its \emph{environment}, which is everything outside of the agent.
 The boundary between agent and environment is a well-defined and narrow interface illustrated in \cref{fig:agent_environment_interaction}.
-They interact via this interface at specific discrete \emph{time steps}, usually indexed with the natural numbers.
+They interact via this interface at specific discrete \emph{time steps}, usually indexed with the natural numbers $\N$.
 \begin{figure}[htb]
     \centering
     \missingfigure[figheight=0.25\textheight]{Agent-Environment-Interaction}
@@ -48,18 +51,18 @@ They interact via this interface at specific discrete \emph{time steps}, usually
 
 At every such time step $t$, the agent can observe the environment and receives some information in form of its \emph{state} $s_t \in \Es$, where $\Es$ is the space of all possible states and will for the remainder of the thesis be assumed to be a finite-dimensional vector space over the real numbers.
 Based on this information, the agent has to decide on which action $a_t \in \Ah$ to perform.
-The space of all possible actions $\Ah$ is also assumed to be a finite-dimensional vector space over the real numbers and is the same for all time steps and states.
+The space of all possible actions $\Ah$ is assumed to be continuous and of the same form and remains constant for all time steps and states.
 
 The decision-process an agent employs in order to choose an action is called the agent's \emph{policy}.
 A policy is a function which maps states to actions.
 Policies are often encoded in closed forms such as linear functions \cite{deisenroth_efficient_2010}.
 \begin{definition}[Policy]
-    A \emph{policy $\pi$} an agent follows encodes the choice an agent makes when faced with a decision.
+    A \emph{policy $\pi$} an agent follows encodes the choice it makes when faced with a decision.
     It is a function
     \begin{align}
         \pi : \Es \to \Ah
     \end{align}
-    which maps the state the system currently is in to the action the agent will perform.
+    which maps the current state of the system to the action the agent will perform.
 \end{definition}
 
 Once the agent has chosen an action for time step $t$, the \emph{transition dynamics} of the system determine the state $s_{t+1}$.
@@ -75,7 +78,7 @@ The set $\Es \cup \Tee$ is called the \emph{extended state space $\Es^+$} and co
 A task which does not have terminal states is called \emph{continuous} and has episodes of infinite length.
 
 \begin{definition}[Transition Dynamics]
-    The \emph{transition dynamics $\Dyn$} of a system encode the physical behaviour of a system.
+    The \emph{transition dynamics $\Dyn$} of a system encode its physical behaviour.
     These dynamics
     \begin{align}
         \Dyn : \Es \times \Ah \to \Dists(\Es^+)
@@ -89,7 +92,7 @@ In other words, the transition dynamics only depend on the present state of the 
 At time step $t+1$, the agent observes the environment again in the form of the state $s_{t+1}$.
 Additionally, it also receives immediate feedback about this new state called the \emph{reward $r_{t+1}$}.
 The reward is a quality assigned to each state and serves as a measure of how good a state to be in it is.
-This measure is independent of future or past development.
+This measure is independent of the future or past development of the system.
 It is obtained from a real-valued \emph{reward function $\Rwd$} such that $r_{t+1} = \Rwd(s_{t+1})$.
 \begin{definition}[Reward Function]
     The \emph{reward function $\Rwd$} assigns a quality to each state in the extended state space and has the signature
@@ -100,9 +103,9 @@ It is obtained from a real-valued \emph{reward function $\Rwd$} such that $r_{t+
 \end{definition}
 
 The goal of the agent is to maximize the sum of all rewards earned throughout an episode.
-A greedy agent which is only concerned about the next immediate reward might not be the most successful, since it may be necessary to make a decision which is bad in the short term to gain an advantage in the long term, such as sacrificing a piece in chess to end up in a better position overall.
+A greedy agent which is only concerned with the next immediate reward might not be the most successful, since it may be necessary to make a decision which is bad in the short term to gain an advantage in the long run, such as sacrificing a piece in chess to end up in a better position overall.
 
-The \emph{value function} is a measure for how good a policy behaves in the long-run.
+The \emph{value function} is a measure for how good a policy behaves in the long run.
 Given a policy and a start state, it is defined as the expected sum of rewards earned in a time horizon $T$.
 Since the transition dynamics are assumed to be probabilistic, the states at all time steps greater than zero are random variables.
 Given a distribution of the state $\rv{s_t}$, the distribution for the next state $\rv{s_{t+1}}$ for all $t \in \N_{>0}$ can be calculated as
@@ -120,7 +123,7 @@ This extends all episodes to potentially infinite length.
 
 The time horizon $T$ can be chosen freely but does not depend on either the current policy or state.
 The larger the time horizon, the more far-sighted a agent has to be to be successful.
-For large values of $T$, it can be helpful to focus to weigh potential rewards further into the future less.
+For large values of $T$, it can be helpful to focus on rewards earned in the near future and to weigh potential rewards further along with a smaller factor.
 This can be achieved using the discount factor $\gamma$ which is a constant real number between zero and one.
 In the case of an infinite time horizon, $\gamma$ must be chosen smaller than one to ensure the well-definedness of the function.
 
@@ -141,30 +144,30 @@ Assume now a known distribution of possible start states $\Prob{\rv{s_0}}$.
 The sets $\Es^+$ and $\Ah$ of states and actions together with the transition dynamics $\Dyn$, the reward function $\Rwd$ and this distribution $\Prob{\rv{s_0}}$ defines a fully observable Markov decision process (MDP) \cite{sutton_reinforcement_1998,murphy_machine_2012}.
 
 The objective of the reinforcement learning problem stated here is to find the most successful policy to control this decision process under the assumption that no expert knowledge about the transition dynamics is available.
-This optimal policy $\pi^*$ maximizes the expected value for all start states, that is it solves the optimization problem
+The optimal policy $\pi^*$ maximizes the expected value for all start states, that is it solves the optimization problem
 \begin{align}
     \label{eq:optimal_policy}
     \pi^* &\in \argmax_{\pi} \Moment*{\E_{\rv{s_0}}}{V^\pi(\rv{s_0})} \\
     &= \argmax_{\pi} \int V^\pi(\rv{s_0}) \Prob{\rv{s_0}} \diff \rv{s_0}.
 \end{align}
 
-There is a multitude of different approaches of arriving at such an optimal policy.
+There is a multitude of different approaches of arriving at good policies.
 The following will introduce the important distinction of model-based and model-free methods and give a high level view of how the former will be used within this thesis.
 
 \subsection{Model-Based Reinforcement Learning}
 To find a good policy, an agent has to gain experience about its environment via interaction.
-In \emph{direct reinforcement learning} \cite{sutton_reinforcement_1998}, or model-free methods, this experience is used to update the current policy or its value function directly.
+In \emph{direct reinforcement learning} \cite{sutton_reinforcement_1998}, or model-free methods, this experience is used to update the current policy or an estimation of its value function directly.
 After enough time spent with the system, iteratively improving the current policy can converge to the optimal policy.
 
 In \emph{model-based} reinforcement learning, the experience is used to learn an internal representation of the transition dynamics $\Dyn$.
 This allows the agent to make predictions about the future behaviour of the system and therefore approximatively evaluate the value function without actually interacting with the system.
 A closed-form policy can then be found by solving the non-linear optimization problem proposed in \cref{eq:optimal_policy}.
 
-\citeauthor{deisenroth_efficient_2010} \cite{deisenroth_efficient_2010} describes an algorithmic scheme called PILCO in which phases of exploration on the real system to gather more data to improve the internal model alternate with phases of improvement of the current policy based on this internal simulation.
+\citeauthor{deisenroth_efficient_2010} \cite{deisenroth_efficient_2010} describes an algorithmic scheme called PILCO in which phases of exploration on the real system to gather more data to improve the internal model alternate with phases of improvement of the current policy based on the internal simulation.
 This iteration allows the agent to explore promising directions in the state space using intermediate policies.
 
-In this thesis however, it is assumed that all interaction with the system has to happen before any learning can take place.
-This assumption is sensible in the context of industrial applications where interactions with a system can be very expensive and dangerous and where a possibly bad agent cannot be allowed to choose actions to perform.
+In this thesis it is assumed that all interaction with the system has to happen before any learning can take place.
+This assumption is sensible in the context of industrial applications where interactions with a system can be very expensive and dangerous and where a potentially bad agent cannot be allowed to choose actions to perform.
 Instead of allowing interaction, the agent is presented with a data set of observations of the transition dynamics in the form of tuples $(\mat{s_t}, \mat{a_t}, \mat{s_{t+1}})$.
 These observations can be obtained via a mix of random exploration and actions chosen by a sub-optimal controller.
 
@@ -177,8 +180,8 @@ Instead of focusing on one single dynamics model, a probabilistic representation
 This yields a measure of uncertainty of predictions one step into the future and can be extended to long-term predictions as required in the value function.
 Assuming deterministic transition dynamics such as the bicycle benchmark, this measure does not describe a property of the system but rather the uncertainty about the model itself.
 
-Gaussian Processes provide a framework to represent such a distribution over possible dynamic models.
-The following will introduce their definition and how they can be used to solve regression problems.
+Gaussian Processes provide a framework to represent such a distribution over possible models for the transition dynamics.
+The following section will introduce their definition and derive how they can be used to solve regression problems.
 The last part of this chapter will be concerned with introducing a policy-representation based on these results which does not depend on a closed-form solution.
 
 \section{Gaussian Process Regression}
@@ -502,7 +505,7 @@ For many choices of priors $\Prob{\mat{\theta}}$ this is still a hard problem.
 But assuming a flat prior which assigns almost equal probability to all choices of hyperparameters, it holds that
 \begin{align}
     \Prob{\mat{\theta} \mid \mat{X}, \mat{y}} &\propto \Prob{\mat{y} \given \mat{X}, \mat{\theta}} \\
-    &= \int \Prob{\mat{y} \given \mat{f}, \mat{\theta}} \Prob{\mat{f} \given \mat{\theta}} \diff \mat{f},
+    &= \int \Prob{\mat{y} \given \mat{f}, \mat{\theta}} \Prob{\mat{f} \given \mat{X}, \mat{\theta}} \diff \mat{f},
 \end{align}
 that is, the posterior distribution is proportional to the likelihood term and can be obtained using a maximum likelihood estimate using the \emph{marginal likelihood} after integrating out the function values $\mat{f}$.
 Optimizing this term is called a \emph{type II maximum likelihood estimate (ML-II)}.
@@ -587,7 +590,7 @@ With $\delta$ denoting the Kronecker-Delta it is defined as
     \K_{\text{SPGP}}(\mat{a}, \mat{b}) &\coloneqq \Q(\mat{a}, \mat{b}) + \delta_{\mat{a}, \mat{b}} \left( \K(\mat{a}, \mat{b}) - \Q(\mat{a}, \mat{b}) \right).
 \end{align}
 This kernel is equal to $\K$ when both arguments are identical and equal to $\Q$ everywhere else.
-For well-chosen pseudo inputs, $\Q$ is a low-rank approximation of $\K$ \cite{snelson_flexible_2007}.
+For well-chosen pseudo inputs, $\mat{Q_N}$ is a low-rank approximation of $\mat{K_N}$ \cite{snelson_flexible_2007}.
 Because of this identity, an SPGP is a normal Gaussian process with an altered kernel function.
 The pseudo inputs $\ps{\mat{X}}$ are hidden in the kernel matrix $\mat{K_M}$ are additional hyperparameters to this kernel.
 This observation directly yields the SPGP predictive posterior.
