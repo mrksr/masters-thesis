@@ -49,9 +49,9 @@ They interact via this interface at specific discrete \emph{time steps}, usually
     \label{fig:agent_environment_interaction}
 \end{figure}
 
-At every such time step $t$, the agent can observe the environment and receives some information in form of its \emph{state} $s_t \in \Es$, where $\Es$ is the space of all possible states and will for the remainder of the thesis be assumed to be a finite-dimensional vector space over the real numbers.
+At every such time step $t$, the agent can observe the environment and receives some information in form of its \emph{state} $s_t \in \Es$, where $\Es$ is the continuous space of all possible states.
 Based on this information, the agent has to decide on which action $a_t \in \Ah$ to perform.
-The space of all possible actions $\Ah$ is assumed to be continuous and of the same form and remains constant for all time steps and states.
+The space of all possible actions $\Ah$ is assumed to be continuous and remains constant for all time steps and states.
 
 The decision-process an agent employs in order to choose an action is called the agent's \emph{policy}.
 A policy is a function which maps states to actions.
@@ -161,7 +161,7 @@ After enough time spent with the system, iteratively improving the current polic
 
 In \emph{model-based} reinforcement learning, the experience is used to learn an internal representation of the transition dynamics $\Dyn$.
 This allows the agent to make predictions about the future behaviour of the system and therefore approximatively evaluate the value function without actually interacting with the system.
-A closed-form policy can then be found by solving the non-linear optimization problem proposed in \cref{eq:optimal_policy}.
+A closed form policy can then be found by solving the non-linear optimization problem proposed in \cref{eq:optimal_policy}.
 
 \citeauthor{deisenroth_efficient_2010} \cite{deisenroth_efficient_2010} describes an algorithmic scheme called PILCO in which phases of exploration on the real system to gather more data to improve the internal model alternate with phases of improvement of the current policy based on the internal simulation.
 This iteration allows the agent to explore promising directions in the state space using intermediate policies.
@@ -182,7 +182,7 @@ Assuming deterministic transition dynamics such as the bicycle benchmark, this m
 
 Gaussian Processes provide a framework to represent such a distribution over possible models for the transition dynamics.
 The following section will introduce their definition and derive how they can be used to solve regression problems.
-The last part of this chapter will be concerned with introducing a policy-representation based on these results which does not depend on a closed-form solution.
+The last part of this chapter will be concerned with introducing a policy-representation based on these results which does not depend on a closed form solution.
 
 \section{Gaussian Process Regression}
 The transition dynamics $\Dyn : \Es \times \Ah \to \Dists(\Es^+)$ are a function mapping states and actions to a probability distribution of following states.
@@ -196,7 +196,7 @@ Since the number of observations is finite and the function $f$ is an infinite o
 
 In classic control scenarios, these prior assumptions often follow from physical descriptions of the system to be modelled.
 While the physics of driving a bicycle is understood quite well and can be described using differential equations, a controller for a specific bicycle depends on some parameters $\gamma$ such as the masses and measures detailed in \cref{tab:bicycle_constants}.
-In this setting, solving the regression problem corresponds to a choice of parameters $\gamma^\ast$ which explain the observations of the true system best.
+In this setting, solving the regression problem corresponds to finding a choice of parameters $\gamma^\ast$ which explain the observations of the true system best.
 
 In a Bayesian context, instead of deciding on one specific vector of parameters, it might be more interesting to derive a distribution $\Prob{\gamma^*}$ of probable parameter values which then represents the uncertainty about their true value.
 When making a prediction for a new input point $\mat{x_\ast}$, this uncertainty can be used to derive a predictive distribution $\Prob{y_\ast \given \mat{x_\ast}, \mat{\gamma^\ast}}$, which propagates this uncertainty through the model to the prediction.
@@ -211,7 +211,7 @@ This means that both the number of parameters becomes large and it may be hard t
 \emph{Non-parametric models} are not based on insights about the concrete structure of the function to be modelled but rather only make assumptions about properties of the function itself, such as smoothness or differentiability.
 Instead of modelling a distribution of parameter values, a Bayesian non-parametric model is concerned with finding a distribution $\Prob{f^\ast}$ of probable functions which represents the believe of the model about the function $f$ to be estimated.
 
-\emph{Gaussian Processes (GPs)} are a state-of-the-art framework for non-parametric regression.
+\emph{Gaussian processes (GPs)} are a state-of-the-art framework for non-parametric regression.
 They are a way of representing a probability distribution over functions in a way which is both computationally feasible and allows for Bayesian inference.
 This section introduces Gaussian Processes and describes how to encode a prior distribution over functions to represent preference in the space of all possible functions $f$.
 Based on observed data, GPs can be used make predictions about the predictive distribution $\Prob{y_\ast \given \mat{x_\ast}, f^\ast}$ taking all functions in the distribution $\Prob{f^\ast}$ into account.
@@ -258,22 +258,22 @@ Instead of a mean vector $\mat{\mu}$ and a covariance matrix $\mat{\Sigma}$, a G
     &= \Moment{\cov}{\rv{X_a}, \rv{X_{a^\prime}}}
 \end{align}
 with $a, a^\prime \in A$.
-The mean function contains the pointwise mean over all trajectories which could be sampled from $\rv{X}$.
+The mean function encodes the point wise mean over all trajectories which could be sampled from $\rv{X}$.
 The covariance function is also called a \emph{kernel} and describes the interaction between different parts of the function.
-A function which is distributed according to a Gaussian process is denoted as $f \sim \GP\Cond{\mu(\cdot), \K(\cdot, \cdot)}$.
+A function which is distributed according to a Gaussian process is denoted as $f \sim \GP\Cond{\mu_f, \K}$.
 
-For convenience it is often assumed that the prior mean function $\mu(\cdot)$ is constant zero.
+For convenience it is often assumed that the prior mean function $\mu_f$ is constant zero.
 This assumption is without loss of generality \cite{rasmussen_gaussian_2006} since in the case the mean function is known to be different to zero, the observations $\left( \mat{X}, \mat{y} \right)$ can be transformed to $\mat{y^\prime} = \mat{y} - \mu(\mat{X})$.
 The Gaussian process based on the observations $\left( \mat{X}, \mat{y^\prime} \right)$ then only models the differences to the mean function.
 It is the covariance functions which encode the assumptions about the underlying function.
 
 \subsection{Kernels}
 Gaussian processes are collections of random variables, any finite subset of which have a joint multivariate Gaussian distribution.
-For any pair $(\rv{X_i}, \mat{X_j})$ of these random variables, their covariance is given by the covariance function $\Moment{\cov}{\rv{X_i}, \rv{X_j}} = \K(\rv{X_i}, \rv{X_j})$.
+For any pair $(\rv{X_i}, \mat{X_j})$ of these random variables, their covariance is given by the covariance function $\Moment{\cov}{\rv{X_i}, \rv{X_j}} = \K(i, j)$.
 The pairwise covariances in a multivariate Gaussian $\Gaussian{\mat{\mu}, \mat{\Sigma}}$ are given by its \emph{covariance matrix} $\mat{\Sigma}$.
 For any finite set of random variables, the matrix obtained by pairwise application of the covariance function is called the \emph{Gram matrix}.
 \begin{definition}[Gram Matrix]
-    Given a non-empty set $M$, a function $\K : M^2 \to \R$ and two sets $X = \Set*{x_i \in M \with i \in [n]}$ and $Y = \Set*{y_j \in M \with j \in [m]}$.
+    Given a non-empty set $A$, a function $\K : A^2 \to \R$ and two sets $X = \Set*{x_i \in A \with i \in [n]}$ and $Y = \Set*{y_j \in A \with j \in [m]}$.
     The $n \times m$ matrix
     \begin{align}
         \K(X, Y) = \mat{K_{XY}} \coloneqq \bigg( \K(x_i, y_j) \bigg)_{\substack{i \in [n], \\ j \in [m]}}
@@ -283,16 +283,16 @@ For any finite set of random variables, the matrix obtained by pairwise applicat
 In order for the Gram matrix to be a valid covariance matrix $\mat{\Sigma}$ of a Gaussian distribution, it must be positive definite.
 \emph{Kernels} are functions which fulfill the property that for every possible subset of random variables, or more generally every set of elements in their domain, their induced Gram matrix is positive definite.
 \begin{definition}[Kernel]
-    Given a non-empty set $M$, a function
+    Given a non-empty set $A$, a function
     \begin{align}
-        \K : M^2 \to \R
+        \K : A^2 \to \R
     \end{align}
-    is called a \emph{(positive definite) kernel} or \emph{covariance function}, if for any subset $X \subseteq M$, the Gram matrix $\K(X, X)$ is positive definite \cite{scholkopf_learning_2002}.
+    is called a \emph{(positive definite) kernel} or \emph{covariance function}, if for any finite subset $X \subseteq A$, the Gram matrix $\K(X, X)$ is positive definite \cite{scholkopf_learning_2002}.
 \end{definition}
 The kernel is crucial in encoding the assumptions about the function a Gaussian process should estimate.
 It is a measure of \emph{similarity} of different points in the observed data and of new points to be predicted.
 A natural assumption to make is to assume that the closer together in the domain two points lie, the more similar their function values will be.
-Similarly, to predict a test point, trainings points close to it are probably more informative than those further away.
+Similarly, to predict a test point, training points close to it are probably more informative than those further away.
 
 But closeness is not the only possible reason two points could be similar.
 Assume a function to be modeled which is a possibly noisy sinusoidal wave with a known frequency.
@@ -305,15 +305,15 @@ A simple example of such a non-stationary kernel is the linear kernel.
         \K_{\text{linear}}(\mat{x}, \mat{y}) \coloneqq \mat{x}^T \mat{y} = \left\langle \mat{x}, \mat{y}\right\rangle.
     \end{align}
 \end{definition}
-Consider a function $f : \R \to \R$ which is distributed according to a Gaussian process with the linear kernel $f \sim \GP\Cond{0, \K_{\text{linear}}}$.
+Consider a function $f : \R \to \R$ which is distributed according to a Gaussian process with the linear kernel $f \sim \GP\Cond{\mat{0}, \K_{\text{linear}}}$.
 According to the definition of Gaussian processes, for any two input numbers $x$, $y \in \R$ their corresponding random variables $\rv{f_x}$ and $\rv{f_y}$ have a joint Gaussian distribution
 \begin{align}
     \begin{pmatrix}
         \rv{f_x} \\ \rv{f_y}
-    \end{pmatrix} \sim \Gaussian*{\mat{0}, \begin{pmatrix}
+    \end{pmatrix} \sim \Gaussian*{\mat{0}, \begin{bmatrix}
         \K(x, x) & \K(x, y) \\
         \K(y, x) & \K(y, y)
-    \end{pmatrix}}
+    \end{bmatrix}}
 \end{align}
 where $\K = \K_{\text{linear}}$.
 Assuming that both $x$ and $y$ are not equal to zero, the correlation coefficient of these two variables is given by
@@ -377,7 +377,7 @@ The different length scale parameters $l_i$ roughly specify the distance of data
 \Cref{fig:gp_samples} compares sample functions drawn from Gaussian processes with squared exponential kernels with different hyperparameters.
 
 These plots show continuous functions being drawn from their respective processes.
-It is however only possible to evaluate the Gaussian process at finitely many points and connect the resulting samples.
+It is however only possible to evaluate the Gaussian process at finitely many points and then connect the resulting samples.
 Drawing the function values of a finite amount of sample input points $\mat{X_\ast}$ from a Gaussian process prior is equivalent to drawing a sample from the Gaussian $\Gaussian{\mat{0}, \mat{K_\ast}}$ where $\mat{K_\ast}$ is a short hand notation for $\K(\mat{X_\ast}, \mat{X_\ast})$.
 
 \subsection{Predictions and Posterior}
@@ -421,7 +421,7 @@ By definition the latent function values $\mat{f}$ of the training set and the l
         \mat{K_{\ast N}} & \mat{K_{\ast}}
     \end{bmatrix}}.
 \end{align}
-Adding the noise model to this distribution gives the joint Gaussian of training outputs $\mat{y}$ and test outputs $\mat{f_\ast}$ by
+Adding the noise model to this distribution leads to the joint Gaussian of training outputs $\mat{y}$ and test outputs $\mat{f_\ast}$ which is given by
 \begin{align}
     \Prob*{\begin{pmatrix}
         \mat{y} \\
@@ -474,10 +474,10 @@ Note that the posterior mean function is not necessarily the constant zero funct
 \Cref{fig:gp_posterior} shows samples from a pair of prior and posterior Gaussian processes.
 
 Computing the inverse $\left(\mat{K_N} + \sigma_n^2 \Eye \right)^{-1}$ costs $\Oh(N^3)$ but can be done as a preprocessing step since it is independent of the test points.
-Predicting the mean of a single test point is a weighted sum of $N$ basis functions $\mu_\ast = \mat{K_{\ast N}} \mat{\alpha}$ where $\mat{\alpha} = \left(\mat{K_N} + \sigma_n^2 \Eye \right)^{-1} \mat{y}$ and $\mat{\alpha}$ can be precomputed, too.
-This means the prediction of a single mean costs $\Oh(N)$.
-To predict the variance, it is still necessary to perform a matrix multiplication which costs $\Oh(N^2)$.
-Since all of these operations are dependent the number of training points, evaluating Gaussian processes on large data sets can be computationally expensive.
+Predicting the mean of a single test point is a weighted sum of $N$ basis functions $\mu_\ast = \mat{K_{\ast N}} \mat{\alpha}$ where $\mat{\alpha} = \left(\mat{K_N} + \sigma_n^2 \Eye \right)^{-1} \mat{y}$ which can be precomputed.
+After this precomputation, predicting the mean of a single test point costs $\Oh(N)$.
+To predict its variance, it is still necessary to perform a matrix multiplication which costs $\Oh(N^2)$.
+Since all of these operations are dependent on the number of training points, evaluating Gaussian processes on large data sets can be computationally expensive.
 Before introducing sparse approximations with better asymptotic complexity, the next section deals with choosing good values for the vector of hyperparameters $\mat{\theta}$.
 
 \subsection{Choosing hyperparameters}
@@ -489,7 +489,7 @@ A major advantage of Gaussian processes is the ability to select hyperparameters
 
 In a fully Bayesian setup, the correct way to model uncertainty about hyperparameters is to assign them a prior $\Prob{\mat{\theta}}$ and marginalize it to derive the dependent distributions
 \begin{align}
-    \Prob{f} &= \int \Prob{f \given \mat{\theta}} \Prob{\mat{\theta}} \diff \theta \\
+    \Prob{f} &= \int \Prob{f \given \mat{\theta}} \Prob{\mat{\theta}} \diff \mat{\theta} \\
     \Prob{\mat{y} \given \mat{X}} &= \int \Prob{\mat{y} \given \mat{X}, \mat{\theta}} \Prob{\mat{\theta}} \diff \mat{\theta}. \label{eq:theta_posterior_integration}
 \end{align}
 Updating the believe about the distribution of the hyperparameters then becomes part of the process of obtaining a posterior model.
@@ -507,16 +507,17 @@ But assuming a flat prior which assigns almost equal probability to all choices 
     \Prob{\mat{\theta} \mid \mat{X}, \mat{y}} &\propto \Prob{\mat{y} \given \mat{X}, \mat{\theta}} \\
     &= \int \Prob{\mat{y} \given \mat{f}, \mat{\theta}} \Prob{\mat{f} \given \mat{X}, \mat{\theta}} \diff \mat{f},
 \end{align}
-that is, the posterior distribution is proportional to the likelihood term and can be obtained using a maximum likelihood estimate using the \emph{marginal likelihood} after integrating out the function values $\mat{f}$.
+that is, the posterior distribution is proportional to the likelihood term and can be obtained using a maximum likelihood estimate on the \emph{marginal likelihood} after integrating out the function values $\mat{f}$.
 Optimizing this term is called a \emph{type II maximum likelihood estimate (ML-II)}.
 
-The marginal likelihood is an integral over a product of Gaussians obtained from the noise model the distribution of function values according to the Gaussian process definition.
+The marginal likelihood is an integral over a product of Gaussians obtained from the noise model and the distribution of function values according to the Gaussian process definition.
 It is given by
 \begin{align}
-    \Prob{\mat{\theta} \mid \mat{X}, \mat{y}} &= \int \Prob{\mat{y} \given \mat{f}, \mat{\theta}} \Prob{\mat{f} \given \mat{\theta}} \diff \mat{f} \label{eq:gp_f_marginalization} \\
-    &= \int \Gaussian{\mat{y} \given \mat{f}, \sigma_n^2 \Eye} \cdot \Gaussian{\mat{f} \given \mat{0}, \mat{K_N}} \diff \mat{f}.
+    \Prob{\mat{y} \mid \mat{X}, \mat{\theta}} &= \int \Prob{\mat{y} \given \mat{f}, \mat{\theta}} \Prob{\mat{f} \given \mat{\theta}} \diff \mat{f} \label{eq:gp_f_marginalization} \\
+    &= \int \Gaussian{\mat{y} \given \mat{f}, \sigma_n^2 \Eye} \cdot \Gaussian{\mat{f} \given \mat{0}, \mat{K_N}} \diff \mat{f} \\
+    &= \Gaussian{\mat{y} \given \mat{0}, \mat{K_N} + \sigma_n^2 \Eye}
 \end{align}
-The solution of this integral is a non-normalized Gaussian density function \cite{petersen_matrix_2008}.
+The solution of this integral is a Gaussian density function \cite{petersen_matrix_2008}.
 For practical reasons, it is convenient to minimize the negative logarithm of the likelihood which is given by
 \begin{align}
     \Ell(\mat{\theta}) = -\log\Prob{\mat{y} \given \mat{X}, \mat{\theta}} =
@@ -528,16 +529,16 @@ The estimation of hyperparameters is the solution of the optimization problem
 \begin{align}
     \mat{\theta}^\ast &\in \argmin_{\mat{\theta}} \Ell(\mat{\theta})
 \end{align}
-and is calculated using standard approaches to non-convex optimization such as scaled conjugate gradient (SCD) techniques, since deriving the derivatives of $\Ell$ is comparatively easy \cite{rasmussen_gaussian_2006}.
+and is calculated using standard approaches to non-convex optimization such as scaled conjugate gradient (SCD) techniques, since finding the derivatives of $\Ell$ is comparatively easy \cite{rasmussen_gaussian_2006}.
 The computational complexity of evaluating the likelihood term and its derivatives is dominated by the inversion of $\mat{K_N} + \sigma_n^2 \Eye$.
 
-Since this optimization scheme does not choose parameters of the function approximation directly but rather changes a small number of broad and high-level assumptions about it, overfitting does not tend to be a problem for Gaussian processes in general \cite{rasmussen_gaussian_2006}.
+Since this optimization scheme does not choose parameters of the function approximation directly but rather changes a small number of broad and high-level assumptions about it, overfitting does not tend to be a problem for Gaussian processes in general \cite{snelson_flexible_2007}.
 The sparse approximation of Gaussian processes presented in the next section chooses a small number of points in the input space to represent a large training set.
 The positions of these input points can be interpreted as hyperparameters to the original Gaussian process and induce a kernel function with many hyperparameters, where overfitting can become relevant.
 
 \subsection{Sparse Approximations using Inducing Inputs}
 A major drawback of Gaussian Processes in real-world applications is their high computational cost for large data sets.
-Assume a data set $(\mat{X}, \mat{y})$ with $\abs{\mat{y}} = N$, then the operations on a Gaussian Process on it are usually dominated by the inversion of the kernel matrix $\mat{K_N}$ which takes $\Oh(N^3)$ time.
+Assume a data set $(\mat{X}, \mat{y})$ with $\abs{\mat{y}} = N$, then the operations on a posterior Gaussian Process are usually dominated by the inversion of the kernel matrix $\mat{K_N}$ which takes $\Oh(N^3)$ time.
 While this is only a preprocessing step, the cost of predicting the mean and variance of one test point remains $\Oh(N)$ and $\Oh(N^2)$ respectively.
 Additionally, these operations have a space requirement of $\Oh(N^2)$.
 The goal of sparse approximations of Gaussian Processes is to find model representations which avoid these quadratic complexities or at least restrict them to the training phase of finding hyperparameters.
@@ -567,8 +568,8 @@ The likelihood of the original data under the Gaussian process trained on the ps
     &= \Gaussian*{\mat{y} \given \mat{K_{N M}}\mat{K_M}^{-1} \ps{\mat{f}}, \diag\left( \mat{K_N} - \mat{Q_N} \right) + \sigma_n^2 \Eye}
 \end{align}
 with $\mat{Q_N} \coloneqq \mat{K_{N M}} \mat{K_M}^{-1} \mat{K_{M N}}$.
-The additive term $\sigma_n^2$ comes from the noise model about the observations $\mat{y}$ in the original data set.
-Rather than using maximum likelihood on this likelihood to learn the complete pseudo data set $(\ps{\mat{X}}, \ps{\mat{f}})$, the pseudo targets $\ps{\mat{f}}$ can be marginalized.
+The additive term $\sigma_n^2$ comes from the noise model assumed about the observations $\mat{y}$ in the original data set.
+Rather than using maximum likelihood on this term to learn the complete pseudo data set $(\ps{\mat{X}}, \ps{\mat{f}})$, the pseudo targets $\ps{\mat{f}}$ can be marginalized.
 This can be combared to the marginalization of the latent function values $\mat{f}$ in the derivation of Gaussian processes in \cref{eq:gp_f_marginalization}.
 Assuming the pseudo targets to be distributed very similarly to the real data, a reasonable prior for them is given by
 \begin{align}
@@ -592,8 +593,8 @@ With $\delta$ denoting the Kronecker-Delta it is defined as
 This kernel is equal to $\K$ when both arguments are identical and equal to $\Q$ everywhere else.
 For well-chosen pseudo inputs, $\mat{Q_N}$ is a low-rank approximation of $\mat{K_N}$ \cite{snelson_flexible_2007}.
 Because of this identity, an SPGP is a normal Gaussian process with an altered kernel function.
-The pseudo inputs $\ps{\mat{X}}$ are hidden in the kernel matrix $\mat{K_M}$ are additional hyperparameters to this kernel.
-This observation directly yields the SPGP predictive posterior.
+The pseudo inputs $\ps{\mat{X}}$ are hidden in the kernel matrix $\mat{K_M}$ and are additional hyperparameters to this kernel.
+This observation directly yields the SPGP predictive posterior using \cref{lem:gp_posterior}.
 \begin{lemma}[SPGP predictive posterior]
     \label{lem:spgp_posterior}
     Given a latent function with a sparse pseudo-input Gaussian process distribution $f \sim \GP(\mat{0}, \K_{\text{SPGP}})$, $N$ training points $\mat{X}$ with noisy observations of the form $\mat{y} = f(\mat{X}) + \Gaussian{\mat{0}, \sigma_n^2 \Eye}$ and $M$ positions of pseudo-inputs $\ps{\mat{X}}$.
@@ -603,6 +604,7 @@ This observation directly yields the SPGP predictive posterior.
         \mat{\mu_\ast} &= \mat{Q_{\ast N}} \left( \mat{Q_N} + \diag(\mat{K_N} - \mat{Q_N}) + \sigma_n^2 \Eye \right)^{-1} \mat{y} \\
         \mat{\Sigma_\ast} &= \mat{K_\ast} - \mat{Q_{\ast N}} \left( \mat{Q_N} + \diag(\mat{K_N} - \mat{Q_N}) + \sigma_n^2 \Eye \right)^{-1} \mat{Q_{N \ast}}.
     \end{align}
+    and $\mat{Q_N} \coloneqq \mat{K_{N M}} \mat{K_M}^{-1} \mat{K_{M N}}$.
 \end{lemma}
 \begin{figure}[t]
     \centering
@@ -649,5 +651,19 @@ Instead of a closed form representation of the policy, the choice of which actio
 This technique is presented in the next section.
 
 \section{Particle Swarm Optimization}
+\begin{itemize}
+    \item Optimizing over the approximative Value function
+    \item Using a vector of actions
+    \item Where we cannot really evaluate the gradient
+\end{itemize}
 \subsection{Basic PSO}
+\begin{itemize}
+    \item Positions, Velocities
+    \item Neighborhoods
+    \item Update-Step
+\end{itemize}
 \subsection{Improvements}
+\begin{itemize}
+    \item Velocity clamping
+    \item Values for omega and gammas
+\end{itemize}
