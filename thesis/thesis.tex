@@ -28,6 +28,8 @@
 
 \addbibresource{sources.bib}
 
+% \includeonly{chapters/bicycle,chapters/theory}
+
 \begin{document}
 \frontmatter
 % See https://www.in.tum.de/fuer-studierende/pruefungen-und-formalitaeten/abschlussarbeit.html
@@ -41,28 +43,17 @@
 
 \mainmatter
 
-\chapter{Introduction}
-
+\include{chapters/introduction}
 \include{chapters/bicycle}
 \include{chapters/theory}
-
-\chapter{Solution of the Bicycle Benchmark}
-\section{Standard Approach: Means Only}
-\subsection{Dynamics: with GP Models}
-\subsection{Results and Discussion of Problems}
-\subsection{New Reward Function Reward function}
-\section{Our second Approach: Linearization}
-
-\chapter{Conclusion}
-\section{Discussion of the Approaches}
-\section{Possible Improvements}
+\include{chapters/solution}
+\include{chapters/conclusion}
 
 \appendix
 
 \nocite{*}
 \printbibliography
-\listoffigures
-\listoftables
-\listoflistings
-
+% \listoffigures
+% \listoftables
+% \listoflistings
 \end{document}
