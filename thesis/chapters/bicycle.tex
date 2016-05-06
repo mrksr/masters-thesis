@@ -1,42 +1,43 @@
 \chapter{The Bicycle Benchmark}
 \label{cha:the_bicycle_benchmark}
-An example of a system which a computer should learn to control is the bicycle benchmark originally defined by \citeauthor{randlov_learning_1998} in 1998~\cite{randlov_learning_1998}.
-The task introduced in this benchmark is to balance a simulated bicycle which travels at a constant speed.
+The bicycle benchmark is an example of a dynamic a computer should learn to control.
+It was originally defined by \citeauthor{randlov_learning_1998} in 1998~\cite{randlov_learning_1998}.
+The task in this benchmark is to balance and navigate a simulated bicycle which travels at a constant speed.
 
-The computer, or agent, takes the place of the rider of the bicycle.
-After fixed time intervals, the controller has to decide how to influence the bicycle by applying some torque $T$ on the handle bars to steer, by displacing the center of mass of the bicycle via leaning over the bicycle by some distance $d$ or both.
-Besides the short-term goal of preventing the bicycle from falling over, there is also the long-term one of navigating to some predefined goal position.
-To make its decision, the controller is given perfect information about the internal state of the simulation.
+The computer, or \emph{agent}, takes the place of the rider of the bicycle.
+After fixed time intervals, it has to decide how to influence the bicycle by applying some torque $T$ on the handle bars to steer or by displacing the center of mass of the bicycle via leaning over the bicycle by some distance $d$ or both.
+In order to make its decision, the controller is given perfect information about the internal state of the simulation.
+Besides having to prevent the bicycle from falling over in the short-term, there is also the long-term goal of navigating to some predefined goal position.
 
-The bicycle is modelled by non-linear differential equations which describe the steering behaviour and the leaning behaviour of the bicycle.
+The bicycle is modelled by non-linear differential equations which describe the steering and leaning behaviour of the bicycle.
 The speed of the back tyre is considered constant and independent of the actions of the agent.
 This results in two important angles to describe the system.
 The angle $\theta$ is measured between the front tyre and the frame of the bicycle and describes the straightness of the bicycles path.
-The angle $\omega$ measures the amount of tilt of the bicycle's frame from standing upright.
-If the absolute value of $\omega$ is greater than \ang{12}, the bicycle has fallen over.
-In addition to the two angles, their time-derivatives $\dot{\theta}$ and $\dot{\omega}$ define the current state of the dynamics of the bicycle.
+The angle $\omega$ measures the amount of tilt of the bicycle's frame compared to standing upright.
+If the absolute value of $\omega$ is greater than 12 degrees, the bicycle has fallen over.
+In addition to the two angles, their time-derivatives $\dot{\theta}$ and $\dot{\omega}$ define the dynamics of the bicycle.
 Together with the bicycle's position and rotation in euclidean space, this completely describes the current state of one instance of the bicycle benchmark and is summarized in \cref{tab:bicycle_variables}.
 
-The conservations of angular momentum of the tyres results in interactions between $\theta$ and $\omega$ and their derivatives.
+The conservation of angular momentum of the tyres results in interactions between $\theta$ and $\omega$ and their derivatives.
 The equations presented in the following describe the dynamics of the system as introduced in~\cite{randlov_learning_1998}.
 Two simplifying assumptions have been made:
-Firstly, the front fork is assumed to be vertical, which makes balancing the bicycle more difficult but is not physically impossible.
-And secondly, the equations are not an exact analytical descriptions, as some second and higher order terms have been ignored.
+Firstly, the front fork is assumed to be vertical, which is unusual and makes balancing the bicycle more difficult but is not physically impossible.
+And secondly, the equations are not an exact analytical description, as some second and higher order terms have been ignored.
 \begin{table}[p]
     \centering
-    \caption{Variables which define the current state in the bicycle system.}
+    \caption{Variables defining the current state of the bicycle system.}
     \label{tab:bicycle_variables}
     \begin{tabularx}{\tablewidth}{cXcc}
         \toprule
         Notation & Description & Value range & Unit \\
         \midrule
-        $\theta$ & Angle of the handlebar and the front tyre & \numrange[parse-numbers=false]{-\sfrac{\pi}{2}}{\sfrac{\pi}{2}} & \si{\radian} \\
+        $\theta$ & Angle between the frame and the front tyre & \numrange[parse-numbers=false]{-\sfrac{\pi}{2}}{\sfrac{\pi}{2}} & \si{\radian} \\
         $\dot{\theta}$ & Rotational speed of the handlebars & \numrange{-10}{10} & \si{\radian\per\second} \\
-        $\omega$ & Tilt of the bike & \numrange[parse-numbers=false]{-\sfrac{\pi}{15}}{\sfrac{\pi}{15}} & \si{\radian} \\
-        $\dot{\omega}$ & Tilting speed of the bike & \numrange{-10}{10} & \si{\radian\per\second} \\
-        $x$ & Global $x$-position of front tyre & \numrange{-100}{100} & \si{\metre} \\
-        $y$ & Global $y$-position of front tyre & \numrange{-100}{100} & \si{\metre} \\
-        $\psi$ & Global orientation of the bike & \numrange[parse-numbers=false]{-\pi}{\pi} & \si{\radian} \\
+        $\omega$ & Tilt of the bicycle & \numrange[parse-numbers=false]{-\sfrac{\pi}{15}}{\sfrac{\pi}{15}} & \si{\radian} \\
+        $\dot{\omega}$ & Tilting speed of the bicycle & \numrange{-10}{10} & \si{\radian\per\second} \\
+        $x$ & Global $x$-position of the front tyre & \numrange{-100}{100} & \si{\metre} \\
+        $y$ & Global $y$-position of the front tyre & \numrange{-100}{100} & \si{\metre} \\
+        $\psi$ & Global orientation of the bicycle & \numrange[parse-numbers=false]{-\pi}{\pi} & \si{\radian} \\
         \bottomrule
     \end{tabularx}
 \end{table}
@@ -49,7 +50,7 @@ And secondly, the equations are not an exact analytical descriptions, as some se
         Notation & Description & Value range & Unit \\
         \midrule
         $d$ & The distance the agent leans sideways by displacing the center of mass & \numrange{-0.02}{0.02} & \si{\metre} \\
-        $T$ & The torque the agent applies on handlebars & \numrange{-2}{2} & \si{\N} \\
+        $T$ & The torque the agent applies on the handlebars & \numrange{-2}{2} & \si{\N} \\
         \bottomrule
     \end{tabularx}
 \end{table}
@@ -62,8 +63,8 @@ And secondly, the equations are not an exact analytical descriptions, as some se
         Notation & Description & Value \\
         \midrule
         CM & Center of mass of the bicycle and cyclist in total & \\
-        $c$ & Horizontal distance between the point where the front tyre touches the ground and the CM & \SI{66}{\cm} \\
-        $d_{\CM}$ & Vertical distance between the CM of the bicycle and the cyclist & \SI{30}{\cm} \\
+        $c$ & Horizontal distance between the point where the front tyre touches the ground and the saddle & \SI{66}{\cm} \\
+        $d_{\CM}$ & Vertical distance between the centers of mass of the bicycle and the cyclist & \SI{30}{\cm} \\
         $h$ & Vertical distance between the CM and the ground & \SI{94}{\cm} \\
         $l$ & Distance between the points where the front and back tyres touch the ground & \SI{111}{\cm} \\
         $M_c$ & Mass of the bicycle & \SI{15}{\kg} \\
@@ -71,7 +72,7 @@ And secondly, the equations are not an exact analytical descriptions, as some se
         $M_p$ & Mass of the cyclist & \SI{60}{\kg} \\
         $r$ & Radius of a tyre & \SI{34}{\cm} \\
         $v$ & Velocity of the bicycle & \SI{10}{\km\per\hour} \\
-        $\dot{\sigma}$ & The angular velocity of a tyre & $\dot{\sigma} = \sfrac{v}{r}$ \\
+        $\dot{\sigma}$ & Angular velocity of the back tyre & $\dot{\sigma} = \sfrac{v}{r}$ \\
         \bottomrule
     \end{tabularx}
 \end{table}
@@ -108,9 +109,10 @@ The moments of the tyre as displayed in \cref{fig:bicycle:inertia} and the momen
 \end{align}
 The dynamics also depend on multiple constants which are detailed in \cref{tab:bicycle_constants}.
 
-The angular acceleration $\ddot{\omega}$ of the lean of the bicycle consists of three terms.
-Firstly, the gravitation acting on the bicycle and cyclist which pulls the bicycle in the direction it is already leaning.
-Secondly, there are effects based on the conservation of angular momentum introduced via a cross-term dependent on \todo{interpretation?} $\dot{\theta}$ and lastly the centrifugal force applied because of the curved movement of the bicycle.
+The angular acceleration $\ddot{\omega}$ of the lean of the bicycle consists of three parts.
+The first part describes the gravitation acting on the bicycle and cyclist which pulls the bicycle in the direction it is already leaning.
+The second one are effects based on the conservation of angular momentum introduced via a cross-term dependent on \todo{interpretation?} $\dot{\theta}$.
+The centrifugal force applied because of the curved movement of the bicycle forms the last part.
 The center of mass can be displaced horizontally by the agent via the choice of $d$.
 The combination $\varphi$ of this displacement and the lean angle of the bicycle is defined as
 \begin{align}
@@ -128,19 +130,20 @@ With this, the angular acceleration $\ddot{\omega}$ can be calculated as
     \right).
 \end{align}
 
-The angular acceleration $\ddot{\theta}$ of the orientation of the front tyre and the handlebars is equal by definition.
-It is dependent on the torque $T$ applied to the handlebars and the conservation of angular momentum introduced via a cross-term dependent on $\dot{\omega}$ and is defined as
+The angular acceleration $\ddot{\theta}$ of the orientation of the front tyre is equal to that of the handlebars because the front fork is assumed to vertical.
+It is dependent on the torque $T$ applied to the handlebars and the conservation of angular momentum introduced via a cross-term dependent on $\dot{\omega}$ and is calculated as
 \begin{align}
     \ddot{\theta} \coloneqq \frac{T - I_{dv}\dot{\sigma}\cdot\dot{\omega}}{I_{dl}}.
 \end{align}
 
-These differential equations describe the internal dynamics of the bicycle benchmark, namely how leaning and turning the handlebars interact with each other.
-What remains is the movement of the bicycle in space.
+These differential equations describe how leaning left or right as the driver and turning the handlebars interact with each other.
+These internal dynamics are the important factors when trying to balance the bicycle while ignoring the movement of the bicycle in space.
+In order to successfully navigate to the goal position, these movements have to be taken into consideration.
 The bicycle state contains three variables which locate the bicycle in space.
 The position of the bicycle is defined by the point where the front tyre touches the ground.
-This point is independent of the orientation of the handlebars (given by the angle $\theta$) and identified via the two euclidean coordinates $x$ and $y$.
-The last state variable, $\psi$, describes the orientation of the bicycle frame relative to this point as shown in \cref{fig:bicycle:above}.
-If $\psi$ is equal to zero, the back tyre points in to $x$-direction if viewed from the point $(x, y)$ and a positive $\psi$ denotes a counter-clockwise rotation\todo{$\psi$ rotation direction correct?}.
+This point is independent of the orientation of the handlebars given by the angle $\theta$ and identified via the two euclidean coordinates $x$ and $y$.
+The last state variable $\psi$ describes the orientation of the bicycle frame relative to this point as shown in \cref{fig:bicycle:above}.
+If $\psi$ is equal to zero, the back tyre points in $x$-direction if viewed from the point $(x, y)$ and a positive $\psi$ denotes a counter-clockwise rotation\todo{$\psi$ rotation direction correct?}.
 
 The back tyre of the bicycle moves at the constant speed $v$.
 The front and back tyre follow two circular paths with different radii but the same center as can be seen in \cref{fig:bicycle:above} with the front tyre following the longer path.
@@ -152,10 +155,10 @@ The radii $r_f$ and $r_b$ can be calculated as
 respectively for $\theta$ not equal to zero.
 The singularity of $\theta$ approaching zero yields radii of arbitrary size as the bicycle's path becomes more and more straight.
 If $\theta$ is equal to zero, the bicycle's orientation does not change and it moves along a straight line.
-This case will be ignored below.
+If it is not zero, the change of position and orientation can be calculated from the curved movement.
 
 Since the two tyres are connected with a rigid frame and the front tyre travels on a longer path, it has to do so at a higher speed.
-They do share the same angular velocity $v_\circ$ on their respective circular paths however, since if $\theta$ was constant, the bicycle would rotate around the common center point.
+They do however share the same angular velocity $v_\circ$ on their respective circular paths, since if $\theta$ remains constant, the bicycle rotates around the common center point.
 This angular velocity can be derived from the constant speed of the back tyre and is given by
 \begin{align}
     v_\circ = \frac{v}{r_b}.
@@ -176,17 +179,17 @@ of the position of the bicycle.
 The original implementation of \citeauthor{randlov_learning_1998} uses an explicit Euler scheme to evolve the dynamics of the system for a time step.
 The changes of position and orientation are calculated using the exact analytical solution of moving the tyres along their circular paths.
 To improve accuracy, the implementation developed for this thesis implements a standard Runge-Kutta-Scheme as described in Numerical Recipies~\cite[908]{press_numerical_2007}.
-For ease of implementation, the exact solutions for the orientation and position are also evaluate using Runge-Kutta.
+The assumption that for a single time step, the bicycle moves along a fixed circular path is no longer correct when evaluating the dynamics with Runge-Kutta.
+Because of this, the changes in position and orientation are integrated into the scheme.
 
-The goal of the bicycle benchmark is to drive the bicycle to the goal area which is assumed to be a circle at the origin of the coordinate system with a radius of 5.
-The bicycle starts in a position which is almost upright, with the state variables $\theta$, $\dot{\theta}$, $\omega$, $\dot{\omega}$ being sampled with from Gaussian noise with a standard deviation of one percent of their value range.
+The goal of the bicycle benchmark is to drive the bicycle to a specific position which is assumed to be a circle at the origin of the coordinate system with a radius of 5.
+The bicycle starts in a position which is almost upright, with the state variables $\theta$, $\dot{\theta}$, $\omega$, $\dot{\omega}$ being sampled from Gaussian noise with a standard deviation of one percent of their value range.
 
-The agent has to choose the two actions $d$ and $T$ (see \cref{tab:bicycle_actions}) every 0.01 seconds, after which they are assumed constant for this time interval.
-After this time, the controller is presented with the current and exact values of the state variables and has to make a new decision.
-The bicycle system is therefore a benchmark which creates time series data.
-Every such time series or episode starts with some predefined start state and consists of pairs of states and the actions chosen by the agent for this state.
-The episode ends in failure if either the bicycle falls over and it ends in success if the bicycle reaches the goal.
+The agent has to choose the two continuous actions $d$ and $T$ described in \cref{tab:bicycle_actions} every 0.01 seconds, after which they are assumed constant for this time interval.
+After this time, the controller is again presented with the current and exact values of the state variables and has to make a new decision.
+One run of the bicycle system creates a time series of bicycle states and the actions chosen by the controller.
+The episode ends in failure if the bicycle falls over and it ends in success if the bicycle reaches the goal.
 Since it is possible for the bicycle to drive in circles indefinitely, the episode also ends in failure after a certain amount of time has passed.
 
-The next chapter will introduce the current state of the art of solving problems such as the bicycle benchmark using model based reinforcement learning.
-These standard methods will then be applied to the benchmark, followed by approaches incorporating information about uncertainties.
+The next chapter introduces reinforcement learning as a general mathematical description of the problem posed with the bicycle benchmark.
+Model based reinforcement learning is one way to solve the bicycle benchmark which tries to learn the bicycle's dynamics using general function approximators and use them to make informed guesses about the future.
