@@ -128,12 +128,12 @@ This can be achieved using the discount factor $\gamma$ which is a constant real
 In the case of an infinite time horizon, $\gamma$ must be chosen smaller than one to ensure the well-definedness of the function.
 
 \begin{definition}[Value Function]
-    Given a policy $\pi$, a time horizon $T \in \N \cup \left\{ \infty \right\}$ and a discount factor $0 \leq \gamma \leq 1$, the \emph{value function $\Vlu^\pi$} denotes the expected long-term reward of a state and is given by
+    Given transition dynamics $\Dyn$, a policy $\pi$, a time horizon $T \in \N \cup \left\{ \infty \right\}$ and a discount factor $0 \leq \gamma \leq 1$, the \emph{value function $\Vlu^\pi$} denotes the expected long-term reward of a state and is given by
     \begin{align}
         \Vlu^\pi : \left\{
             \begin{aligned}
                 \Es^+ &\to \R \\
-                s &\mapsto \Moment*{\E}{\sum_{t=0}^T \gamma^t \Rwd \left( \rv{s_t} \right) \given \pi, \rv{s_0} = s }.
+                s &\mapsto \Moment*{\E}{\sum_{t=0}^T \gamma^t \Rwd(\rv{s_t}) \given \Dyn, \pi, \rv{s_0} = s }.
             \end{aligned}
         \right.
     \end{align}
@@ -651,19 +651,89 @@ Instead of a closed form representation of the policy, the choice of which actio
 This technique is presented in the next section.
 
 \section{Particle Swarm Optimization}
-\begin{itemize}
-    \item Optimizing over the approximative Value function
-    \item Using a vector of actions
-    \item Where we cannot really evaluate the gradient
-\end{itemize}
+How does PSO-P work? Instead of a closed policy, we optimize over the Value function, or rather, the approximate value function. We optimize over
+\begin{align}
+    \hat{\Vlu}_{\mat{s_0}} : \left\{
+        \begin{aligned}
+            \Ah^T &\to \R \\
+            \left( \mat{a_0}, \dots, \mat{a_{T-1}} \right) &\mapsto \Moment*{\E}{\sum_{t=0}^T \gamma^t \Rwd(\mat{s_t}) \given \Dyn, \mat{s_0}, \mat{a_0}, \dots, \mat{a_{T-1}}}
+        \end{aligned}
+    \right.
+\end{align}
+in the problem
+\begin{alignat}{3}
+    & \maximize_{\left( \mat{a_0}, \dots, \mat{a_{T-1}} \right)} && \hat{\Vlu}_{\mat{s_0}}(\mat{a_0}, \dots, \mat{a_{T-1}}) &&\\
+& \subjectto\quad && \mat{a_i} \in \Ah, &\quad i &= 0, \dots, T-1
+\end{alignat}
+\begin{align}
+    \mat{a^\ast} \in \argmax_{\mat{a} \in \Ah^T} \hat{\Vlu}_{\mat{s_0}}(\mat{a})
+\end{align}
+and then apply $\mat{a^\ast_0}$ as the action \citeauthor{hein_reinforcement_2016} \cite{hein_reinforcement_2016}.
+We need to remember that we maybe have to evaluate some integrals for $\hat{\Vlu}$ but this hugely depends on the transition dynamics.
+This is a very nonlinear problem and we usually cannot get derivatives, so we have to come up with something to solve that.
+
 \subsection{Basic PSO}
+More generally, PSO is concerned with solving
+\begin{align}
+    \mat{x^\ast} \in \argmax_{\mat{x} \in \X} f(x)
+\end{align}
+where
+\begin{align}
+    \X \coloneqq \Set*{\mat{x} \in \R^d \with x^{\text{min}}_i \leq x_i \leq x^{\text{max}}_i}
+\end{align}
+is a cuboid of permissible function values.
+It is defined using the vectors $\mat{x^{\text{min}}}, \mat{x^{\text{max}}} \in \R^d$.
+
+To solve this, we take a look at a set $\Pe$ of particles with $\abs{\Pe} = n$ which have positions and velocities which change over the set of discrete time steps $T =\N$.
+\begin{definition}
+    A \emph{PSO-Run} on a set $\Pe$ of particles in $\R^d$ space is a tuple $(\Pos, \Vel, \Neigh)$ of functions where
+    \begin{itemize}
+        \item $\Pos: \Pe \times T \to \R^d$ contains the positions at all timesteps
+        \item $\Vel: \Pe \times T \to \R^d$ contains the velocities
+        \item $\Neigh: \Pe \to \Powerset{\Pe}$ contains the neighbours of each particle
+    \end{itemize}
+\end{definition}
+
+Let $\Pos_i(t)$ denote the position of particle $i$ at time step $t$ and $\Vel_i(t)$ denote it's velocity.
+We initialize both uniformly, i.e. $\Pos_i(0), \Vel_i(0) \sim \Uniform{0, 1}$.
+The update for the position is
+\begin{align}
+    \Pos_i(t+1) \coloneqq \Pos_i(t) + \Vel_i(t).
+\end{align}
+We have to take care that we stay inside of $\X$ by doing componentwise clamping.
+
+The magic is in the velocity.
+We update it dependent on every particle's own history and the history of its neighbours.
+For both we are interested in the overall best.
+They are defined as
+\begin{align}
+    \Cog_i(t) &\coloneqq \Pos_i \left(\min\argmin_{t \in T} f(\Pos_i(t)) \right) \\
+    \Soc_i(t) &\coloneqq \Cog_{n^\ast}(t) \\
+    n^\ast &\in \argmin_{n \in \Neigh(i)} f(\Cog_n(t)).
+\end{align}
+
+With them, we get the velocity update step given by
+\begin{align}
+    \Vel_i(t+1) \coloneqq \omega \cdot \Vel_i(t)
+        + \underbracket[1pt]{\gamma_c \cdot r_c \cdot \left( \Cog_i(t) - \Pos_i(t) \right)}_{\text{cognitive component}}
+        + \underbracket[1pt]{\gamma_s \cdot r_s \cdot \left( \Soc_i(t) - \Pos_i(t) \right)}_{\text{stochastic component}}
+\end{align}
+with $\omega, \gamma_c, \gamma_s \in \R$ and $r_c, r_s \sim \Uniform{0, 1}$ for a stochastic element.
+The constants define the relative weight of the terms and can be chosen more or less freely, but there are good values mentioned in \cite{engelbrecht_fundamentals_2006} (this we mention in the next section maybe?).
+Usually we do something called velocity clamping where we define $\mat{v^\text{min}}, \mat{v^\text{max}} \in \R^d$ and then ensure that the velocities remain inside the cuboid defined by these vectors, analogously to $\X$.
+
+The final position of a PSO-Run is given by
+\begin{align}
+    \mat{x^\ast} \in \lim_{t \to \infty} \argmin_{p \in \Pe} \Cog_p(t)
+\end{align}
+which directly raises the question of convergence which cannot really be guaranteed since this is a heuristic and we can think of plenty examples which do not converge (multiple minima).
+In practice we will probably use standard convergence criteria such as minimum relative stepsize, minimum improvement, maximum of number of iterations without improvement.
+Usually however, these all do not help and we have to define a maximum number of iterations.
+\subsection{Choice of parameters}
 \begin{itemize}
-    \item Positions, Velocities
+    \item Number of particles
     \item Neighborhoods
-    \item Update-Step
-\end{itemize}
-\subsection{Improvements}
-\begin{itemize}
-    \item Velocity clamping
-    \item Values for omega and gammas
+    \item Values for omega and gamma
+    \item Velocity clamping factor (this can be used to force convergence)
+    \item Number of iterations
 \end{itemize}

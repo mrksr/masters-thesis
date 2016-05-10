@@ -20,17 +20,34 @@
 \renewcommand{\emptyset}{\varnothing}
 
 % Math operators
+% General
 \DeclareMathOperator*{\argmax}{argmax}
 \DeclareMathOperator*{\argmin}{argmin}
 \DeclareMathOperator{\sgn}{sgn}
 \DeclareMathOperator{\diag}{diag}
+\DeclareMathOperator*{\maximize}{maximize}
+\DeclareMathOperator*{\minimize}{minimize}
+\DeclareMathOperator{\subjectto}{subject\ to}
+\DeclareMathOperator{\Oh}{\mathcal{O}}
+\newcommand{\Powerset}[1]{2^{#1}}
+\newcommand*{\diff}{\mathop{}\!\mathrm{d}}
+\DeclarePairedDelimiter{\abs}{\vert}{\vert}
 
+% RL
 \DeclareMathOperator{\Dists}{\mathcal{P}}
 \DeclareMathOperator{\Rwd}{\mathbf{R}}
 \DeclareMathOperator{\Vlu}{\mathbf{V}}
 \DeclareMathOperator{\Dyn}{\mathbf{f}}
-\newcommand*\diff{\mathop{}\!\mathrm{d}}
 
+% PSO
+\DeclareMathOperator{\Pe}{\mathcal{P}}
+\DeclareMathOperator{\Pos}{\mathbf{x}}
+\DeclareMathOperator{\Vel}{\mathbf{v}}
+\DeclareMathOperator{\Neigh}{\mathcal{N}}
+\DeclareMathOperator{\Cog}{\mathbf{y}}
+\DeclareMathOperator{\Soc}{\hat{\Cog}}
+
+% Probabilities
 \DeclareMathOperator{\E}{\mathbb{E}}
 \DeclareMathOperator{\cov}{cov}
 \DeclareMathOperator{\var}{var}
@@ -39,15 +56,12 @@
 \DeclareMathOperator{\K}{\mathcal{K}}
 \DeclareMathOperator{\Q}{\mathcal{Q}}
 \DeclareMathOperator{\Norm}{\mathcal{N}}
+\DeclareMathOperator{\Uni}{U}
 \DeclareMathOperator{\GP}{\mathcal{GP}}
 \DeclareMathOperator{\SPGP}{\mathcal{SPGP}}
 \DeclareMathOperator{\Ell}{\mathcal{L}}
+\DeclareMathOperator{\X}{\mathcal{X}}
 
-\DeclareMathOperator{\Oh}{\mathcal{O}}
-
-% Functions
-\DeclarePairedDelimiter{\abs}{\vert}{\vert}
-% Probabilities
 \providecommand\given{}
 \DeclarePairedDelimiterX{\Cond}[1]{(}{)}{
 \renewcommand\given{%
@@ -60,6 +74,7 @@
 }
 \newcommand{\Prob}{\p\Cond}
 \newcommand{\Gaussian}{\Norm\Cond}
+\newcommand{\Uniform}{\Uni\Cond}
 
 \DeclarePairedDelimiterXPP{\Moment}[2]{#1}{[}{]}{}{
 \renewcommand\given{%
