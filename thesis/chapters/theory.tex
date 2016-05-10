@@ -253,7 +253,7 @@ Sampling a trajectory from $\rv{X}$ corresponds to sampling one possible functio
 Similar to the finite case, the random variables have a dependency structure.
 Instead of a mean vector $\mat{\mu}$ and a covariance matrix $\mat{\Sigma}$, a Gaussian process is completely determined by a \emph{mean function} $\mu_f(a) = \Moment{\E}{f(a)}$ and a \emph{covariance function}
 \begin{align}
-    \K(a, a^\prime) &\coloneqq \Moment{\E}{(f(a) - \mu_f(a))(f(a^\prime) - \mu_f(a^\prime)} \\
+    \K(a, a^\prime) &\coloneqq \Moment{\E}{(f(a) - \mu_f(a))(f(a^\prime) - \mu_f(a^\prime))} \\
     &= \Moment{\cov}{f(a), f(a^\prime)} \\
     &= \Moment{\cov}{\rv{X_a}, \rv{X_{a^\prime}}}
 \end{align}
