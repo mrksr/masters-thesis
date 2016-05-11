@@ -128,6 +128,7 @@ This can be achieved using the discount factor $\gamma$ which is a constant real
 In the case of an infinite time horizon, $\gamma$ must be chosen smaller than one to ensure the well-definedness of the function.
 
 \begin{definition}[Value Function]
+    \label{def:value_function}
     Given transition dynamics $\Dyn$, a policy $\pi$, a time horizon $T \in \N \cup \left\{ \infty \right\}$ and a discount factor $0 \leq \gamma \leq 1$, the \emph{value function $\Vlu^\pi$} denotes the expected long-term reward of a state and is given by
     \begin{align}
         \Vlu^\pi : \left\{
@@ -185,6 +186,7 @@ The following section will introduce their definition and derive how they can be
 The last part of this chapter will be concerned with introducing a policy-representation based on these results which does not depend on a closed form solution.
 
 \section{Gaussian Process Regression}
+\label{sec:gp_regression}
 The transition dynamics $\Dyn : \Es \times \Ah \to \Dists(\Es^+)$ are a function mapping states and actions to a probability distribution of following states.
 In order to estimate them using Gaussian Processes, some assumptions about the structure of this function are needed.
 First, it will be assumed that both the set of states $\Es$ and the set of actions $\Ah$ are euclidean real valued vector spaces and that the set of terminal states $\Tee$ is empty, that is, $\Es^+$ and $\Es$ are assumed equal, requiring that episode endings have to be modelled separately.
@@ -650,29 +652,57 @@ In order to solve the control problem of the bicycle benchmark, the next step af
 Instead of a closed form representation of the policy, the choice of which action to take is made by directly optimizing over the value function using Particle Swarm Optimization.
 This technique is presented in the next section.
 
-\section{Particle Swarm Optimization}
-How does PSO-P work? Instead of a closed policy, we optimize over the Value function, or rather, the approximate value function. We optimize over
+\section{Particle Swarm Optimization Policy}
+Given a starting state, the way to evaluate a policy in the general reinforcement learning setup is to evaluate its value function as defined in \cref{def:value_function}.
+Since the value is defined as the sum of expected rewards of all future states in the time horizon, calculating it correctly requires knowledge of the true transition function or, in the case of deterministic dynamics, interaction with the system.
+Model-based reinforcement learning is centered around learning a model of the transition function and use this representation to approximate the value function.
+
+This allows simulated interaction with the system and can be used to choose optimal parameters for a parametric closed-form policy formulation.
+Similar to the comparison of parametric and non-parametric models in \cref{sec:gp_regression}, the performance of such policies heavily depends on the choice of function representation.
+In a Bayesian setting, the uncertainties about the transition model should be propagated through to an uncertainty about the choice of policy parameters and finally marginalized to obtain a distribution over good actions to take.
+In order to keep this process computationally feasible, trade-offs must be made in the flexibility of policy representations.
+\citeauthor{deisenroth_pilco:_2011} recommend the use of linear policies or non-linear representations via RBF networks in \cite{deisenroth_pilco:_2011}.
+
+This thesis chooses the non-parametric approach of the \emph{particle swarm optimization policy~(PSO-P)} described by \citeauthor{hein_reinforcement_2016} in \cite{hein_reinforcement_2016}.
+In PSO-P, the approximation of the value function is not used to choose parameter models but rather to choose the actions themselves.
+For a finite time horizon $T$, the policy is used in the value function to choose actions at every time step and finding an optimal policy means finding policy parameters which result in good choices of actions at every time step.
+Given a model $f$ for the transition function and a state $\mat{s_0}$, PSO-P examines the \emph{action-value-function $\hat{\Vlu}$} given by
 \begin{align}
     \hat{\Vlu}_{\mat{s_0}} : \left\{
         \begin{aligned}
             \Ah^T &\to \R \\
-            \left( \mat{a_0}, \dots, \mat{a_{T-1}} \right) &\mapsto \Moment*{\E}{\sum_{t=0}^T \gamma^t \Rwd(\mat{s_t}) \given \Dyn, \mat{s_0}, \mat{a_0}, \dots, \mat{a_{T-1}}}
+            \left( \mat{a_0}, \dots, \mat{a_{T-1}} \right) &\mapsto \Moment*{\E}{\sum_{t=0}^T \gamma^t \Rwd(\mat{s_t}) \given f, \mat{s_0}, \mat{a_0}, \dots, \mat{a_{T-1}}}
         \end{aligned}
     \right.
 \end{align}
-in the problem
-\begin{alignat}{3}
-    & \maximize_{\left( \mat{a_0}, \dots, \mat{a_{T-1}} \right)} && \hat{\Vlu}_{\mat{s_0}}(\mat{a_0}, \dots, \mat{a_{T-1}}) &&\\
-& \subjectto\quad && \mat{a_i} \in \Ah, &\quad i &= 0, \dots, T-1
-\end{alignat}
-\begin{align}
-    \mat{a^\ast} \in \argmax_{\mat{a} \in \Ah^T} \hat{\Vlu}_{\mat{s_0}}(\mat{a})
-\end{align}
-and then apply $\mat{a^\ast_0}$ as the action \citeauthor{hein_reinforcement_2016} \cite{hein_reinforcement_2016}.
-We need to remember that we maybe have to evaluate some integrals for $\hat{\Vlu}$ but this hugely depends on the transition dynamics.
-This is a very nonlinear problem and we usually cannot get derivatives, so we have to come up with something to solve that.
+with a discount factor $\gamma$.
+PSO-P optimizes over the vector of all possible actions in the time horizon and then applies the best action found for time step zero to the system.
+\begin{definition}[PSO-P]
+    \label{def:psop}
+    The \emph{particle swarm optimization policy (PSO-P)} \cite{hein_reinforcement_2016} chooses actions via direct optimization of the action value function $\hat{\Vlu}$ and is defined as
+    \begin{align}
+        \pi_{\text{PSO-P}} &: \left\{
+            \begin{aligned}
+                \Es &\to \Ah\\
+                \mat{s} &\mapsto \mat{a^\ast}_0 \text{, where } \mat{a^\ast} \in \argmax_{\mat{a} \in \Ah^T} \hat{\Vlu}_{\mat{s}}(\mat{a})
+            \end{aligned}
+        \right..
+    \end{align}
+\end{definition}
+The optimization over $\hat{\Vlu}$ at time step $t$ yields a vector of optimal actions for the complete time horizon.
+The PSO-Policy still only applies the first of these actions and repeats the optimization at time step $t+1$.
+This is done to both reduce model bias and profit from the more accurate information about $\mat{s_{t+1}}$ from the system.
 
-\subsection{Basic PSO}
+The action value function is itself not probabilistic but is defined as an expected value dependent on all future states.
+Since the transition model is Bayesian, evaluating this expected values implies iterated marginalizations of beliefs about both model parameters and intermediate states.
+The dependency of the action value on the different actions is therefore very complex and finding their gradients for the optimization is analytically intractable.
+
+\emph{Particle swarm optimization} is the gradient-free heuristic technique which is used in PSO-P to solve this non-convex optimization problem.
+It works by creating a set, or \emph{swarm}, of candidate solutions, or \emph{particles}, in the search space.
+These particles move through the search space with the direction being dependent on their own function value and the function values of the other particles in the swarm.
+This section introduces a basic version of the algorithm and discusses the different choices of parameters for the algorithm.
+
+\subsection{Basic Particle Swarm Optimization}
 More generally, PSO is concerned with solving
 \begin{align}
     \mat{x^\ast} \in \argmax_{\mat{x} \in \X} f(x)
@@ -686,7 +716,7 @@ It is defined using the vectors $\mat{x^{\text{min}}}, \mat{x^{\text{max}}} \in 
 
 To solve this, we take a look at a set $\Pe$ of particles with $\abs{\Pe} = n$ which have positions and velocities which change over the set of discrete time steps $T =\N$.
 \begin{definition}
-    A \emph{PSO-Run} on a set $\Pe$ of particles in $\R^d$ space is a tuple $(\Pos, \Vel, \Neigh)$ of functions where
+    A \emph{PSO-Run} on a set $\Pe$ of particles in $\R^d$ space is a tuple $(f, \Pe, \R^d, \Pos, \Vel, \Neigh)$ of functions where
     \begin{itemize}
         \item $\Pos: \Pe \times T \to \R^d$ contains the positions at all timesteps
         \item $\Vel: \Pe \times T \to \R^d$ contains the velocities
@@ -716,7 +746,7 @@ With them, we get the velocity update step given by
 \begin{align}
     \Vel_i(t+1) \coloneqq \omega \cdot \Vel_i(t)
         + \underbracket[1pt]{\gamma_c \cdot r_c \cdot \left( \Cog_i(t) - \Pos_i(t) \right)}_{\text{cognitive component}}
-        + \underbracket[1pt]{\gamma_s \cdot r_s \cdot \left( \Soc_i(t) - \Pos_i(t) \right)}_{\text{stochastic component}}
+        + \underbracket[1pt]{\gamma_s \cdot r_s \cdot \left( \Soc_i(t) - \Pos_i(t) \right)}_{\text{social component}}
 \end{align}
 with $\omega, \gamma_c, \gamma_s \in \R$ and $r_c, r_s \sim \Uniform{0, 1}$ for a stochastic element.
 The constants define the relative weight of the terms and can be chosen more or less freely, but there are good values mentioned in \cite{engelbrecht_fundamentals_2006} (this we mention in the next section maybe?).
