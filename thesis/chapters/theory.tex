@@ -318,12 +318,12 @@ According to the definition of Gaussian processes, for any two input numbers $x$
     \end{bmatrix}}
 \end{align}
 where $\K = \K_{\text{linear}}$.
-Assuming that both $x$ and $y$ are not equal to zero, the correlation coefficient of these two variables is given by
+Assuming that both $x$ and $y$ are not equal to zero, the correlation coefficient $\corr$ of these two variables is given by
 \begin{align}
     \Moment{\corr}{\rv{f_x}, \rv{f_y}} &= \frac{\Moment{\cov}{\rv{f_x}, \rv{f_y}}}{\sqrt{\Moment{\var}{\rv{f_x}\vphantom{\rv{f_y}}}}\sqrt{\Moment{\var}{\rv{f_y}}}} \\
-    &= \frac{\K(x, y)}{\sqrt{\K(x, x)} \sqrt{\K(y, y)}} = \frac{xy}{\sqrt{\vphantom{y^2}x^2}\sqrt{\vphantom{y^2}y^2}} = 1.
+    &= \frac{\K(x, y)}{\sqrt{\K(x, x)} \sqrt{\K(y, y)}} = \frac{xy}{\sqrt{\vphantom{y^2}x^2}\sqrt{\vphantom{y^2}y^2}} \in \left\{ -1, 1 \right\}.
 \end{align}
-A correlation coefficient of one implies that the value of one of the random variables is a linear function of the other.
+A correlation coefficient of plus or minus one implies that the value of one of the random variables is a linear function of the other.
 Any function drawn from this Gaussian process, such as the ones shown in \cref{fig:gp_samples:linear}, is therefore a linear function.
 This observation generalizes to higher dimensions \cite{rasmussen_gaussian_2006}.
 Gaussian process regression with a linear kernel is equivalent to Bayesian linear regression.
