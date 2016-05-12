@@ -697,68 +697,118 @@ The action value function is itself not probabilistic but is defined as an expec
 Since the transition model is Bayesian, evaluating this expected values implies iterated marginalizations of beliefs about both model parameters and intermediate states.
 The dependency of the action value on the different actions is therefore very complex and finding their gradients for the optimization is analytically intractable.
 
-\emph{Particle swarm optimization} is the gradient-free heuristic technique which is used in PSO-P to solve this non-convex optimization problem.
-It works by creating a set, or \emph{swarm}, of candidate solutions, or \emph{particles}, in the search space.
+\emph{Particle swarm optimization} is the heuristic technique which is used in {PSO-P} to solve this non-convex optimization problem.
+It works by creating a set of candidate solutions in the search space.
 These particles move through the search space with the direction being dependent on their own function value and the function values of the other particles in the swarm.
 This section introduces a basic version of the algorithm and discusses the different choices of parameters for the algorithm.
 
 \subsection{Basic Particle Swarm Optimization}
-More generally, PSO is concerned with solving
-\begin{align}
-    \mat{x^\ast} \in \argmax_{\mat{x} \in \X} f(x)
-\end{align}
-where
-\begin{align}
-    \X \coloneqq \Set*{\mat{x} \in \R^d \with x^{\text{min}}_i \leq x_i \leq x^{\text{max}}_i}
-\end{align}
-is a cuboid of permissible function values.
-It is defined using the vectors $\mat{x^{\text{min}}}, \mat{x^{\text{max}}} \in \R^d$.
+To choose an appropriate action for the current state, PSO-P needs to solve a non-convex optimization problem.
+Classical non-linear optimization schemes such as the scaled conjugated gradient technique or Newton methods \cite{press_numerical_2007} rely on the evaluation of the first or even second derivatives of the objective function.
+In the setting of optimizing the action value function with respect to all actions at the different time steps, finding these gradients is hard.
 
-To solve this, we take a look at a set $\Pe$ of particles with $\abs{\Pe} = n$ which have positions and velocities which change over the set of discrete time steps $T =\N$.
-\begin{definition}
-    A \emph{PSO-Run} on a set $\Pe$ of particles in $\R^d$ space is a tuple $(f, \Pe, \R^d, \Pos, \Vel, \Neigh)$ of functions where
-    \begin{itemize}
-        \item $\Pos: \Pe \times T \to \R^d$ contains the positions at all timesteps
-        \item $\Vel: \Pe \times T \to \R^d$ contains the velocities
-        \item $\Neigh: \Pe \to \Powerset{\Pe}$ contains the neighbours of each particle
-    \end{itemize}
+Particle swarm optimization is a heuristic technique which does not assume knowledge about the derivatives of the objective function and is therefore called \emph{gradient-free}.
+It is a population-based optimization approach, where a number of solution candidates move through the domain of the target function in search of a good solution.
+The most well-known class of population-based approaches, which are often inspired by nature, are evolutionary or genetic algorithms.
+Genetic algorithms mimic natural selection by evaluating a generation of individuals and allowing the most successful to survive and recombine, giving rise to a new generation of particles.
+
+In contrast, the set of individuals, or \emph{swarm}, remains constant in PSO.
+Instead of implementing survival of the fittest, PSO is based on social interaction.
+Every individual, or \emph{particle}, flies in the search space with a velocity which is dynamically adjusted according to its own past experience and the experience of the other particles in the swarm.
+While they are initialized randomly throughout the space, they are expected to collapse on a single point which, ideally, should be the optimum.
+
+More formally, PSO is mostly used in a non-convex optimization setting.
+Given some function $f : \X \to \R$, the problem is to find an $\mat{x^\ast} \in \X$ such that
+\begin{align}
+    \mat{x^\ast} \in \argmax_{\mat{x} \in \X} f(x).
+\end{align}
+While variantes of PSO exist which can handle arbitrary constraints \cite{engelbrecht_fundamentals_2006}, the basic variant presented in this thesis assumes that the domain $\X$ of $f$ is a set of the form
+\begin{align}
+    \X \coloneqq \Set*{\mat{x} \in \R^d \with x^{\text{min}}_i \leq x_i \leq x^{\text{max}}_i}.
+\end{align}
+This set of feasible points $\X$ is an axis-parallel cuboid in the finite dimensional real vector space $\R^d$.
+The boundaries of this cuboid are defined by the vectors $\mat{x^{\text{min}}}$ and $\mat{x^{\text{max}}}$ which are both in $\R^d$ and specify the minimal and maximal value for every dimension.
+
+The swarm of a PSO run consists of a finite set $\Pe$ of particles.
+These particles each have a position and velocity which are both updated for all particles simultaneously at discrete time steps.
+The set of all time steps $T$ is usually considered to be the natural numbers.
+At every such time step, the objective function value is evaluated for every particle.
+Since PSO models social interaction and communication, every particle has a neighbourhood of particles it communicates with after every time step.
+This communication influences the particle's velocity as it is attracted by particles with good performance.
+\begin{definition}[PSO Instance]
+    An instance of the \emph{particle swarm optimization (PSO)} scheme on the objective function $f : \R^d \to \R$ is defined by the set of particles $\Pe$.
+    For every timestep in $T$, the particles' positions and velocities are given by the functions
+    \begin{align}
+        \Pos &: \Pe \times T \to \R^d \text{ and} \\
+        \Vel &: \Pe \times T \to \R^d
+    \end{align}
+    respectively. The position of particle $i$ at time step $t$ is denoted as $\Pos_i(t)$ and its velocity as $\Vel_i(t)$. A particle can be influenced by the set of its neighbours given by the neighbourhood function
+    \begin{align}
+        \Neigh &: \Pe \to \Powerset{\Pe}.
+    \end{align}
 \end{definition}
 
-Let $\Pos_i(t)$ denote the position of particle $i$ at time step $t$ and $\Vel_i(t)$ denote it's velocity.
-We initialize both uniformly, i.e. $\Pos_i(0), \Vel_i(0) \sim \Uniform{0, 1}$.
-The update for the position is
+The positions and velocities of the particles are defined using dynamic programming.
+The bounded search space allows for a uniform initial distribution of positions and velocities which are, for every particle $i \in \Pe$, defined as
+\begin{align}
+    \Pos_i(0), \Vel_i(0) \sim \mat{x^{\text{min}}} + \Uniform{0, 1} \cdot \left( \mat{x^{\text{max}}} - \mat{x^{\text{min}}} \right)
+\end{align}
+where $\Uniform{0, 1}$ denotes the standard uniform distribution.
+The update of the positions only depends on the particle's current state, such that for every $t \in T$ it is defined as
 \begin{align}
     \Pos_i(t+1) \coloneqq \Pos_i(t) + \Vel_i(t).
 \end{align}
-We have to take care that we stay inside of $\X$ by doing componentwise clamping.
+This operation can move particles out of the set of feasible points.
+\citeauthor{engelbrecht_fundamentals_2006} discusses multiple possible boundary conditions such as circular algebra or reflection \cite{engelbrecht_fundamentals_2006}.
+The most simple solution is to stop the particle at the boundary.
 
-The magic is in the velocity.
-We update it dependent on every particle's own history and the history of its neighbours.
-For both we are interested in the overall best.
-They are defined as
+Velocities can be though of as the result of forces pulling on the particles.
+Ideally, these forces would originate from the extrema of the functions, but their positions are unknown.
+In classical optimization schemes, gradients are used which by definition point to local extrema.
+Since gradients are not available, the particles must rely on other sources of information.
+At the first time step, no information about the function or the search space is available, so particle velocities are initialized randomly.
+At later steps, the particles have already visited parts of the search space and have gained some knowledge.
+
+This knowledge is represented by the personal best position $\Cog$ of every particle, which is the best position in the search space the particle has visited since the first time step.
+A particle is pulled towards its own personal best position since for the single individual, it is the best guess for the position of the maximum.
+It is defined as
 \begin{align}
-    \Cog_i(t) &\coloneqq \Pos_i \left(\min\argmin_{t \in T} f(\Pos_i(t)) \right) \\
-    \Soc_i(t) &\coloneqq \Cog_{n^\ast}(t) \\
+    \Cog_i(t) &\coloneqq \Pos_i \left(\min\argmax_{t \in T} f(\Pos_i(t)) \right).
+\end{align}
+Since the particles are initialized randomly in the search space, most of these personal best positions are expected to be not very good.
+Particles at bad parts of the search space should communicate with their neighbours and be pulled towards the most successful.
+For every particle, the best position seen by any of its neighbours $\Soc$ is defined as
+\begin{align}
+    \Soc_i(t) &\coloneqq \Cog_{n^\ast}(t) \text{, where} \\
     n^\ast &\in \argmin_{n \in \Neigh(i)} f(\Cog_n(t)).
 \end{align}
 
-With them, we get the velocity update step given by
+The update of the velocity of a particle is a linear combination of these two components and the previous velocity to simulate inertia of a particle and is defined as
 \begin{align}
-    \Vel_i(t+1) \coloneqq \omega \cdot \Vel_i(t)
+    \Vel_i(t+1) \coloneqq
+        \underbracket[1pt]{\omega \cdot \Vel_i(t)}_{\text{inertia}}
         + \underbracket[1pt]{\gamma_c \cdot r_c \cdot \left( \Cog_i(t) - \Pos_i(t) \right)}_{\text{cognitive component}}
-        + \underbracket[1pt]{\gamma_s \cdot r_s \cdot \left( \Soc_i(t) - \Pos_i(t) \right)}_{\text{social component}}
+        + \underbracket[1pt]{\gamma_s \cdot r_s \cdot \left( \Soc_i(t) - \Pos_i(t) \right)}_{\text{social component}}.
 \end{align}
-with $\omega, \gamma_c, \gamma_s \in \R$ and $r_c, r_s \sim \Uniform{0, 1}$ for a stochastic element.
-The constants define the relative weight of the terms and can be chosen more or less freely, but there are good values mentioned in \cite{engelbrecht_fundamentals_2006} (this we mention in the next section maybe?).
-Usually we do something called velocity clamping where we define $\mat{v^\text{min}}, \mat{v^\text{max}} \in \R^d$ and then ensure that the velocities remain inside the cuboid defined by these vectors, analogously to $\X$.
+The real constants $\omega$, $\gamma_c$ and $\gamma_s$ weigh the relative influences of the different components and $r_c, r_s \sim \Uniform{0, 1}$ introduce a stochastic element to the algorithm which enable some random exploration after the first time step.
+Since both the cognitive and social components are proportional to the distance of the particle to either the personal or the social best position, velocities can become very large.
+A common solution to avoid this is \emph{velocity clamping} which bounds the maximum velocity of a particle to a fraction of the size of the input space.
 
-The final position of a PSO-Run is given by
+Using the update steps for the positions and velocities, the behaviour of the swarm $\Pe$ can be calculated for an arbitrary number of time steps.
+The result of the optimization using PSO is the best position visited by any particle at any time step and is given by
 \begin{align}
-    \mat{x^\ast} \in \lim_{t \to \infty} \argmin_{p \in \Pe} \Cog_p(t)
+    \mat{x^\ast} \in \lim_{t \to \infty} \argmax_{p \in \Pe} f(\Cog_p(t)).
 \end{align}
-which directly raises the question of convergence which cannot really be guaranteed since this is a heuristic and we can think of plenty examples which do not converge (multiple minima).
-In practice we will probably use standard convergence criteria such as minimum relative stepsize, minimum improvement, maximum of number of iterations without improvement.
-Usually however, these all do not help and we have to define a maximum number of iterations.
+This limit is not well-defined for arbitrary inputs.
+If $f$ is bounded, this limit is well-defined since $f(\Cog_p(\cdot))$ is monotonically increasing for all $p \in \Pe$.
+Assuming a neighbourhood which transitively connects all particles, an arbitrary amount of time and a unique global optimum which gets visited by a particle at some time, the swarm should intuitively collapse to this global optimum, since the best particle attracts all other particles.
+While the heuristic is surprisingly successful in practice, the basic PSO algorithm can be shown to not converge to a single point or to the global optimum in scenarios which are not so ideal \cite{engelbrecht_fundamentals_2006}.
+
+Since PSO cannot judge whether it has converged to the limit, standard termination criteria for optimization have to be employed.
+Common problem-dependent choices are a minimum step size between optimal solutions of successive time steps, minimum improvement of the objective function of consecutive optimal solutions or a maximum number of iterations or iterations without improvement.
+Besides these criteria, there are many other variable parameters in PSO such as the number of particles or the structure of the neighbourhood function.
+The next subsection discusses these choices.
+
 \subsection{Choice of parameters}
 \begin{itemize}
     \item Number of particles
