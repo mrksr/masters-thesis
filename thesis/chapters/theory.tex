@@ -401,9 +401,12 @@ Given some vector of hyperparameters $\mat{\theta}$, the definition of Gaussian 
 where $\mat{K_N} = \K(\mat{X}, \mat{X})$ denotes the Gram matrix of the observed data.
 Combining the two distributions according to the law of total probability yields the probability distribution of the outputs conditioned on the inputs and is given by
 \begin{align}
-    \Prob{\mat{y} \given \mat{X}, \mat{\theta}} &= \int \Prob{\mat{y} \given \mat{f}} \Prob{\mat{f} \given \mat{X}, \mat{\theta}} \diff \mat{f}\label{eq:gp_marginal_likelihood} \\
-    &= \int \Gaussian{\mat{y} \given \mat{f}, \sigma_n^2 \Eye} \Gaussian*{\mat{f} \given \mat{0}, \mat{K_N}} \diff \mat{f} \\
-    &= \Gaussian{\mat{y} \given \mat{0}, \mat{K_N} + \sigma_n^2 \Eye}.
+    \begin{split}
+        \label{eq:gp_marginal_likelihood}
+        \Prob{\mat{y} \given \mat{X}, \mat{\theta}} &= \int \Prob{\mat{y} \given \mat{f}} \Prob{\mat{f} \given \mat{X}, \mat{\theta}} \diff \mat{f} \\
+        &= \int \Gaussian{\mat{y} \given \mat{f}, \sigma_n^2 \Eye} \Gaussian*{\mat{f} \given \mat{0}, \mat{K_N}} \diff \mat{f} \\
+        &= \Gaussian{\mat{y} \given \mat{0}, \mat{K_N} + \sigma_n^2 \Eye}.
+    \end{split}
 \end{align}
 Note that this distribution is obtained by integrating over all possible latent function values $\mat{f}$ and thereby taking all possible function realizations into account.
 This integration is called the \emph{marginalization} of $\mat{f}$.
@@ -515,9 +518,12 @@ Optimizing this term is called a \emph{type II maximum likelihood estimate (ML-I
 The marginal likelihood is an integral over a product of Gaussians obtained from the noise model and the distribution of function values according to the Gaussian process definition.
 It is given by
 \begin{align}
-    \Prob{\mat{y} \mid \mat{X}, \mat{\theta}} &= \int \Prob{\mat{y} \given \mat{f}, \mat{\theta}} \Prob{\mat{f} \given \mat{\theta}} \diff \mat{f} \label{eq:gp_f_marginalization} \\
-    &= \int \Gaussian{\mat{y} \given \mat{f}, \sigma_n^2 \Eye} \cdot \Gaussian{\mat{f} \given \mat{0}, \mat{K_N}} \diff \mat{f} \\
-    &= \Gaussian{\mat{y} \given \mat{0}, \mat{K_N} + \sigma_n^2 \Eye}
+    \begin{split}
+        \label{eq:gp_f_marginalization}
+        \Prob{\mat{y} \mid \mat{X}, \mat{\theta}} &= \int \Prob{\mat{y} \given \mat{f}, \mat{\theta}} \Prob{\mat{f} \given \mat{\theta}} \diff \mat{f} \\
+        &= \int \Gaussian{\mat{y} \given \mat{f}, \sigma_n^2 \Eye} \cdot \Gaussian{\mat{f} \given \mat{0}, \mat{K_N}} \diff \mat{f} \\
+        &= \Gaussian{\mat{y} \given \mat{0}, \mat{K_N} + \sigma_n^2 \Eye}
+    \end{split}
 \end{align}
 The solution of this integral is a Gaussian density function \cite{petersen_matrix_2008}.
 For practical reasons, it is convenient to minimize the negative logarithm of the likelihood which is given by
