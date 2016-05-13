@@ -360,7 +360,7 @@ The most important stationary kernel is the squared exponential kernel.
 \begin{definition}[Squared Exponential Kernel]
     For a finite dimensional euclidean vector space $\R^d$, the \emph{squared exponential kernel} (or \emph{RBF kernel}) is defined as
     \begin{align}
-        \K_{\text{SE}} \coloneqq \sigma_f^2 \cdot \exp \left( -\frac{1}{2} (\mat{x} - \mat{y})^T \mat{\Lambda}^{-1} (\mat{x} - \mat{y}) \right).
+        \K_{\text{SE}}(\mat{x}, \mat{y}) \coloneqq \sigma_f^2 \cdot \exp \left( -\frac{1}{2} (\mat{x} - \mat{y})^T \mat{\Lambda}^{-1} (\mat{x} - \mat{y}) \right).
     \end{align}
     The parameter $\sigma_f^2 \in \R_{>0}$ is called the \emph{signal variance} and $\mat{\Lambda} = \diag(l_1^2, \dots, l_d^2)$ is a diagonal matrix of the squared \emph{length scales} $l_i \in \R_{>0}$.
 \end{definition}
@@ -737,16 +737,16 @@ The boundaries of this cuboid are defined by the vectors $\mat{x^{\text{min}}}$ 
 
 The swarm of a PSO run consists of a finite set $\Pe$ of particles.
 These particles each have a position and velocity which are both updated for all particles simultaneously at discrete time steps.
-The set of all time steps $T$ is usually considered to be the natural numbers.
+The set of all time steps $\Tee$ is usually considered to be the natural numbers.
 At every such time step, the objective function value is evaluated for every particle.
 Since PSO models social interaction and communication, every particle has a neighbourhood of particles it communicates with after every time step.
 This communication influences the particle's velocity as it is attracted by particles with good performance.
 \begin{definition}[PSO Instance]
     An instance of the \emph{particle swarm optimization (PSO)} scheme on the objective function $f : \R^d \to \R$ is defined by the set of particles $\Pe$.
-    For every timestep in $T$, the particles' positions and velocities are given by the functions
+    For every time step in $\Tee$, the particles' positions and velocities are given by the functions
     \begin{align}
-        \Pos &: \Pe \times T \to \R^d \text{ and} \\
-        \Vel &: \Pe \times T \to \R^d
+        \Pos &: \Pe \times \Tee \to \R^d \text{ and} \\
+        \Vel &: \Pe \times \Tee \to \R^d
     \end{align}
     respectively. The position of particle $i$ at time step $t$ is denoted as $\Pos_i(t)$ and its velocity as $\Vel_i(t)$. A particle can be influenced by the set of its neighbours given by the neighbourhood function
     \begin{align}
@@ -760,7 +760,7 @@ The bounded search space allows for a uniform initial distribution of positions 
     \Pos_i(0), \Vel_i(0) \sim \mat{x^{\text{min}}} + \Uniform{0, 1} \cdot \left( \mat{x^{\text{max}}} - \mat{x^{\text{min}}} \right)
 \end{align}
 where $\Uniform{0, 1}$ denotes the standard uniform distribution.
-The update of the positions only depends on the particle's current state, such that for every $t \in T$ it is defined as
+The update of the positions only depends on the particle's current state, such that for every $t \in \Tee$ it is defined as
 \begin{align}
     \Pos_i(t+1) \coloneqq \Pos_i(t) + \Vel_i(t).
 \end{align}
@@ -779,7 +779,7 @@ This knowledge is represented by the personal best position $\Cog$ of every part
 A particle is pulled towards its own personal best position since for the single individual, it is the best guess for the position of the maximum.
 It is defined as
 \begin{align}
-    \Cog_i(t) &\coloneqq \Pos_i \left(\min\argmax_{t \in T} f(\Pos_i(t)) \right).
+    \Cog_i(t) &\coloneqq \Pos_i \left(\min\argmax_{t \in \Tee} f(\Pos_i(t)) \right).
 \end{align}
 Since the particles are initialized randomly in the search space, most of these personal best positions are expected to be not very good.
 Particles at bad parts of the search space should communicate with their neighbours and be pulled towards the most successful.
@@ -791,6 +791,7 @@ For every particle, the best position seen by any of its neighbours $\Soc$ is de
 
 The update of the velocity of a particle is a linear combination of these two components and the previous velocity to simulate inertia of a particle and is defined as
 \begin{align}
+    \label{eq:pso_velocity}
     \Vel_i(t+1) \coloneqq
         \underbracket[1pt]{\omega \cdot \Vel_i(t)}_{\text{inertia}}
         + \underbracket[1pt]{\gamma_c \cdot r_c \cdot \left( \Cog_i(t) - \Pos_i(t) \right)}_{\text{cognitive component}}
@@ -798,7 +799,7 @@ The update of the velocity of a particle is a linear combination of these two co
 \end{align}
 The real constants $\omega$, $\gamma_c$ and $\gamma_s$ weigh the relative influences of the different components and $r_c, r_s \sim \Uniform{0, 1}$ introduce a stochastic element to the algorithm which enable some random exploration after the first time step.
 Since both the cognitive and social components are proportional to the distance of the particle to either the personal or the social best position, velocities can become very large.
-A common solution to avoid this is \emph{velocity clamping} which bounds the maximum velocity of a particle to a fraction of the size of the input space.
+A common solution to avoid this is \emph{velocity clamping} which bounds the maximum velocity of a particle to a fraction $\zeta$ of the size of the input space.
 
 Using the update steps for the positions and velocities, the behaviour of the swarm $\Pe$ can be calculated for an arbitrary number of time steps.
 The result of the optimization using PSO is the best position visited by any particle at any time step and is given by
@@ -815,11 +816,106 @@ Common problem-dependent choices are a minimum step size between optimal solutio
 Besides these criteria, there are many other variable parameters in PSO such as the number of particles or the structure of the neighbourhood function.
 The next subsection discusses these choices.
 
-\subsection{Choice of parameters}
-\begin{itemize}
-    \item Number of particles
-    \item Neighborhoods
-    \item Values for omega and gamma
-    \item Velocity clamping factor (this can be used to force convergence)
-    \item Number of iterations
-\end{itemize}
+\subsection{Choosing Parameters}
+The performance of basic PSO depends on choices for multiple parameters, namely the number of particles in the swarm, the structure of the neighbourhood, the number of iterations and constants in the velocity update step.
+Since it is a heuristic algorithm, the correct settings of these parameters are problem-dependent and it is hard to give mathematical proofs.
+This subsection describes the empirical findings of this thesis and summarizes the recommendations given by \citeauthor{engelbrecht_fundamentals_2006} in \cite{engelbrecht_fundamentals_2006}.
+
+As with many other optimization algorithms, there are two important trade-offs when deciding on parameter values.
+PSO evaluates the objective function $\Oh(\abs{\Pe} \cdot \abs{\Tee})$ times, about once per particle and time step.
+This introduces the first compromise between computational time and the quality of the result.
+Both a higher number of particles and time steps can be expected to improve the overall best position, up to a point of saturation where the algorithm converges.
+Therefore, this product should be as large as the available computational resources allow.
+The minimum number of function evaluations required is highly dependent on the structure of the search space.
+Too few iterations can terminate the search prematurely, not giving the swarm time to collapse to a good solution.
+On the other hand, too few particles can mean that relevant parts of the search space are never visited.
+
+Dividing computational power between the number of particles and the number of time steps introduces one instance of the second trade-off of exploration and exploitation.
+The more particles there are in the swarm, that is the larger $\abs{\Pe}$ is, the more diversity in the initial positions of the swarm.
+During the first few iterations of PSO where particles are just starting to influence each other, more unknown parts of the search space will be visited and therefore more of the search space will be explored.
+If $\abs{\Pe}$ is increased in expense of the number of iterations, more particles mean a higher chance that some of them find good parts of the search space.
+However, fewer iterations can mean that there is less time for the swarm to collapse towards these good parts and search them more thoroughly to exploit and improve the knowledge gained.
+
+\citeauthor{engelbrecht_fundamentals_2006} recommends a number of about 10 to 30 particles as a good starting point for an unknown problem but suggests cross-validation to improve the results.
+In this thesis, PSO is used to optimize in the space of actions for every time step which, depending on the time horizon, has about 50 dimensions.
+To ensure good coverage of the actions space, 250 particles were used during the experiments.
+
+\begin{figure}[t]
+    \centering
+    \begin{subfigure}{\subfigurewidth}
+        \missingfigure[figheight=.25\textheight]{Ring topology}
+        \caption{Ring topology}
+        \label{fig:pso_topology:ring}
+    \end{subfigure}
+    \begin{subfigure}{\subfigurewidth}
+        \missingfigure[figheight=.25\textheight]{Star topology}
+        \caption{Star topology}
+        \label{fig:pso_topology:star}
+    \end{subfigure}
+    \caption{PSO topologies}
+    \label{fig:pso_topology}
+\end{figure}
+The feature separating PSO from other population-based optimization schemes is social interaction.
+Particles in the swarm communicate with their neighbours to obtain additional knowledge and move towards better parts of the search space.
+The structure of this neighbourhood is determined by the constant neighbourhood function $\Neigh$ and the performance of PSO depends strongly on the structure of this network.
+The information flow through this network is described by the average degree of connectivity and the average distance between two arbitrary particles.
+
+The average degree of connectivity $\lambda_{\Neigh}$ is the average fraction of all available particles a particle is connected to.
+It the degree of connectivity is high and the average distance between two arbitrary particles low, information about a good position in the search space propagates quickly to all particles and the swarm will tend to collapse more quickly.
+For simple or unimodal objective functions, this behaviour can be very beneficial, since it lowers the number of iterations required for the swarm to collapse towards the global optimum.
+For more complex problems however, the swarm is in danger of quickly collapsing in a local optimum without good exploration of the search space.
+
+\citeauthor{engelbrecht_fundamentals_2006} describes a number of different social network structures.
+This thesis uses the \emph{ring topology} where every particle communicates with itself and a number of immediate neighbours as shown in \cref{fig:pso_topology:ring}.
+A higher degree of connectivity can be achieved by increasing the number of immediate neighbours a particle is connected to.
+This topology guarantees transitive connections between every particle while still allowing for some exploration since knowledge must potentially pass through several particles to reach a particle on the other side of the ring.
+Neighbourhoods move smoothly around the ring and overlap, which means that this topology does not favour the formation of clusters of particles in the search space.
+The special case of the ring topology where $\lambda_{\Neigh}$ is one is the \emph{star topology} as shown in \cref{fig:pso_topology:star}.
+In this topology, every particle is connected with every other particle, which implies that the PSO will quickly converge towards the globally best solution.
+
+Having established a swarm of particles with a neighbourhood $\Neigh$, the constants $\omega$, $\gamma_c$ and $\gamma_s$ in the velocity update in \cref{eq:pso_velocity} define the relative influences of the different kinds of information a particle has gathered to its trajectory.
+The cognitive weight $\gamma_c$ and the social weight $\gamma_s$ describe the trust of a particle towards its own experiences and the experiences of its neighbours.
+If $\gamma_s$ is equal to zero, the communication of the particles is ignored and every particle performs a local optimization independent of the rest of the swarm.
+On the other hand, if $\gamma_c$ is zero in a star topology, every particle would be attracted towards the single best known position and it turns into a stochastic hill-climber \cite{engelbrecht_fundamentals_2006}.
+The strength of PSO comes from weighing both aspects, so a common choice is to set both constants to similar values.
+The inertia weight $\omega$ is meant to ensure smooth trajectories and is set to be between zero and one to allow the swarm to converge.
+Based on empirical studies\todo{Alex suggested these are actually based on a proof?}, \citeauthor{eberhart_comparing_2000} suggest setting $\omega$ to 0.7291 and both $\gamma_c$ and $\gamma_s$ to 1.49618 \cite{eberhart_comparing_2000}.
+
+The velocity clamping factor $\zeta$ defines the maximum absolute value of the velocity per dimension to be given by $\mat{v^\text{max}} = \zeta \cdot ( \mat{x^\text{max}} - \mat{x^\text{min}} )$.
+This avoids erratic movement of the particles jumping over huge parts of the search space in one time step.
+Like the weight factors, the velocity clamping factor is defined to be constant through a PSO run within this thesis.
+It is chosen as 0.1 which allows a particle to cross the complete space in comparatively few iterations but still limit its dynamic.
+
+In the experiments of this thesis, the conversion of the PSO runs did not present a problem.
+For other problem instances, time dependent values of the constants can be used to influence the behaviour of the algorithm.
+It may be interesting to switch focus from exploration in the early time steps to exploitation in the later time steps and finally force conversion.
+This can be achieved by adaptively choosing the different weights or the velocity clamping factor \cite{engelbrecht_fundamentals_2006}.
+
+The choices for the parameters of the PSO used in this thesis are presented in \cref{tab:pso_parameters}.
+The problem of choosing a vector of actions in PSO-P is very high dimensional.
+Because of this, the ratio of number of particles to number of time steps leans towards a higher than usual number of particles.
+This is compensated somewhat by a high average connectivity in the ring neighbourhood.
+For the inertia weight, the cognitive and social weights and the velocity clamping factor, standard choices are successful for this thesis.
+\begin{table}[t]
+    \centering
+    \caption{The PSO parameters used in this thesis.}
+    \label{tab:pso_parameters}
+    \begin{tabularx}{\tablewidth}{cXc}
+        \toprule
+        Parameter & Description & Value \\
+        \midrule
+        $\abs{\Pe}$ & Number of particles & 250 \\
+        $\abs{\Tee}$ & Maximum number of time steps & 80 \\
+        $\Neigh$ & Neighbourhood topology & Ring \\
+        $\lambda_{\Neigh}$ & Average connectivity in the neighbourhood & 0.1 \\
+        $\omega$ & Inertia weight & 0.72981 \\
+        $\gamma_c$ & Cognitive weight & 1.49618 \\
+        $\gamma_s$ & Social weight & 1.49618 \\
+        $\zeta$ & Velocity clamping factor & 0.1 \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+
+This chapter presented the mathematical framework of reinforcement learning to describe solutions to the bicycle benchmark presented in \cref{cha:the_bicycle_benchmark} with mathematical rigor.
+With Gaussian Processes and the PSO-Policy it introduced the two main tools used in this thesis to solve it in a Bayesian way.
+The next chapter introduces a standard approach to controlling the bicycle with PSO-P and compares it to two schemes which incorporate uncertainty into their decision making process.
