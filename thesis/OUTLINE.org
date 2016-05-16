@@ -69,19 +69,47 @@
     - Values for omega and gammas
 
 * Solution of the Bicycle Benchmark
-** Standard Approach: Means Only
-*** Dynamics: with GP Models
-   - Model the deltas
-   - One model per dimension
-   - Implicit assumption that outputs are independent
+   - Overview of what we actually have to do
+     + Data
+     + Transition Dynamics
+     + Reward function
+     + Long-term predictions
+     + Evaluation
+** Transition Dynamics
+*** Data Set
+   - Represent angles with sines and cosines
+   - Polar coordinates
+   - We want analytically independent dimensions
+   - Meta-Actions and Time Steps
    - Choice of Data Sets
      + Random exploration
      + Random sampling
      + Size of data sets
+*** GP Models
+   - Model the deltas
+   - One model per dimension
+   - Implicit assumption that outputs are independent
+   - Which model depends on which dimension
    - Values for N, M, Kernel
-*** MPC/Unrolling: PSO-Optimization of Value Function
-   - Reward function: Non-Probabilistic
-   - PSO Parameters
+     + N too low: Models very bad
+     + N large, M large: Models very good
+     + We are interested in the behaviour in-between
+     + We use RBF kernels, trials seemed that others do not behave much
+       better
+   - Training Parameters
+     + Multiple restarts
+     + Many iterations
+   - Explicit posterior distribution?
+   - Interpretation of uncertainties
+   - Behaviour of GPs (e.g. away from data)
+** Standard Approach: Means Only
+*** Deterministic Reward function
+   - Reward from the paper
+   - Why we do not use distance to goal
+   - Terminal states, terminal rewards
+*** Long-Term predictions
+   - Easy: Just add things
+   - Handling of terminal states is easy, too.
 *** Results and Discussion of Problems
    - Evaluation
      + Create data set
@@ -93,20 +121,26 @@
 ** Our first Approach: One-Step Uncertainties
 *** New Reward Function
    - Extension with probabilities
-   - Folding of gaussians
+   - Quadratic Cost
+   - Folding of Gaussians
+*** Long-Term predictions
+   - Still just adding, discard the uncertainty for propagation
+   - But terminal states are now hard
 *** Results
+   - Improvement over means only, but not so much
 ** Our second Approach: Linearization
-*** New propagation method
+*** Linearization
    - Now we do proper long-term predictions
    - Starting point: Model that gives posterior uncertainties
    - But only for single points
    - How to get a posterior distribution given a prior one?
    - Derive formulae for GPs via Taylor expansion
    - Maybe mention moment matching?
-*** Further extension of the reward function
-   - "Stop Probabilities" and Bimodality
+*** Truncate Gaussians at stop probabilities
    - Extension of PILCO, truncated gaussians
 *** Results
+   - Good in terms of getting to the goal
+   - But there is wiggling
 
 * Conclusion
 ** Discussion of the Approaches
