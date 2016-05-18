@@ -33,6 +33,12 @@
 \newcommand*{\diff}{\mathop{}\!\mathrm{d}}
 \DeclarePairedDelimiter{\abs}{\vert}{\vert}
 
+% Bicycle
+\DeclareMathOperator{\DynBicycle}{\Dyn_{\text{bicycle}}}
+\DeclareMathOperator{\RwdBicycle}{\Rwd_{\text{bicycle}}}
+\DeclareMathOperator{\Goal}{\Tee_{\text{goal}}}
+\DeclareMathOperator{\Fallen}{\Tee_{\text{fallen}}}
+
 % RL
 \DeclareMathOperator{\Dists}{\mathcal{P}}
 \DeclareMathOperator{\Rwd}{\mathbf{R}}
@@ -56,7 +62,7 @@
 \DeclareMathOperator{\K}{\mathcal{K}}
 \DeclareMathOperator{\Q}{\mathcal{Q}}
 \DeclareMathOperator{\Norm}{\mathcal{N}}
-\DeclareMathOperator{\Uni}{U}
+\DeclareMathOperator{\Uni}{\mathbb{U}}
 \DeclareMathOperator{\GP}{\mathcal{GP}}
 \DeclareMathOperator{\SPGP}{\mathcal{SPGP}}
 \DeclareMathOperator{\Ell}{\mathcal{L}}
@@ -96,5 +102,7 @@
   \allowbreak}
 #1
 }
+
+\DeclarePairedDelimiter{\Bicycle}{[}{]}
 % Constants
 \newcommand{\CM}{\text{CM}}

@@ -1,16 +1,97 @@
 \chapter{Solution of the Bicycle Benchmark}
 \section{Transition Dynamics}
 \subsection{Data Set}
+\begin{algorithm}[p]
+    \caption{Sampling bicycle transitions}
+    Let $\DynBicycle$ denote the transition function of the bicycle benchmark.
+    The minimal and maximal values for the state variables and the actions can be found in \cref{tab:bicycle_variables,tab:bicycle_actions}.
+    \begin{algorithmic}[1]
+        \Function{SampleBicycleState}{}
+            \State $\left( \theta, \dot{\theta}, \omega, \dot{\omega} \right) \gets \Gaussian{\mat{0}, \sfrac{1}{4} \cdot \diag \left( \theta^{\text{max}}, \dot{\theta}^{\text{max}}, \omega^{\text{max}}, \dot{\omega}^{\text{max}} \right)}$
+            \State $x \gets \Uniform{x^{\text{min}}, x^{\text{max}}}$
+            \State $y \gets \Uniform{y^{\text{min}}, y^{\text{max}}}$
+            \State $\psi \gets \Uniform{-\pi, \pi}$
+            \State \Return $\Bicycle*{\theta, \dot{\theta}, \omega, \dot{\omega}, x, y, \psi}$
+        \EndFunction
+        \Statex
+        \Function{SampleAction}{}
+            \State $d \gets \Uniform{d^{\text{min}}, d^{\text{max}}}$
+            \State $T \gets \Uniform{T^{\text{min}}, T^{\text{max}}}$
+            \State \Return $\Bicycle{d, T}$
+        \EndFunction
+        \Statex
+        \Function{SampleTransitions}{$N$}
+            \For{$i \gets 1, N$}
+                \State $\mat{s_i} \gets \Call{SampleBicycleState}$
+                \State $\mat{a_i} \gets \Call{SampleAction}$
+                \State $\mat{s^\prime_{i}} \gets \DynBicycle(\mat{s_i}, \mat{a_i})$
+            \EndFor
+            \State \Return $\left( \left( \mat{s_0}, \mat{a_0}, \mat{s^\prime_0} \right), \left( \mat{s_1}, \mat{a_1}, \mat{s^\prime_1} \right), \dots, \left( \mat{s_{N}}, \mat{a_{N}}, \mat{s^\prime_{N}} \right) \right)$
+        \EndFunction
+    \end{algorithmic}
+\end{algorithm}
+\begin{algorithm}[p]
+    \caption{Sampling a bicycle trajectory}
+    Let $\DynBicycle$ denote the transition function of the bicycle benchmark.
+    \begin{algorithmic}[1]
+        \Function{SampleBicycleStartState}{}
+            \State $\Bicycle*{\_, \_, \_, \_, x, y, \psi} \gets \Call{SampleBicycleState}$
+            \State \Return $\Bicycle*{0, 0, 0, 0, x, y, \psi}$
+        \EndFunction
+        \Statex
+        \Function{SampleTrajectory}{}
+            \State $\mat{s_0} \gets \Call{SampleBicycleStartState}$
+            \State $t \gets 0$
+            \While{$\mat{s_t}$ is not terminal}
+                \State $\mat{a_t} \gets \Call{SampleAction}$
+                \State $\mat{s_{t+1}} \gets \DynBicycle(\mat{s_t}, \mat{a_t})$
+                \State $t \gets t + 1$
+            \EndWhile
+            \State \Return $\left( \left( \mat{s_0}, \mat{a_0}, \mat{s_1} \right), \left( \mat{s_1}, \mat{a_1}, \mat{s_2} \right), \dots, \left( \mat{s_{t-1}}, \mat{a_{t-1}}, \mat{s_t} \right) \right)$
+        \EndFunction
+    \end{algorithmic}
+\end{algorithm}
+\begin{algorithm}[t]
+    \caption{Sampling a bicycle data set}
+    \begin{algorithmic}[1]
+        \Function{SampleMixedBicycleDataSet}{$N$}
+            \State $\Es \gets \emptyset$
+            \While{$\abs{\Es} < N$}
+                \State $T \gets \Call{SampleTrajectory}$
+                \State $R \gets \Call{SampleTransitions}{\abs{T}}$
+                \State $\Es \gets \Es \cup T \cup R$
+            \EndWhile
+            \State \Return $\Es$
+        \EndFunction
+    \end{algorithmic}
+\end{algorithm}
 \subsection{GP Models}
-\section{Standard Approach: Means Only}
+\section{Predictions without Uncertainties}
 \subsection{Deterministic reward function}
+\begin{definition}[Deterministic Bicycle Reward Function]
+    Given the set $\Es^+$ of possible states of the bicycle benchmark, the \emph{deterministic bicycle reward function} is defined as
+    \begin{align}
+        \RwdBicycle : \left\{
+            \begin{aligned}
+                \Es^+ &\to \R \\
+                \mat{s} &\mapsto \begin{cases}
+                    2 & \text{if $\mat{s} \in \Goal$} \\
+                    0 & \text{if $\mat{s} \in \Fallen$} \\
+                    1 - \frac{\abs{\psi_{\mat{s}} - \varphi_{\mat{s}}}}{\pi} & \text{otherwise}
+                \end{cases}
+            \end{aligned}
+        \right.
+    \end{align}
+    where $\psi_{\mat{s}}$ and $\varphi_{\mat{s}}$ denote the respective angles in state $\mat{s}$.
+    It assigns constant reward for terminal states and reward inversely proportional to the angle between the bicycle's heading and the goal otherwise.
+\end{definition}
 \subsection{Long-Term predictions}
 \subsection{Results and Problems}
-\section{Our first approach: One-Step uncertainties}
+\section{Predictions with One-Step Uncertainties}
 \subsection{Probabilistic reward function}
 \subsection{Long-Term predictions}
 \subsection{Results and Problems}
-\section{Our second Approach: Linearization}
+\section{Predictions with Multi-Step Uncertainties}
 \subsection{Linearization}
 \subsection{Truncation of Gaussians}
 \subsection{Results and Problems}

@@ -77,9 +77,6 @@
      + Evaluation
 ** Transition Dynamics
 *** Data Set
-   - Represent angles with sines and cosines
-   - Polar coordinates
-   - We want analytically independent dimensions
    - Meta-Actions and Time Steps
    - Choice of Data Sets
      + Random exploration
@@ -88,6 +85,9 @@
 *** GP Models
    - Model the deltas
    - One model per dimension
+   - Represent angles with sines and cosines
+   - Polar coordinates
+   - We want analytically independent dimensions
    - Implicit assumption that outputs are independent
    - Which model depends on which dimension
    - Values for N, M, Kernel
