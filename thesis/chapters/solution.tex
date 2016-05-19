@@ -1,6 +1,29 @@
-\chapter{Solution of the Bicycle Benchmark}
+\chapter{Uncertainties in the Bicycle Benchmark}
+\label{cha:solution}
+\Cref{cha:theory} introduced reinforcement learning as a general mathematical framework to describe the problem of controlling a bicycle in the benchmark presented in \cref{cha:the_bicycle_benchmark}.
+This thesis is concerned with model-based reinforcement learning, where the transition function of the system to be controlled is represented with some function approximation which is learnt from observations of the system and is used to make predictions about the future.
+Learning a model of the true system introduces model bias, where actions considered to be good with respect to the model's predictions can show bad performance in reality because the model is incorrect.
+In order to reduce this bias, Gaussian Processes can be used which do not only yield one specific function approximation but a distribution over all plausible models.
+This uncertainty about the correct model can be propagated through to predictions about specific test points and instead of a single point, Gaussian processes predict a Gaussian distribution about possible function values.
+
+Modelling the transition dynamics allows the prediction of a state $\mat{s_{t+1}}$ given a concrete pair of state and action $(\mat{s_t}, \mat{a_t})$ for the previous time step.
+Assuming a deterministic model which yields exactly one posterior state, the \emph{long-term prediction} of states multiple time steps into the future reduces to iterated one-step predictions.
+Given a (deterministic) reward function $\Rwd$ as detailed in \cref{def:reward_function}, it is possible to evaluate the action value function $\AVlu$ of PSO-P and thus directly use the model to extract a policy, since the expected value in \cref{eq:action_value_function} is a simple sum of deterministic values.
+
+In the Bayesian context however, the transition model predicts a distribution over posterior states.
+This complicates long-term predictions since the uncertainty of intermediate states has to be propagated through the (non-linear) transition model to accumulate the uncertainties of multiple predictions.
+Additionally, the original deterministic reward function possibly has to be adapted to make it possible to evaluate the expected reward for all time steps.
+Once these problems are solved and the action value function can be calculated, PSO-P can be used in the same way as in the deterministic case to choose appropriate actions.
+
+Based on the bicycle benchmark, this chapter compares the classical deterministic long-term predictions to two approaches of integrating uncertainty into the predictions.
+The first section describes the creation of data sets used to train the transition model and the design-choices made to obtain suitable models.
+These models are then interpreted as deterministic to obtain a base-line for comparison in the next section.
+The last two sections describe how to use uncertainties in the planning.
+The first approach is to use the one-step uncertainties of the Gaussian Process models in the reward function but to still create long-term predictions using deterministic states.
+The second fully Bayesian approach completely propagates state uncertainties both to the reward function and subsequent states.
+
 \section{Transition Dynamics}
-\subsection{Data Set}
+\subsection{Data Sets}
 \begin{algorithm}[p]
     \caption{Sampling bicycle transitions}
     Let $\DynBicycle$ denote the transition function of the bicycle benchmark.
@@ -65,7 +88,7 @@
         \EndFunction
     \end{algorithmic}
 \end{algorithm}
-\subsection{GP Models}
+\subsection{Gaussian Process Models}
 \section{Predictions without Uncertainties}
 \subsection{Deterministic reward function}
 \begin{definition}[Deterministic Bicycle Reward Function]

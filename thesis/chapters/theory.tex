@@ -1,4 +1,5 @@
 \chapter{Theoretical Background}
+\label{cha:theory}
 The bicycle benchmark is a problem in a branch of machine learning called reinforcement learning.
 This chapter gives a brief introduction into reinforcement learning and defines the notation necessary to reason about the bicycle benchmark and similar problems in a mathematical way.
 The approach used in this thesis to solve it is called model-based reinforcement learning and is discussed next.
@@ -95,6 +96,7 @@ The reward is a quality assigned to each state and serves as a measure of how go
 This measure is independent of the future or past development of the system.
 It is obtained from a real-valued \emph{reward function $\Rwd$} such that $r_{t+1} = \Rwd(s_{t+1})$.
 \begin{definition}[Reward Function]
+    \label{def:reward_function}
     The \emph{reward function $\Rwd$} assigns a quality to each state in the extended state space and has the signature
     \begin{align}
         \Rwd : \Es^+ \to \R.
@@ -671,9 +673,10 @@ In order to keep this process computationally feasible, trade-offs must be made 
 
 This thesis chooses the non-parametric approach of the \emph{particle swarm optimization policy} described by \citeauthor{hein_reinforcement_2016} in \cite{hein_reinforcement_2016}.
 For a finite time horizon $T$, finding an optimal parametric policy using the approximated value function means finding policy parameters which result in good choices for actions at every time step.
-In contrast to this, PSO-P directly examines the \emph{action-value-function $\hat{\Vlu}$} given by
+In contrast to this, PSO-P directly examines the \emph{action-value-function $\AVlu$} given by
 \begin{align}
-    \hat{\Vlu}_{\mat{s_0}} : \left\{
+    \label{eq:action_value_function}
+    \AVlu_{\mat{s_0}} : \left\{
         \begin{aligned}
             \Ah^T &\to \R \\
             \left( \mat{a_0}, \dots, \mat{a_{T-1}} \right) &\mapsto \Moment*{\E}{\sum_{t=0}^T \gamma^t \Rwd(\mat{s_t}) \given f, \mat{s_0}, \mat{a_0}, \dots, \mat{a_{T-1}}}
@@ -684,17 +687,17 @@ where $f$ denotes a model of the transition function, $\mat{s_0}$ denotes a stat
 PSO-P optimizes over the vector of all possible actions in the time horizon and then applies the best action found for time step zero to the system.
 \begin{definition}[PSO-P]
     \label{def:psop}
-    The \emph{particle swarm optimization policy (PSO-P)} \cite{hein_reinforcement_2016} chooses actions via direct optimization of the action value function $\hat{\Vlu}$ and is defined as
+    The \emph{particle swarm optimization policy (PSO-P)} \cite{hein_reinforcement_2016} chooses actions via direct optimization of the action value function $\AVlu$ and is defined as
     \begin{align}
         \pi_{\text{PSO-P}} &: \left\{
             \begin{aligned}
                 \Es &\to \Ah\\
-                \mat{s} &\mapsto \mat{a^\ast}_0 \text{, where } \mat{a^\ast} \in \argmax_{\mat{a} \in \Ah^T} \hat{\Vlu}_{\mat{s}}(\mat{a})
+                \mat{s} &\mapsto \mat{a^\ast}_0 \text{, where } \mat{a^\ast} \in \argmax_{\mat{a} \in \Ah^T} \AVlu_{\mat{s}}(\mat{a})
             \end{aligned}
         \right..
     \end{align}
 \end{definition}
-The optimization over $\hat{\Vlu}$ at time step $t$ yields a vector of optimal actions for the complete time horizon.
+The optimization over $\AVlu$ at time step $t$ yields a vector of optimal actions for the complete time horizon.
 The PSO-Policy still only applies the first of these actions and repeats the optimization at time step $t+1$.
 This is done to both reduce model bias and profit from the more accurate information about $\mat{s_{t+1}}$ from the system.
 
