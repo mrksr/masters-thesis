@@ -186,7 +186,7 @@ The goal of the bicycle benchmark is to drive the bicycle to a specific position
 The bicycle starts in a position which is almost upright, with the state variables $\theta$, $\dot{\theta}$, $\omega$, $\dot{\omega}$ being sampled from Gaussian noise with a standard deviation of one percent of their value range.
 
 The agent has to choose the two continuous actions $d$ and $T$ described in \cref{tab:bicycle_actions} every 0.01 seconds, after which they are assumed constant for this time interval.
-After this time, the controller is again presented with the current and exact values of the state variables and has to make a new decision.
+After this time, the controller is once again presented with the current and exact values of the state variables and has to make a new decision.
 One run of the bicycle system creates a time series of bicycle states and the actions chosen by the controller.
 The episode ends in failure if the bicycle falls over and it ends in success if the bicycle reaches the goal.
 Since it is possible for the bicycle to drive in circles indefinitely, the episode also ends in failure after a certain amount of time has passed.

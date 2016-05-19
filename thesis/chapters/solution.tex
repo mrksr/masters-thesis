@@ -23,7 +23,42 @@ The first approach is to use the one-step uncertainties of the Gaussian Process 
 The second fully Bayesian approach completely propagates state uncertainties both to the reward function and subsequent states.
 
 \section{Transition Dynamics}
+\label{sec:transition_dynamics}
+The goal in the bicycle benchmark is to learn to both balance a bicycle and to ride it to a target position.
+The state of a bicycle, as described in \cref{cha:the_bicycle_benchmark}, consists of the real valued vector $\Bicycle{\theta, \dot{\theta}, \omega, \dot{\omega}, x, y, \psi}$, where $\theta$ is the angle of the handlebars, $\omega$ is the vertical angle of the bicycle frame, $x$ and $y$ are euclidean coordinates and $\psi$ is the orientation of the bicycle.
+The bicycle starts in almost upright position and the task of the controller is to choose the actions $\Bicycle{d, T}$, where $d$ is the horizontal leaning displacement of the driver and $T$ is the torque applied to the handlebars at every time step.
+The transition dynamics are derived from a physical approximation of the system and are completely deterministic.
+
+This thesis assumes that the actor is not allowed to interact with the system in order to try or improve its policy.
+In contrast, the agent is presented with a predefined data set of observations of the system obtained with a simple and sub-optimal controller.
+This constraint is meant to mimic industrial systems where it is comparatively cheap to obtain measurements of running systems but allowing an agent to explore is either very expensive or a security concern.
+It is therefore not possible to apply an on-line learning scheme on the system or to explore in specific directions in order to improve the dynamics model.
+
+This section first describes how data sets are sampled from the bicycle benchmark in order to simulate this constraint.
+These data sets are then used to train the Gaussian Processes used in PSO-P to form a controller.
+
 \subsection{Data Sets}
+\begin{figure}[tp]
+    \centering
+    \begin{subfigure}{\subfigurewidth}
+        \missingfigure[figheight=.25\textheight]{Length of Episodes}
+        \caption{Length of Episodes}
+        \label{fig:data_set_properties:episode_length}
+    \end{subfigure}
+    \begin{subfigure}{\subfigurewidth}
+        \missingfigure[figheight=.25\textheight]{Omega histogram}
+        \caption{Omega histogram}
+        \label{fig:data_set_properties:omega_histogram}
+    \end{subfigure}
+    \caption{Data Set properties}
+    \label{fig:data_set_properties}
+\end{figure}
+\begin{figure}[tp]
+    \centering
+    \missingfigure[figheight=.4\textheight]{Positional Plot of a few Episodes}
+    \caption{Positional Plot of a few Episodes}
+    \label{fig:data_set_plot}
+\end{figure}
 \begin{algorithm}[p]
     \caption{Sampling bicycle transitions}
     Let $\DynBicycle$ denote the transition function of the bicycle benchmark.
