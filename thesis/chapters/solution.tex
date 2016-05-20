@@ -110,13 +110,13 @@ These data sets are then used to train the Gaussian Processes used in PSO-P to f
     \label{alg:bicycle_data_set}
     \begin{algorithmic}[1]
         \Function{SampleMixedBicycleDataSet}{$N$}
-            \State $\Es \gets \emptyset$
-            \While{$\abs{\Es} < N$}
+            \State $\D \gets \emptyset$
+            \While{$\abs{\D} < N$}
                 \State $T \gets \Call{SampleTrajectory}$
                 \State $R \gets \Call{SampleTransitions}{\abs{T}}$
-                \State $\Es \gets \Es \cup T \cup R$
+                \State $\D \gets \D \cup T \cup R$
             \EndWhile
-            \State \Return $\Es$
+            \State \Return $\D$
         \EndFunction
     \end{algorithmic}
 \end{algorithm}
@@ -158,36 +158,114 @@ While those random samples add more balanced observations of the system, they al
 Not every combination of angles in the state space is sensible and can be reached from an upright starting state by applying actions.
 The transition models therefore also have to learn irrelevant information about the dynamics.
 A heuristic to reduce the amount of improbable states is to not sample the angles uniformly but rather to sample them from a broad random distribution around zero, resampling values which fall outside of the range of allowed values.
+Since terminal states are modelled separately, both the last transition of a trajectory and all samples which result in a terminal state are removed from the data set.
 
 \subsection{Gaussian Process Models}
-\begin{itemize}
-    \item Model the deltas
-    \item Terminal states
-    \item One model per dimension
-    \item Represent angles with sines and cosines
-    \item Polar coordinates
-    \item We want analytically independent dimensions
-    \item Implicit assumption that outputs are independent
-    \item Which model depends on which dimension
-    \item Values for N, M, Kernel
-        \begin{itemize}
-            \item N too low: Models very bad
-            \item N large, M large: Models very good
-            \item We are interested in the behaviour in-between
-            \item We use RBF kernels, trials seemed that others do not behave much
-                better
-        \end{itemize}
-    \item Training Parameters
-        \begin{itemize}
-            \item Algorithm
-            \item Multiple restarts
-            \item Many iterations
-        \end{itemize}
-    \item Explicit posterior distribution?
-    \item Interpretation of uncertainties
-    \item Behaviour of GPs (e.g. away from data)
-\end{itemize}
+The Gaussian process models for the transition dynamics are trained using data sets of the form $\D = \Set{(\mat{s_i}, \mat{a_i}, \mat{s_i^\prime}) \in \Es \times \Ah \times \Es \with i \in [N]}$ of pairs of states and actions and their corresponding following state $\mat{s_i^\prime} = \DynBicycle(\mat{s_i}, \mat{a_i})$.
+Since the transition dynamics of the bicycle benchmark are deterministic, these observations have no probabilistic element and they are not noisy.
+The model $f$ of the transition dynamics is a compact statistical representation of this collected knowledge and is to be used to predict successive states of unobserved combinations of states and actions $(\mat{s_\ast}, \mat{a_\ast})$.
+
+Besides predicting a concrete following state, the model should provide a measure about the uncertainty of its predictions.
+Since there is no randomness in the dynamics themselves, this uncertainty comes from the imperfect information about the true system dynamics and is dependent on the location of both the training data and the required predictions.
+If a query is made to the model in a part of the state space in which it has not seen many observations, the model should express its uncertainty and not assume that its best guess is close to the truth.
+
+\begin{figure}[tb]
+    \centering
+    \missingfigure[figheight=.25\textheight]{GP Posterior}
+    \caption{GP posterior}
+    \label{fig:gp_transition_models}
+\end{figure}
+The Gaussian processes presented in \cref{sec:gp_regression} represent a distribution over all plausible transition dynamics given a data set.
+In figure \cref{fig:gp_transition_models}, the x-axis represents pairs of states and actions while the y-axis represents the successive state.
+Since the observations are noise-free, the GP is completely certain about predicting them and, since it assumed a smooth RBF-prior, it is also confident about predicting states closed to the observed data.
+Between the data points, uncertainties are higher since there are many different models which are plausible.
+Gaussian processes are called \emph{non-degenerate}, since for predictions far away from the training set, the predicted uncertainty does not converge to zero.
+In contrast, for parts of the input space without any knowledge, the GP falls back to the prior assumptions about uncertainties and the mean function.
+Given a large enough data set which is spread out through the complete state and action space, the model becomes more and more confident about its predictions and converges towards the true transition dynamics.
+
+Gaussian processes as presented in this thesis can only model functions with univariate output.
+Approximating successive states requires multivariate predictions however.
+While there do exist extensions of Gaussian processes for multidimensional output \cite{rasmussen_gaussian_2006}, a common solution is to train $D$ separate GPs, one for every dimension in the state space $\R^D$.
+While this requires longer training time, it allows choosing a different set of hyperparameters for every dimension.
+Since the training set does not contain transitions which result in terminal states, the transition models do not know about them.
+The signature of the function represented by the transition model is $f : \Es \times \Ah \to \Es$, where $\Es = \R^D$ and $\Ah = R^k$.
+Similar to the absence of terminal states, the transition models are also not aware of the rectangular boundaries of the state space described in \cref{tab:bicycle_variables}, which means that it is possible for the transition models to predict illegal states, which also have to be handled separately.
+
+All models are trained using the squared exponential kernel presented in \cref{def:rbf_kernel}.
+The bicycle benchmark represents a physical system, which makes smoothness of the transition function a natural assumption.
+The RBF kernel is the standard choice in Gaussian process regression when no special knowledge about the shape of the transition function is available\todo{maybe mention other kernels? Is there anything to say about them?}.
+
+Opposed to learning successive states directly, the training targets for the $d$th dimension are the differences to the current state given by
+\begin{align}
+    \Delta s_{i,d} \coloneqq \DynBicycle(\mat{s_i}, \mat{a_i})_d - s_{i,d} = s_{i,d }^\prime - s_{i,d},
+\end{align}
+where $i \in [N]$ and $d \in [D]$.
+This can be advantageous since differences vary less than the original function \cite{deisenroth_efficient_2010}.
+Learning differences can also introduce independences in the data, since predicting the change in position of the bicycle only depends on the direction of movement but not on the previous position.
+Having learned models for the differences, the mean and the variance of the Gaussian posterior state distribution $\Prob{f_d(\mat{s_\ast}, \mat{a_\ast})}$ is given by
+\begin{align}
+    \Moment*{\E}{f_d(\mat{s_\ast}, \mat{a_\ast}) \given \mat{s_\ast}, \mat{a_\ast}} &= s_{\ast,d} + \Moment*{\E}{\Delta s_{\ast,d} \given \mat{s_\ast}, \mat{a_\ast}}, \\
+    \Moment*{\var}{f_d(\mat{s_\ast}, \mat{a_\ast}) \given \mat{s_\ast}, \mat{a_\ast}} &= \Moment*{\var}{\Delta s_{\ast,d} \given \mat{s_\ast}, \mat{a_\ast}},
+\end{align}
+respectively, since the prior state is considered constant and non-probabilistic.
+Uncertainties in the predictions only originate from the amount of confidence expressed by the models for the differences.
+The values of the expected value and variances are calculated according to \cref{lem:gp_posterior}.
+
+Since the different Gaussian processes are trained independently of each other and their training sets only contain their respective output dimension, their predictions are conditionally independent given the input.
+With the predictive distribution for the single dimension being Gaussian, the joint predictive state distribution is also Gaussian with a diagonal covariance matrix and is given by
+\begin{align}
+    \Prob*{f(\mat{s_\ast}, \mat{a_\ast}) \given \mat{s_\ast}, \mat{a_\ast}} &=
+    \Gaussian*{f(\mat{s_\ast}, \mat{a_\ast}) \given \mat{\mu_f}, \mat{\Sigma_f}}\text{, where} \\
+    \mat{\mu_f} &= \begin{pmatrix}
+    \Moment*{\E}{f_1(\mat{s_\ast}, \mat{a_\ast}) \given \mat{s_\ast}, \mat{a_\ast}} \\
+    \vdots \\
+    \Moment*{\E}{f_D(\mat{s_\ast}, \mat{a_\ast}) \given \mat{s_\ast}, \mat{a_\ast}} \\
+    \end{pmatrix} \\
+    \mat{\Sigma_f} &= \diag\left(
+        \Moment*{\var}{f_1(\mat{s_\ast}, \mat{a_\ast}) \given \mat{s_\ast}, \mat{a_\ast}},
+        \cdots,
+        \Moment*{\var}{f_D(\mat{s_\ast}, \mat{a_\ast}) \given \mat{s_\ast}, \mat{a_\ast}}
+    \right).
+\end{align}
+This diagonal covariance matrix illustrates the implicit independence assumption of the different output dimensions introduced by training one model per output dimension.
+While this assumption is not true in most cases, it can be used as an approximation and generally yields good results.
+
+The state of the bicycle system is given by a vector $\Bicycle{\theta, \dot{\theta}, \omega, \dot{\omega}, x, y, \psi}$ composed of the internal dynamics of the bicycle and its position and orientation in euclidean space.
+During simulation with the transition model, the coordinates were transformed to polar coordinates given by
+\begin{align}
+    \varphi(x, y) &\coloneqq \atanTwo(y, x) \\
+    r(x, y) &\coloneqq \sqrt{x^2 + y^2},
+\end{align}
+where $\atanTwo$ is the arctangent function with two arguments.
+Polar coordinates uniquely represent a two-dimensional point by its angle to the x-axis and its distance to the origin.
+This representation both increases model performance and simplifies calculating the bicycle's relative position to the goal in the origin.
+
+Additionally, representing both $\varphi$ and $\psi$ as numbers between $-\pi$ and $\pi$ leads to a loss of information.
+While two angles with absolute value close to $\pi$ but opposite signs are close together on a circle, their representations have a large euclidean distance.
+A Gaussian Process using the RBF-Kernel cannot recognize their similarity.
+In this case, it is possible to choose a specialized periodic variant of the squared exponential kernel which recognizes periodicity.
+Equivalently, an angle can be represented as a complex number on the unit circle, replacing it by its sine and cosine.
+Therefore, the internal representation of a bicycle state in the simulation is given by a vector
+\begin{align}
+    \mat{s} &= \Bicycle{\theta, \dot{\theta}, \omega, \dot{\omega}, \varphi, r, \psi} \in \R^7 \\
+    \intertext{which is transformed to}
+    \mat{\hat{s}} &= \Bicycle{\theta, \dot{\theta}, \omega, \dot{\omega}, \sin\varphi, \cos\varphi, r, \sin\psi, \cos\psi} \in \R^9
+\end{align}
+when presented to the GPs.
+The transition model consists of seven Gaussian processes, each with nine-dimensional input.
+
+The models are implemented in Python using \citeauthor{titsias_variational_2009}'s sparse variational GP regression implemented in \citetitle{gpy_gpy:_2012} \cite{gpy_gpy:_2012} and trained using expectation maximization as presented in \cref{sub:gp_hyperparameters}.
+The optimization of the likelihood function is calculated using scaled conjugated gradients with multiple restarts to avoid local minima.
+The performance of the transition models is highly dependent on the size of the training set $N$ and the number of inducing inputs $M$.
+For $N$ smaller than 35000, the performance of the transition models for long-term predictions was not good enough to allow PSO-P to succeed for any of the approaches presented below.
+Conversely, for large $N$ and $M$ larger than 250, the models are good enough such that PSO-P finds perfect solutions for all approaches.
+The experiments in this thesis focus on choices for $N$ and $M$ which are inbetween these extremes and where information about the model uncertainties can be used to improve performance.
+The next section presents the classic approach of long-term predictions without the use of uncertainty information, which is used as a baseline for comparison for the following techniques.
+
 \section{Predictions without Uncertainties}
+\begin{itemize}
+    \item Terminal states
+\end{itemize}
 \subsection{Deterministic reward function}
 \begin{definition}[Deterministic Bicycle Reward Function]
     Given the set $\Es^+$ of possible states of the bicycle benchmark, the \emph{deterministic bicycle reward function} is defined as

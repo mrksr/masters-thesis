@@ -360,6 +360,7 @@ As described above, the similarity of two data points $\mat{x}$ and $\mat{y}$ is
 A kernel which is a function of $\mat{x} - \mat{y}$ is called \emph{stationary} and is invariant to translations in the input space.
 The most important stationary kernel is the squared exponential kernel.
 \begin{definition}[Squared Exponential Kernel]
+    \label{def:rbf_kernel}
     For a finite dimensional euclidean vector space $\R^d$, the \emph{squared exponential kernel} (or \emph{RBF kernel}) is defined as
     \begin{align}
         \K_{\text{SE}}(\mat{x}, \mat{y}) \coloneqq \sigma_f^2 \cdot \exp \left( -\frac{1}{2} (\mat{x} - \mat{y})^T \mat{\Lambda}^{-1} (\mat{x} - \mat{y}) \right).
