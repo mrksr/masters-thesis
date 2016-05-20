@@ -178,7 +178,7 @@ of the position of the bicycle.
 
 The original implementation of \citeauthor{randlov_learning_1998} uses an explicit Euler scheme to evolve the dynamics of the system for a time step.
 The changes of position and orientation are calculated using the exact analytical solution of moving the tyres along their circular paths.
-To improve accuracy, the implementation developed for this thesis implements a standard Runge-Kutta-Scheme as described in Numerical Recipies~\cite[908]{press_numerical_2007}.
+To improve accuracy, the implementation developed for this thesis implements a standard Runge-Kutta-Scheme as described in \citetitle{press_numerical_2007}~\cite{press_numerical_2007}.
 The assumption that for a single time step, the bicycle moves along a fixed circular path is no longer correct when evaluating the dynamics with Runge-Kutta.
 Because of this, the changes in position and orientation are integrated into the scheme.
 

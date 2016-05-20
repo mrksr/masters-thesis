@@ -41,26 +41,21 @@ These data sets are then used to train the Gaussian Processes used in PSO-P to f
 \begin{figure}[tp]
     \centering
     \begin{subfigure}{\subfigurewidth}
-        \missingfigure[figheight=.25\textheight]{Length of Episodes}
+        \missingfigure[figheight=.35\textheight]{Length of Episodes}
         \caption{Length of Episodes}
         \label{fig:data_set_properties:episode_length}
     \end{subfigure}
     \begin{subfigure}{\subfigurewidth}
-        \missingfigure[figheight=.25\textheight]{Omega histogram}
-        \caption{Omega histogram}
-        \label{fig:data_set_properties:omega_histogram}
+        \missingfigure[figheight=.35\textheight]{Omega-Plot for one episode}
+        \caption{Omega-Plot for one episode}
+        \label{fig:data_set_properties:omega_example}
     \end{subfigure}
     \caption{Data Set properties}
     \label{fig:data_set_properties}
 \end{figure}
-\begin{figure}[tp]
-    \centering
-    \missingfigure[figheight=.4\textheight]{Positional Plot of a few Episodes}
-    \caption{Positional Plot of a few Episodes}
-    \label{fig:data_set_plot}
-\end{figure}
-\begin{algorithm}[p]
+\begin{algorithm}[tp]
     \caption{Sampling bicycle transitions}
+    \label{alg:bicycle_transitions}
     Let $\DynBicycle$ denote the transition function of the bicycle benchmark.
     The minimal and maximal values for the state variables and the actions can be found in \cref{tab:bicycle_variables,tab:bicycle_actions}.
     \begin{algorithmic}[1]
@@ -84,12 +79,13 @@ These data sets are then used to train the Gaussian Processes used in PSO-P to f
                 \State $\mat{a_i} \gets \Call{SampleAction}$
                 \State $\mat{s^\prime_{i}} \gets \DynBicycle(\mat{s_i}, \mat{a_i})$
             \EndFor
-            \State \Return $\left( \left( \mat{s_0}, \mat{a_0}, \mat{s^\prime_0} \right), \left( \mat{s_1}, \mat{a_1}, \mat{s^\prime_1} \right), \dots, \left( \mat{s_{N}}, \mat{a_{N}}, \mat{s^\prime_{N}} \right) \right)$
+            \State \Return $\left( \left( \mat{s_1}, \mat{a_1}, \mat{s^\prime_1} \right), \left( \mat{s_2}, \mat{a_2}, \mat{s^\prime_2} \right), \dots, \left( \mat{s_{N}}, \mat{a_{N}}, \mat{s^\prime_{N}} \right) \right)$
         \EndFunction
     \end{algorithmic}
 \end{algorithm}
-\begin{algorithm}[p]
+\begin{algorithm}[tp]
     \caption{Sampling a bicycle trajectory}
+    \label{alg:bicycle_trajectories}
     Let $\DynBicycle$ denote the transition function of the bicycle benchmark.
     \begin{algorithmic}[1]
         \Function{SampleBicycleStartState}{}
@@ -109,8 +105,9 @@ These data sets are then used to train the Gaussian Processes used in PSO-P to f
         \EndFunction
     \end{algorithmic}
 \end{algorithm}
-\begin{algorithm}[t]
+\begin{algorithm}[tp]
     \caption{Sampling a bicycle data set}
+    \label{alg:bicycle_data_set}
     \begin{algorithmic}[1]
         \Function{SampleMixedBicycleDataSet}{$N$}
             \State $\Es \gets \emptyset$
@@ -123,7 +120,73 @@ These data sets are then used to train the Gaussian Processes used in PSO-P to f
         \EndFunction
     \end{algorithmic}
 \end{algorithm}
+\begin{figure}[tp]
+    \centering
+    \missingfigure[figheight=.5\textheight]{Positional Plot of a few Episodes}
+    \caption{Positional Plot of a few Episodes}
+    \label{fig:data_set_plot}
+\end{figure}
+The bicycle benchmark's dynamics are introduced in \cref{cha:the_bicycle_benchmark} by defining the derivatives of the state variables and choosing values for the relevant constants in \cref{tab:bicycle_constants}.
+Given a starting state and an appropriate number of actions, these derivatives can be used to approximate the future behaviour of the system using iterative numerical methods for approximating ordinary differential equations.
+For this thesis, the bicycle benchmark was implemented in Python \cite{rossum_python_1995} with NumPy \cite{walt_numpy_2011} and using the classical Runge-Kutta scheme \cite{kutta_beitrag_1901}.
+
+In their experiments, \citeauthor{randlov_learning_1998} chose a time discretization of 0.01 seconds.
+During this time, the action applied by the agent remains constant and after one such time step, the agent can choose a new action
+This results in a controller frequency of \SI[mode=text]{100}{\Hz}.
+A high frequency gives the agent a high degree of control which is often not possible to achieve in real systems.
+The experiments in this thesis are based on the same time discretization of 0.01 seconds but only allow the actor to choose a new action every ten time steps, keeping it constant for the time steps in between.
+This yields a controller frequency of \SI[mode=text]{10}{\Hz}.
+Combined with the differential equations, the choice of time discretization completely defines the interface between the actor and the bicycle system.
+The resulting transition dynamics used for the interaction of the controller and the system are called $\DynBicycle$ in the following.
+
+Applying a controller to the bicycle benchmark produces time series beginning at some starting state and ending when the cyclist either falls down or reaches the goal.
+It is assumed that no expert knowledge is available, so the data sets available for learning transition dynamics should not be based a controller which can successfully balance the bicycle.
+Instead, this thesis chooses an uninformed controller which applies random actions to the system.
+
+\Cref{alg:bicycle_transitions,alg:bicycle_trajectories,alg:bicycle_data_set} describe how data sets were created for the experiments.
+A data set consists of both complete trajectories and single random samples from the state space.
+A trajectory always starts in an upright position, that is, the state variables $\theta$, $\dot{\theta}$, $\omega$ and $\dot{\omega}$ are all set to zero, while the remaining positional variables are sampled uniformly.
+This is both a sensible assumption and increases the mean lengths of the sampled trajectories when compared to more random starting states.
+As shown in \cref{fig:data_set_properties:episode_length,fig:data_set_plot}, an average trajectory in the data set is quite short, since random actions are not suitable to balance the bicycle.
+
+\Cref{fig:data_set_properties:omega_example} shows this in more detail, as it depicts the values of $\omega$ for a typical trajectory.
+While the bicycle starts in an upright position, it quickly starts leaning heavily towards one side and, since the controller does not choose actions to stabilize the bicycle, falls over.
+The sampled trajectories do not contain many state transitions where the bicycle drives straight or the actions counteract falling.
+
+In order to reduce this bias, the data set also contains random samples from the complete state space as shown in \cref{alg:bicycle_data_set}.
+While those random samples add more balanced observations of the system, they also increase the difficulty of the learning problem.
+Not every combination of angles in the state space is sensible and can be reached from an upright starting state by applying actions.
+The transition models therefore also have to learn irrelevant information about the dynamics.
+A heuristic to reduce the amount of improbable states is to not sample the angles uniformly but rather to sample them from a broad random distribution around zero, resampling values which fall outside of the range of allowed values.
+
 \subsection{Gaussian Process Models}
+\begin{itemize}
+    \item Model the deltas
+    \item Terminal states
+    \item One model per dimension
+    \item Represent angles with sines and cosines
+    \item Polar coordinates
+    \item We want analytically independent dimensions
+    \item Implicit assumption that outputs are independent
+    \item Which model depends on which dimension
+    \item Values for N, M, Kernel
+        \begin{itemize}
+            \item N too low: Models very bad
+            \item N large, M large: Models very good
+            \item We are interested in the behaviour in-between
+            \item We use RBF kernels, trials seemed that others do not behave much
+                better
+        \end{itemize}
+    \item Training Parameters
+        \begin{itemize}
+            \item Algorithm
+            \item Multiple restarts
+            \item Many iterations
+        \end{itemize}
+    \item Explicit posterior distribution?
+    \item Interpretation of uncertainties
+    \item Behaviour of GPs (e.g. away from data)
+\end{itemize}
 \section{Predictions without Uncertainties}
 \subsection{Deterministic reward function}
 \begin{definition}[Deterministic Bicycle Reward Function]
