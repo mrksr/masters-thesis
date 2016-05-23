@@ -340,8 +340,7 @@ The agent is still punished when falling down though, since the episode has to e
 and $\Tee = \Goal \cup \Fallen$, $\Es^+ = \Es \cup \Tee$.
 
 \begin{align}
-    \map{\mat{\hat{s}_{t+1}}} &\in \argmax_{\mat{s_{t+1}} \in \Es^+} \Prob{\mat{s_{t+1}} \given \mat{s_t}, \mat{a_t}} \\
-    &= \argmax_{\mat{s_{t+1}} \in \Es^+} f\Cond{\mat{s_{t+1}} \given \mat{s_t}, \mat{a_t}} \\
+    \argmax_{\mat{s_{t+1}} \in \Es^+} \Prob{\mat{s_{t+1}} \given \mat{s_t}, \mat{a_t}} &= \argmax_{\mat{s_{t+1}} \in \Es^+} f\Cond{\mat{s_{t+1}} \given \mat{s_t}, \mat{a_t}} \\
     &= \argmax_{\mat{s_{t+1}} \in \Es^+} \Gaussian{\mat{s_{t+1}} \given \mat{\mu_{t+1}}, \mat{\Sigma_{t+1}}} \\
     &= \Set{\mat{\mu_{t+1}}}
 \end{align}
