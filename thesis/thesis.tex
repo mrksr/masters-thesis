@@ -49,9 +49,16 @@
 
 \appendix
 
+\chapter{Lists of Figures, Tables and Algorithms}
+\listoffigures
+\listoftables
+\begingroup
+    % Since scrbook's listof=leveldown setting does not cover listofalgorithms,
+    % we kinda hackishly do it ourselves.
+    \let\chapter\section
+    \listofalgorithms
+\endgroup
+
 \nocite{*}
 \printbibliography
-% \listoffigures
-% \listoftables
-% \listoflistings
 \end{document}
