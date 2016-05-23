@@ -256,6 +256,7 @@ The transition model consists of seven Gaussian processes, each with nine-dimens
 
 The models are implemented in Python using \citeauthor{titsias_variational_2009}'s sparse variational GP regression implemented in \citetitle{gpy_gpy:_2012} \cite{gpy_gpy:_2012} and trained using expectation maximization as presented in \cref{sub:gp_hyperparameters}.
 The optimization of the likelihood function is calculated using scaled conjugated gradients with multiple restarts to avoid local minima.
+
 The performance of the transition models is highly dependent on the size of the training set $N$ and the number of inducing inputs $M$.
 For $N$ smaller than 35000, the performance of the transition models for long-term predictions was not good enough to allow PSO-P to succeed for any of the approaches presented below.
 Conversely, for large $N$ and $M$ larger than 250, the models are good enough such that PSO-P finds perfect solutions for all approaches.
@@ -263,10 +264,49 @@ The experiments in this thesis focus on choices for $N$ and $M$ which are inbetw
 The next section presents the classic approach of long-term predictions without the use of uncertainty information, which is used as a baseline for comparison for the following techniques.
 
 \section{Predictions without Uncertainties}
-\begin{itemize}
-    \item Terminal states
-\end{itemize}
-\subsection{Deterministic reward function}
+The transition model trained on a predefined data set allows the prediction of a successive state distribution $\Prob{\mat{s_1}}$ given a deterministic pair of a state and an action $(\mat{s_0}, \mat{a_0})$.
+To evaluate the action value function $\AVlu$, two extensions need to be made.
+Firstly, beyond specifying the goal, \cref{cha:the_bicycle_benchmark} does not define a concrete reward function.
+This section introduces a variant of the reward function used by \citeauthor{randlov_learning_1998} in \cite{randlov_learning_1998}.
+
+And secondly, for a time horizon $T$ longer than one step into the future, the predictive state distributions $\Prob{\mat{s_1}}$ up to $\Prob{\mat{s_T}}$ are required.
+Since the GP dynamics model returns a Gaussian predictive distribution for all states beyond the starting state to account for the model uncertainty, all states beyond the starting state are no longer deterministic.
+In order to mimic a classic non-Bayesian model without a measure of uncertainty, the approach presented in this section discards this information and considers the maximum-a-posteriori estimation to be the deterministic prediction of the transition model.
+Having established the deterministic mode of evaluating the action value function, this section finally introduces the evaluation setup used in this thesis and discusses the results of applying this technique to the bicycle system.
+
+\subsection{Deterministic Bicycle Reward Function}
+Solving the bicycle benchmark is a composite problem.
+An agent has to both learn to balance a bicycle and drive to the goal.
+Instead of having to solve the two tasks one after the other, they both have to be solved simultaneously, switching between them.
+While an agent is in control of the bicycle, it can try to drive towards the goal.
+If any action applied to the system leads to the danger of falling over however, the agent has to quickly change its focus towards preventing this.
+
+Without expert knowledge available, the controller must learn this distinction autonomously, given the reward function.
+The most basic and uninformed reward function possible assigns positive reward for reaching the goal, a punishment (in the form of negative reward) for falling over and weighs all other states equally between the two extremes.
+While this can be enough to teach the short-term task of avoiding to fall down, the agent has no initiative of driving towards the goal besides actually hitting it.
+For most situations, the goal cannot be reached within the time-horizon of one PSO-P instance.
+In this setting, PSO-P would optimize towards a trajectory for which the chance of falling down is minimal.
+This trajectory is a circle with large radius~\cite{randlov_learning_1998}.
+
+To give the controller a chance of reaching the goal, it has to receive some hint about the correct direction to drive.
+Encoding this information in the reward function goes against the assumption of the complete absence of expert knowledge.
+If it is too detailed, it introduces the risk of significantly simplifying the learning problem or pushing the agent towards a policy which is only locally optimal.
+This reduction of the hard problem of finding the goal to a series of easier problems of driving in the correct direction and then going straight is called \emph{shaping} \cite{sutton_reinforcement_1998,randlov_learning_1998}.
+
+The hint towards the goal encoded in the reward function should be a term which represents information which is local in the sense that its value can change considerably within the time horizon.
+The most simple term to consider is a punishment based on the current distance to the goal.
+This formulation is problematic however, since the agent should not care about the actual distance rather than the change of distance with respect to the previous state, which cannot be expressed in the reward.
+While an increase in reward would express movement in the correct direction, for any non-linear punishment, the amount of increase is dependent on the current position in the input space and can lead to numerical problems if it gets to small.
+If it were linear, the punishment might at some point be larger than the punishment for falling.
+At this point, the agent's correct choice would be to fall down as quickly as possible.
+
+In order to avoid these problems, the reward function used in this thesis uses the current angle between the frame of the bicycle and the direction towards the goal as a hint.
+Since the goal's position is at the origin of the coordinate system, this angle can be calculated as the difference of the current rotation of the bicycle $\psi$ and the angular component of its polar coordinates in space $\varphi$.
+This difference can be scaled to an interval between zero and one and can take values in the complete range if the time horizon is long enough to contain a curve of the bicycle.
+The reward is scaled to be zero if the bicycle points straight away from the goal and one if directly towards it.
+If the bicycle has reached the goal, the agent receives a constant award of two which is double the amount which can be obtained for any state which is not in the goal.
+Similarly, the reward for falling is constant zero.
+
 \begin{definition}[Deterministic Bicycle Reward Function]
     Given the set $\Es^+$ of possible states of the bicycle benchmark, the \emph{deterministic bicycle reward function} is defined as
     \begin{align}
@@ -282,9 +322,17 @@ The next section presents the classic approach of long-term predictions without 
         \right.
     \end{align}
     where $\psi_{\mat{s}}$ and $\varphi_{\mat{s}}$ denote the respective angles in state $\mat{s}$.
-    It assigns constant reward for terminal states and reward inversely proportional to the angle between the bicycle's heading and the goal otherwise.
+    The difference is defined to take values between $-\pi$ and $\pi$.
+
+    The reward function assigns constant reward for terminal states and reward inversely proportional to the angle between the bicycle's heading and the goal otherwise.
 \end{definition}
+
+The agent does not receive negative reward for falling down.
+Instead, the reward is zero, which is equal to pointing away from the goal.
+The agent is still punished when falling down though, since the episode has to end and the agent is not able to collect additional reward by driving towards the goal.
+
 \subsection{Long-Term predictions}
+\subsection{Evaluation Setup}
 \subsection{Results and Problems}
 \section{Predictions with One-Step Uncertainties}
 \subsection{Probabilistic reward function}
