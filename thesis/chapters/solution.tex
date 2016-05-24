@@ -394,9 +394,12 @@ Given a time horizon $T$ and a starting state $\mat{s_0}$ and a vector $(\mat{a_
 With these intermediate states and the deterministic reward function $\RwdBicycle$ from \cref{sub:deterministic_reward}, it is possible to evaluate the action value function $\AVlu$ defined in \cref{eq:action_value_function} and therefore apply PSO-P to the bicycle system.
 Using the MAP-estimates for intermediate states, the action value function can be calculated as
 \begin{align}
-    \map{\AVlu}_{\mat{s_0}}(\mat{a_0}, \dots, \mat{a_{T-1}}) &= \Moment*{\E}{\sum_{t=0}^T \gamma^t \RwdBicycle(\mat{s_t}) \given f, \mat{s_0}, \mat{a_0}, \dots, \mat{a_{T-1}}} \\
-    &= \sum_{t=0}^T \gamma^t \Moment*{\E}{\RwdBicycle(\mat{s_t}) \given f, \mat{s_0}, \mat{a_0}, \dots, \mat{a_{T-1}}} \\
-    &= \sum_{t=0}^T \gamma^t \RwdBicycle(\map{\mat{s_t}}),
+    \label{eq:map_action_value_function}
+    \begin{split}
+        \map{\AVlu}_{\mat{s_0}}(\mat{a_0}, \dots, \mat{a_{T-1}}) &= \Moment*{\E}{\sum_{t=0}^T \gamma^t \RwdBicycle(\mat{s_t}) \given f, \mat{s_0}, \mat{a_0}, \dots, \mat{a_{T-1}}} \\
+        &= \sum_{t=0}^T \gamma^t \Moment*{\E}{\RwdBicycle(\mat{s_t}) \given f, \mat{s_0}, \mat{a_0}, \dots, \mat{a_{T-1}}} \\
+        &= \sum_{t=0}^T \gamma^t \RwdBicycle(\map{\mat{s_t}}),
+    \end{split}
 \end{align}
 where $\map{\mat{s_0}} = \mat{s_0}$.
 Since all states are deterministic, all expected values collapse to applications of the reward function to the single deterministic state.
@@ -470,8 +473,50 @@ The application of \cref{alg:evaluation_setup} leads to a large set of trajector
 In order to compare different implementations of the action value function $\AVlu$, PSO-P is applied to the same starting states using the same models using the respective functions.
 
 \subsection{Results}
+\begin{figure}[tp]
+    \centering
+    \missingfigure[figheight=.35\textheight]{MAP results}
+    \caption{MAP results, M vs mean-mean-reward}
+    \label{fig:map_results}
+\end{figure}
+\begin{figure}[tp]
+    \centering
+    \missingfigure[figheight=.35\textheight]{MAP trajectory}
+    \caption{Single successful MAP trajectory, all variables}
+    \label{fig:map_successful_trajectory}
+\end{figure}
+\begin{figure}[p]
+    \centering
+    \missingfigure[figheight=.8\textheight]{MAP trajectories}
+    \caption{Multiple MAP trajectories, X-Y-Plot}
+    \label{fig:map_trajectories}
+\end{figure}
+\Cref{fig:map_successful_trajectory} shows an example of a successful trajectory generated using PSO-P on the maximum-a-posteriori action value function $\map{\AVlu}$ derived in \cref{eq:map_action_value_function}.
+Since the PSO policy does not have to be trained, the first interaction with the system can be successful, based on the quality of the transition models.
+PSO-P tends to aggressively exploit model bias to choose good actions in the time horizon.
+Since it does not have any kind of memory, it does not follow any long-term strategy.
+
+The deterministic bicycle reward function hints towards the goal by increasing the reward if the bicycle's frame points towards the goal.
+A typical trajectory created with the PSO policy therefore first describes a curve with a radius as small as possible in order to quickly point into the correct direction.
+If the bicycle points into the correct direction, PSO-P drives straight towards the goal until it is reached.
+The policy avoids falling over on the model since falling over reduces the achieved reward.
+It will however choose actions which are as close to falling over as possible, since the minimum radius of a curve is constrained by the maximum leaning angle $\omega$.
+
+\Cref{fig:map_trajectories} shows that this strategy often is not successful.
+Minimal errors in the predictions of the models when the cyclist is learning close to the maximum amount possible lead to the cyclist falling over.
+Therefore, most trajectories fail while driving a curve.
+If a trajectory starts at a state which does not require a tight curve, PSO-P can often reach the goal, since it can very effectively solve the balancing problem in non-extreme states and drive straight.
+
+While \cref{fig:map_successful_trajectory,fig:map_trajectories} are based on a single transition model and give an idea about the performance of PSO-P using MAP predictions, statistically significant results can be obtained using the multiple iterations of the evaluation algorithm with different data sets and transition models.
+\todo{which plot do we use?} \Cref{fig:map_results} shows the percentage of trajectories which reach the goal plotted against the number of pseudo inputs.
+The more expressive the model, the more successful PSO-P with MAP-predictions becomes, but overall, most trajectories end in failure.
+
+In order to reduce the aggressiveness with which PSO-P exploits the model, the uncertainty measure provided by the Gaussian processes is integrated into the action value function.
+If the model predicts that with a large probability, the true system dynamics lead to failure, even if the MAP prediction might still be a valid state, PSO-P should choose a less extreme action.
+The following section introduces how the deterministic reward function can be extended to believes about states and uses the uncertainty predicted by the transition model in planning without propagating it through multiple time steps.
+
 \section{Predictions with One-Step Uncertainties}
-\subsection{Probabilistic reward function}
+\subsection{Probabilistic Bicycle Reward Function}
 \subsection{Long-Term predictions}
 \subsection{Results}
 \section{Predictions with Multi-Step Uncertainties}
