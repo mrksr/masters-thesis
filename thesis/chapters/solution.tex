@@ -362,6 +362,12 @@ Gaussian processes are Bayesian models which predict values by averaging over al
 In order to simulate a deterministic transition model to use as a baseline for comparison, this first approach for lon-term predictions discards this believe and only predicts a single successive state.
 The most plausible choice for this single successive state is the maximum-a-posteriori estimation given by the maximum of the posterior density function.
 
+\begin{figure}[t]
+    \centering
+    \missingfigure[figheight=.55\textheight]{MAP predictions}
+    \caption{MAP predictions}
+    \label{fig:map_predictions}
+\end{figure}
 With a deterministic state $\mat{s_t}$ and an action $\mat{a_t}$, this MAP estimate of the transition model $f$ is given by
 \begin{align}
     \argmax_{\mat{s_{t+1}} \in \R^7} \Prob{\mat{s_{t+1}} \given \mat{s_t}, \mat{a_t}} &= \argmax_{\mat{s_{t+1}} \in \R^7} f\Cond{\mat{s_{t+1}} \given \mat{s_t}, \mat{a_t}} \\
@@ -383,7 +389,7 @@ Since states at all time steps are deterministic, terminal states can easily be 
     \right.
 \end{align}
 where $\mat{\mu_{t+1}}$ is the mean of the distribution $f(\mat{s_t}, \mat{a_t})$ returned by the transition model.
-Given a time horizon $T$ and a  starting state $\mat{s_0}$ and a vector $(\mat{a_0}, \dots, \mat{a_{T-1}})$ of actions, this function can be used to calculate the intermediate states $\map{\mat{s_1}}$ to $\map{\mat{s_T}}$ using dynamic programming.
+Given a time horizon $T$ and a starting state $\mat{s_0}$ and a vector $(\mat{a_0}, \dots, \mat{a_{T-1}})$ of actions, this function can be used to calculate the intermediate states $\map{\mat{s_1}}$ to $\map{\mat{s_T}}$ using dynamic programming. \Cref{fig:map_predictions} compares these iterated MAP-predictions with the correct evolution of the bicycle system.
 
 With these intermediate states and the deterministic reward function $\RwdBicycle$ from \cref{sub:deterministic_reward}, it is possible to evaluate the action value function $\AVlu$ defined in \cref{eq:action_value_function} and therefore apply PSO-P to the bicycle system.
 Using the MAP-estimates for intermediate states, the action value function can be calculated as
@@ -395,6 +401,43 @@ Using the MAP-estimates for intermediate states, the action value function can b
 where $\map{\mat{s_0}} = \mat{s_0}$.
 Since all states are deterministic, all expected values collapse to applications of the reward function to the single deterministic state.
 \subsection{Evaluation Setup}
+\begin{table}[t]
+    \centering
+    \caption{The parameters used for evaluation in this thesis.}
+    \label{tab:evaluation_parameters}
+    \begin{tabularx}{\tablewidth}{ccXc}
+        \toprule
+        Part & Parameter & Description & Values \\
+        \midrule
+        Evaluation & $I$ & Number of data sets & $43$ \\
+        & $S$ & Number of trajectories & $15$ \\
+        \addlinespace
+        GP models & $\mat{N}$ & Number of training points & $\Set{60000, 70000}$ \\
+        & $\mat{M}$ & Number of pseudo-inputs & $\Set{20, 30, 40, 50, 75, 100, 150}$ \\
+        & $\K$ & Kernel & RBF \\
+        \addlinespace
+        PSO-P & $T$ & Time horizon & $15$ \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+\begin{algorithm}[tp]
+    \caption{Bicycle evaluation setup}
+    \label{alg:evaluation_setup}
+    \begin{algorithmic}[1]
+        \For{$i \gets 1, I$}
+            \State $\D_i \gets \Call{SampleMixedBicycleDataSet}{\max \mat{N}}$
+            \ForAll{$(N, M) \in \mat{N} \times \mat{M}$}
+                \State Train transition model $f^{(N, M)}$ on $\D_i$
+            \EndFor
+
+            \For{$s \gets 1, S$}
+                \State Sample start state $\mat{s^{(s)}_0} \sim \Prob{\mat{s_0}}$
+                \State Observe trajectory $\Trajectory_{i, s}$ from $\mat{s^{(s)}_0}$ using PSO-P on $f^{(N, M)}$ and $\AVlu$
+            \EndFor
+        \EndFor
+        \State Evaluate $\AVlu$ using the trajectories $\Set{\Trajectory_{i, s} \with i \in [I], s \in [S]}$
+    \end{algorithmic}
+\end{algorithm}
 \subsection{Results}
 \section{Predictions with One-Step Uncertainties}
 \subsection{Probabilistic reward function}
