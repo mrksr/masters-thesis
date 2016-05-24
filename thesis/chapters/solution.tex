@@ -409,35 +409,66 @@ Since all states are deterministic, all expected values collapse to applications
         \toprule
         Part & Parameter & Description & Values \\
         \midrule
-        Evaluation & $I$ & Number of data sets & $43$ \\
-        & $S$ & Number of trajectories & $15$ \\
+        Evaluation & $I$ & Number of data sets & 43 \\
+        & $S$ & Number of trajectories & 15 \\
+        & $L$ & Maximum trajectory length & 200 \\
         \addlinespace
-        GP models & $\mat{N}$ & Number of training points & $\Set{60000, 70000}$ \\
-        & $\mat{M}$ & Number of pseudo-inputs & $\Set{20, 30, 40, 50, 75, 100, 150}$ \\
+        GP models & $\mat{N}$ & Number of training points & \{60000, 70000\} \\
+        & $\mat{M}$ & Number of pseudo inputs & \{20, 30, 40, 50, 75, 100, 150\} \\
         & $\K$ & Kernel & RBF \\
         \addlinespace
-        PSO-P & $T$ & Time horizon & $15$ \\
+        PSO-P & $T$ & Time horizon & 15 \\
         \bottomrule
     \end{tabularx}
 \end{table}
 \begin{algorithm}[tp]
     \caption{Bicycle evaluation setup}
     \label{alg:evaluation_setup}
+    Let $\AVlu$ denote an implementation of the action value function to be evaluated.
+    All other constants are described in \cref{tab:evaluation_parameters} and \cref{alg:bicycle_data_set}.
     \begin{algorithmic}[1]
         \For{$i \gets 1, I$}
             \State $\D_i \gets \Call{SampleMixedBicycleDataSet}{\max \mat{N}}$
             \ForAll{$(N, M) \in \mat{N} \times \mat{M}$}
-                \State Train transition model $f^{(N, M)}$ on $\D_i$
-            \EndFor
-
-            \For{$s \gets 1, S$}
-                \State Sample start state $\mat{s^{(s)}_0} \sim \Prob{\mat{s_0}}$
-                \State Observe trajectory $\Trajectory_{i, s}$ from $\mat{s^{(s)}_0}$ using PSO-P on $f^{(N, M)}$ and $\AVlu$
+                \State Train transition model $f^{(N, M)}$ on $\D_i$ with kernel $\K$
+                \For{$s \gets 1, S$}
+                \State $\mat{s^{(s)}_0} \gets \Call{SampleBicycleStartState}{\null} + \Gaussian{\mat{0}, \diag(10^{-4} \cdot \mat{s}^{\text{max}})}$
+                    \State Observe trajectory $\Trajectory_{i, s}$ from $\mat{s^{(s)}_0}$ using PSO-P on $f^{(N, M)}$ and $\AVlu$
+                \EndFor
             \EndFor
         \EndFor
         \State Evaluate $\AVlu$ using the trajectories $\Set{\Trajectory_{i, s} \with i \in [I], s \in [S]}$
     \end{algorithmic}
 \end{algorithm}
+\Cref{alg:evaluation_setup} describes the setup used to evaluate and compare the different implementations of the action value function used in this thesis.
+PSO-P directly optimizes over the action value function in order choose actions to be applied to the bicycle system.
+Since the action value function is based on the dynamics models, this policy highly depends on the performance of the transition models.
+In order to reduce this model bias in the evaluations, the performance is measured based on multiple different transition models.
+
+The behaviour of the transition models depends on the quality of the underlying data set, the number of input points used for training and the prior choices of the hyperparameters.
+The evaluation considers multiple combinations of training points $N$ and pseudo inputs $M$ as shown in \cref{tab:evaluation_parameters}.
+The number of pseudo inputs determines the expressiveness of the model.
+Many pseudo inputs allow the transition models to describe the data with more details while few pseudo inputs force the model to generalize.
+
+Standard choices for the number of pseudo inputs is in the range from a few ten to several hundred pseudo inputs \cite{snelson_flexible_2007}, but the correct choice depends on the function to be learned and cannot easily be determined.
+The models in this thesis range from very simple models with 20 pseudo inputs to more powerful models with 150 pseudo inputs.
+The boundaries were chosen based on empirical studies.
+At some point below 20 pseudo inputs, the models collapse since they loose their expressive power.
+For a very high number of pseudo inputs, all techniques discussed in this thesis behave very similarly, since the predictions of the models become almost perfect.
+Similarly, the number of training points was chosen such that there is enough data to catch all relevant parts of the dynamics but not enough data for the models to be perfect.
+
+These different choices of hyperparameters for the transition models are applied to a number of different data sets sampled according to \cref{alg:bicycle_data_set}.
+For every such data set, transition models are trained using the different combinations of number of training points and pseudo inputs.
+Based on every such model, multiple trajectories are generated using PSO-P and the action value function $\AVlu$ to be evaluated.
+A trajectory is created by sampling a starting state $\mat{s_0}$ and using PSO-P to choose an action $\mat{a_0}$ to be applied.
+Using this pair, the successive state $\mat{s_1} = \DynBicycle(\mat{s_0}, \mat{a_0})$ can be calculated using the simulation.
+This process is iterated until the bicycle reaches the goal, falls over or the trajectory becomes longer than the maximum trajectory length.
+The time horizon $T$ used in PSO-P is chosen to be long enough to contain about a third of a rotation of the bicycle on a tight curve.
+This proofed to be a long enough horizon to solve the benchmark while still remaining computationally feasible.
+
+The application of \cref{alg:evaluation_setup} leads to a large set of trajectories based on different data and different models.
+In order to compare different implementations of the action value function $\AVlu$, PSO-P is applied to the same starting states using the same models using the respective functions.
+
 \subsection{Results}
 \section{Predictions with One-Step Uncertainties}
 \subsection{Probabilistic reward function}
