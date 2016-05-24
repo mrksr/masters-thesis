@@ -5,7 +5,7 @@ This chapter gives a brief introduction into reinforcement learning and defines 
 The approach used in this thesis to solve it is called model-based reinforcement learning and is discussed next.
 
 The models in model-based reinforcement learning are used to learn the dynamics of the system to be controlled in order to be able to make predictions about its future development.
-Gaussian Processes provide a framework to learn such dynamics in a way which adds information about the uncertainty of a prediction.
+Gaussian processes provide a framework to learn such dynamics in a way which adds information about the uncertainty of a prediction.
 This is achieved by learning a distribution over possible models rather than deciding on one single model.
 The uncertainty about the development in a single time step can be used to reason about the uncertainty of predictions multiple steps into the future.
 
@@ -190,7 +190,7 @@ The last part of this chapter will be concerned with introducing a policy-repres
 \section{Gaussian Process Regression}
 \label{sec:gp_regression}
 The transition dynamics $\Dyn : \Es \times \Ah \to \Dists(\Es^+)$ are a function mapping states and actions to a probability distribution of following states.
-In order to estimate them using Gaussian Processes, some assumptions about the structure of this function are needed.
+In order to estimate them using Gaussian processes, some assumptions about the structure of this function are needed.
 First, it will be assumed that both the set of states $\Es$ and the set of actions $\Ah$ are euclidean real valued vector spaces and that the set of terminal states $\Tee$ is empty, that is, $\Es^+$ and $\Es$ are assumed equal, requiring that episode endings have to be modelled separately.
 And secondly, the probability distribution of the following state is assumed to be unimodal.
 This unimodality can result from deterministic transition functions, such as the one of the bicycle benchmark defined in \cref{cha:the_bicycle_benchmark}, being disturbed slightly by Gaussian noise.
@@ -217,9 +217,9 @@ Instead of modelling a distribution of parameter values, a Bayesian non-parametr
 
 \emph{Gaussian processes (GPs)} are a state-of-the-art framework for non-parametric regression.
 They are a way of representing a probability distribution over functions in a way which is both computationally feasible and allows for Bayesian inference.
-This section introduces Gaussian Processes and describes how to encode a prior distribution over functions to represent preference in the space of all possible functions $f$.
+This section introduces Gaussian processes and describes how to encode a prior distribution over functions to represent preference in the space of all possible functions $f$.
 Based on observed data, GPs can be used make predictions about the predictive distribution $\Prob{y_\ast \given \mat{x_\ast}, f^\ast}$ taking all functions in the distribution $\Prob{f^\ast}$ into account.
-Since these predictions are not computationally cheap, an extension of Gaussian Processes for large data sets, sparse Gaussian processes using pseudo-inputs \cite{snelson_sparse_2005}, is introduced last.
+Since these predictions are not computationally cheap, an extension of Gaussian processes for large data sets, sparse Gaussian processes using pseudo-inputs \cite{snelson_sparse_2005}, is introduced last.
 
 \subsection{Definition}
 Gaussian processes are a generalization of the Gaussian distribution to function spaces.
@@ -548,14 +548,14 @@ The sparse approximation of Gaussian processes presented in the next section cho
 The positions of these input points can be interpreted as hyperparameters to the original Gaussian process and induce a kernel function with many hyperparameters, where overfitting can become relevant.
 
 \subsection{Sparse Approximations using Inducing Inputs}
-A major drawback of Gaussian Processes in real-world applications is their high computational cost for large data sets.
-Assume a data set $(\mat{X}, \mat{y})$ with $\abs{\mat{y}} = N$, then the operations on a posterior Gaussian Process are usually dominated by the inversion of the kernel matrix $\mat{K_N}$ which takes $\Oh(N^3)$ time.
+A major drawback of Gaussian processes in real-world applications is their high computational cost for large data sets.
+Assume a data set $(\mat{X}, \mat{y})$ with $\abs{\mat{y}} = N$, then the operations on a posterior Gaussian process are usually dominated by the inversion of the kernel matrix $\mat{K_N}$ which takes $\Oh(N^3)$ time.
 While this is only a preprocessing step, the cost of predicting the mean and variance of one test point remains $\Oh(N)$ and $\Oh(N^2)$ respectively.
 Additionally, these operations have a space requirement of $\Oh(N^2)$.
-The goal of sparse approximations of Gaussian Processes is to find model representations which avoid these quadratic complexities or at least restrict them to the training phase of finding hyperparameters.
+The goal of sparse approximations of Gaussian processes is to find model representations which avoid these quadratic complexities or at least restrict them to the training phase of finding hyperparameters.
 This section introduces one type of approximation based on representing the complete data set through a smaller set of points.
 
-The most simple approach to achieve this is to only use a small subset of $M \ll N$ \emph{inducing} points of the original training set and learn a normal Gaussian Process.
+The most simple approach to achieve this is to only use a small subset of $M \ll N$ \emph{inducing} points of the original training set and learn a normal Gaussian process.
 This approach can work for data sets with a very high level of redundancy but does impose the problem of choosing an appropriate subset.
 While choosing a random subset can be effective \cite{snelson_flexible_2007}, the optimal choice is dependent on the hyperparameters and both should therefore be chosen in a joint optimization scheme.
 This is a combinatorical optimization problem which can be very hard to solve in practice since the function to be optimized is very non-smooth.
@@ -564,7 +564,7 @@ To overcome this problem, \emph{sparse pseudo input Gaussian processes (SPGP)} \
 The original data set is replaced by a \emph{pseudo data set} $(\ps{\mat{X}}, \ps{\mat{f}})$ of \emph{pseudo inputs} $\ps{\mat{X}}$ and \emph{pseudo targets} $\ps{\mat{f}} = f(\ps{\mat{X}})$ which are equal true latent function $f \sim \GP(\mat{0}, \K)$.
 Since they are not true observations, they are assumed to be noise-free.
 
-With known positions of the pseudo inputs and fixed hyperparameters $\mat{\theta}$, the predictive posterior of a Gaussian Process based on this pseudo data set for test points $(\mat{X_\ast}, \mat{f_\ast})$ is given by
+With known positions of the pseudo inputs and fixed hyperparameters $\mat{\theta}$, the predictive posterior of a Gaussian process based on this pseudo data set for test points $(\mat{X_\ast}, \mat{f_\ast})$ is given by
 \begin{align}
     \Prob{\mat{f_\ast} \given \mat{X_\ast}, \ps{\mat{X}}, \ps{\mat{f}}, \mat{\theta}} &= \Gaussian{\mat{K_{\ast M}}\mat{K_M}^{-1} \ps{\mat{f}}, \mat{K_\ast} - \mat{K_{\ast M}} \mat{K_M}^{-1} \mat{K_{M \ast}}}
 \end{align}
@@ -920,5 +920,5 @@ The different weights and the velocity clamping factor are standard choices sinc
 
 \section{Summary}
 This chapter presented the mathematical framework of reinforcement learning to describe solutions to the bicycle benchmark presented in \cref{cha:the_bicycle_benchmark} with mathematical rigor.
-With Gaussian Processes and the PSO-Policy it introduced the two main tools used in this thesis to solve it in a Bayesian way.
+With Gaussian processes and the PSO-Policy it introduced the two main tools used in this thesis to solve it in a Bayesian way.
 The next chapter introduces a standard approach to controlling the bicycle with PSO-P and compares it to two strategies which incorporate uncertainty into their decision making process.
