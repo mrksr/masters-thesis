@@ -119,7 +119,7 @@ Given a distribution of the state $\rv{s_t}$, the distribution for the next stat
         \Dyn\Cond{\rv{s_{t+1}} \given \rv{s_t}, \pi(\rv{s_t})} & \text{ otherwise.}
     \end{cases}
 \end{align}
-Here, $\delta$ denotes the Dirac-delta-function and the notation $\Dyn\Cond{\rv{s_{t+1}} \given \rv{s_t}, \pi(\rv{s_t})}$ means the probability of $\rv{s_{t+1}}$ under the distribution $\Dyn(\rv{s_t}, \pi(\rv{s_t}))$.
+Here, $\delta$ denotes the Dirac-delta-distribution and the notation $\Dyn\Cond{\rv{s_{t+1}} \given \rv{s_t}, \pi(\rv{s_t})}$ means the probability of $\rv{s_{t+1}}$ under the distribution $\Dyn(\rv{s_t}, \pi(\rv{s_t}))$.
 Once the dynamics have reached a terminal state, all future states will be this same state.
 This extends all episodes to potentially infinite length.
 
@@ -596,10 +596,10 @@ The marginalization is stated as the integral of a product of two Gaussian distr
 \end{align}
 This \emph{SPGP marginal likelihood} can be interpreted as the marginal likelihood of a Gaussian process given the original data set $(\mat{X}, \mat{y})$ in \cref{eq:gp_marginal_likelihood}.
 In this Gaussian process, the original kernel $\K$ is replaced by the kernel $\K_{\text{SPGP}}$.
-With $\delta$ denoting the Kronecker-Delta it is defined as
+With $\Ind$ denoting the indicator function it is defined as
 \begin{align}
     \Q(\mat{a}, \mat{b}) &\coloneqq \mat{K_{aM}} \mat{K_M}^{-1} \mat{K_{Mb}} \\
-    \K_{\text{SPGP}}(\mat{a}, \mat{b}) &\coloneqq \Q(\mat{a}, \mat{b}) + \delta_{\mat{a}, \mat{b}} \left( \K(\mat{a}, \mat{b}) - \Q(\mat{a}, \mat{b}) \right).
+    \K_{\text{SPGP}}(\mat{a}, \mat{b}) &\coloneqq \Q(\mat{a}, \mat{b}) + \Indicator{\mat{a} = \mat{b}} \left( \K(\mat{a}, \mat{b}) - \Q(\mat{a}, \mat{b}) \right).
 \end{align}
 This kernel is equal to $\K$ when both arguments are identical and equal to $\Q$ everywhere else.
 For well-chosen pseudo inputs, $\mat{Q_N}$ is a low-rank approximation of $\mat{K_N}$ \cite{snelson_flexible_2007}.
