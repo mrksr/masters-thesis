@@ -8,11 +8,11 @@ This uncertainty about the correct model can be propagated through to prediction
 
 Modelling the transition dynamics allows the prediction of a state $\mat{s_{t+1}}$ given a concrete pair of state and action $(\mat{s_t}, \mat{a_t})$ for the previous time step.
 Assuming a deterministic model which yields exactly one posterior state, the \emph{long-term prediction} of states multiple time steps into the future reduces to iterated one-step predictions.
-Given a (deterministic) reward function $\Rwd$ as detailed in \cref{def:reward_function}, it is possible to evaluate the action value function $\AVlu$ of PSO-P and thus directly use the model to extract a policy, since the expected value in \cref{eq:action_value_function} is a simple sum of deterministic values.
+Given a reward function $\Rwd$ as detailed in \cref{def:reward_function}, it is possible to evaluate the action value function $\AVlu$ of PSO-P and thus directly use the model to extract a policy, since the expected value in \cref{eq:action_value_function} is a simple sum of deterministic values.
 
 In the Bayesian context however, the transition model predicts a distribution over posterior states.
 This complicates long-term predictions since the uncertainty of intermediate states has to be propagated through the (non-linear) transition model to accumulate the uncertainties of multiple predictions.
-Additionally, the original deterministic reward function possibly has to be adapted to make it possible to evaluate the expected reward for all time steps.
+Additionally, the reward function must be formulated in such a way that it is possible to evaluate the expected reward for all time steps.
 Once these problems are solved and the action value function can be calculated, PSO-P can be used in the same way as in the deterministic case to choose appropriate actions.
 
 Based on the bicycle benchmark, this chapter compares the classical deterministic long-term predictions to two approaches of integrating uncertainty into the predictions.
@@ -260,7 +260,7 @@ The optimization of the likelihood function is calculated using scaled conjugate
 The performance of the transition models is highly dependent on the size of the training set $N$ and the number of inducing inputs $M$.
 For $N$ smaller than 35000, the performance of the transition models for long-term predictions was not good enough to allow PSO-P to succeed for any of the approaches presented below.
 Conversely, for large $N$ and $M$ larger than 250, the models are good enough such that PSO-P finds perfect solutions for all approaches.
-The experiments in this thesis focus on choices for $N$ and $M$ which are inbetween these extremes and where information about the model uncertainties can be used to improve performance.
+The experiments in this thesis focus on choices for $N$ and $M$ which are in-between these extremes and where information about the model uncertainties can be used to improve performance.
 The next section presents the classic approach of long-term predictions without the use of uncertainty information, which is used as a baseline for comparison for the following techniques.
 
 \section{Predictions without Uncertainties}
@@ -274,8 +274,8 @@ Since the GP dynamics model returns a Gaussian predictive distribution for all s
 In order to mimic a classic non-Bayesian model without a measure of uncertainty, the approach presented in this section discards this information and considers the maximum-a-posteriori estimation to be the deterministic prediction of the transition model.
 Having established the deterministic mode of evaluating the action value function, this section finally introduces the evaluation setup used in this thesis and discusses the results of applying this technique to the bicycle system.
 
-\subsection{Deterministic Bicycle Reward Function}
-\label{sub:deterministic_reward}
+\subsection{Bicycle Reward Function}
+\label{sub:reward_function}
 Solving the bicycle benchmark is a composite problem.
 An agent has to both learn to balance a bicycle and drive to the goal.
 Instead of having to solve the two tasks one after the other, they both have to be solved simultaneously, switching between them.
@@ -301,15 +301,28 @@ While an increase in reward would express movement in the correct direction, for
 If it were linear, the punishment might at some point be larger than the punishment for falling.
 At this point, the agent's correct choice would be to fall down as quickly as possible.
 
-In order to avoid these problems, the reward function used in this thesis uses the current angle between the frame of the bicycle and the direction towards the goal as a hint.
+In order to avoid these problems, the reward function used in this thesis is based on the current angle between the frame of the bicycle and the direction towards the goal as a hint.
 Since the goal's position is at the origin of the coordinate system, this angle can be calculated as the difference of the current rotation of the bicycle $\psi$ and the angular component of its polar coordinates in space $\varphi$.
-This difference can be scaled to an interval between zero and one and can take values in the complete range if the time horizon is long enough to contain a curve of the bicycle.
-The reward is scaled to be zero if the bicycle points straight away from the goal and one if directly towards it.
-If the bicycle has reached the goal, the agent receives a constant award of two which is double the amount which can be obtained for any state which is not in the goal.
-Similarly, the reward for falling is constant zero.
+It is in the agent's interest to minimize this angle, since if it zero, the agent is heading towards the goal on the shortest route possible.
+Since the bicycle moves at a constant speed, a successful trajectory which locally minimizes this angle is also a globally optimal trajectory, since it results in the shortest path possible.
 
-\begin{definition}[Deterministic Bicycle Reward Function]
-    Given the set $\Es^+$ of possible states of the bicycle benchmark, the \emph{deterministic bicycle reward function} is defined as
+\begin{figure}[t]
+    \centering
+    \missingfigure[figheight=.35\textheight]{Comparison of linear and saturating reward.}
+    \caption{Comparison of linear and saturating reward.}
+    \label{fig:saturating_reward}
+\end{figure}
+Instead of a linear reward based on the difference, this thesis chooses a quadratic saturating reward function as proposed by \citeauthor*{deisenroth_gaussian_2015} in \cite{deisenroth_gaussian_2015}.
+The quadratic saturating reward function is Gaussian density function normalized to a value of one at it's maximum.
+It behaves locally quadratic around this maximum and shows exponential drop off towards zero for large deviations from the mean.
+\Cref{fig:saturating_reward} compares the saturating reward function to a linear one.
+The Gaussian reward is more forgiving for small errors around zero but punishes large deviations more, which is a good behaviour for the bicycle benchmark.
+If the bicycle has reached the goal, the agent receives a constant award of two.
+This is double the reward which can be obtained for any state which is not in the goal.
+Similarly, the reward for any state where the bicycle has fallen over is zero, which is less then for any non-terminal state in the benchmark.
+
+\begin{definition}[Bicycle Reward Function]
+    Given the set $\Es^+$ of possible states of the bicycle benchmark, the \emph{bicycle reward function} is defined as
     \begin{align}
         \RwdBicycle : \left\{
             \begin{aligned}
@@ -317,15 +330,12 @@ Similarly, the reward for falling is constant zero.
                 \mat{s} &\mapsto \begin{cases}
                     2 & \text{if $\mat{s} \in \Goal$} \\
                     0 & \text{if $\mat{s} \in \Fallen$} \\
-                    1 - \frac{\abs{\psi_{\mat{s}} - \varphi_{\mat{s}}}}{\pi} & \text{otherwise}
+                \sqrt{2\pi\sigma_{\text{angle}}^2}\Gaussian{\Delta^\psi_{\mat{s}} \given 0, \sigma_{\text{angle}}^2} & \text{otherwise}
                 \end{cases}
             \end{aligned}
         \right.
     \end{align}
-    where $\psi_{\mat{s}}$ and $\varphi_{\mat{s}}$ denote the respective angles in state $\mat{s}$.
-    The difference is defined to take values between $-\pi$ and $\pi$.
-
-    The reward function assigns constant reward for terminal states and reward inversely proportional to the angle between the bicycle's heading and the goal otherwise.
+    where $\Delta^\psi_{\mat{s}} = \abs{\psi_{\mat{s}} - \varphi_{\mat{s}}} \in (-\pi, \pi]$ denotes the difference between the bicycle's heading and the goal given a state $\mat{s}$ and $\sigma_{\text{angle}}^2$ is a positive real constant and the Gaussian density function is normalized to a maximum value of 1.
 \end{definition}
 
 The agent does not receive negative reward for falling down.
@@ -391,7 +401,7 @@ Since states at all time steps are deterministic, terminal states can easily be 
 where $\mat{\mu_{t+1}}$ is the mean of the distribution $f(\mat{s_t}, \mat{a_t})$ returned by the transition model.
 Given a time horizon $T$ and a starting state $\mat{s_0}$ and a vector $(\mat{a_0}, \dots, \mat{a_{T-1}})$ of actions, this function can be used to calculate the intermediate states $\map{\mat{s_1}}$ to $\map{\mat{s_T}}$ using dynamic programming. \Cref{fig:map_predictions} compares these iterated MAP-predictions with the correct evolution of the bicycle system.
 
-With these intermediate states and the deterministic reward function $\RwdBicycle$ from \cref{sub:deterministic_reward}, it is possible to evaluate the action value function $\AVlu$ defined in \cref{eq:action_value_function} and therefore apply PSO-P to the bicycle system.
+With these intermediate states and the reward function $\RwdBicycle$ from \cref{sub:reward_function}, it is possible to evaluate the action value function $\AVlu$ defined in \cref{eq:action_value_function} and therefore apply PSO-P to the bicycle system.
 Using the MAP-estimates for intermediate states, the action value function can be calculated as
 \begin{align}
     \label{eq:map_action_value_function}
@@ -421,6 +431,7 @@ Since all states are deterministic, all expected values collapse to applications
         & $\K$ & Kernel & RBF \\
         \addlinespace
         PSO-P & $T$ & Time horizon & 15 \\
+        & $\sigma_{\text{angle}}^2$ & Reward width & $(\sfrac{\pi}{2})^2$ \\
         \bottomrule
     \end{tabularx}
 \end{table}
@@ -496,7 +507,7 @@ Since the PSO policy does not have to be trained, the first interaction with the
 PSO-P tends to aggressively exploit model bias to choose good actions in the time horizon.
 Since it does not have any kind of memory, it does not follow any long-term strategy.
 
-The deterministic bicycle reward function hints towards the goal by increasing the reward if the bicycle's frame points towards the goal.
+The bicycle reward function hints towards the goal by increasing the reward if the bicycle's frame points towards the goal.
 A typical trajectory created with the PSO policy therefore first describes a curve with a radius as small as possible in order to quickly point into the correct direction.
 If the bicycle points into the correct direction, PSO-P drives straight towards the goal until it is reached.
 The policy avoids falling over on the model since falling over reduces the achieved reward.
@@ -513,7 +524,7 @@ The more expressive the model, the more successful PSO-P with MAP-predictions be
 
 In order to reduce the aggressiveness with which PSO-P exploits the model, the uncertainty measure provided by the Gaussian processes is integrated into the action value function.
 If the model predicts that with a large probability, the true system dynamics lead to failure, even if the MAP prediction might still be a valid state, PSO-P should choose a less extreme action.
-The following section introduces how the deterministic reward function can be extended to believes about states and uses the uncertainty predicted by the transition model in planning without propagating it through multiple time steps.
+The following section introduces how the reward function can be extended to believes about states and uses the uncertainty predicted by the transition model in planning without propagating it through multiple time steps.
 
 \section{Predictions with One-Step Uncertainties}
 PSO-P on the basis of MAP-predictions discards all information about model uncertainties by assuming that the mean of the predictive distribution produced by the transition model is the correct successive state.
@@ -521,48 +532,44 @@ Long-term predictions for states multiple time steps into the future can be obta
 In the same way, the expected reward for every time step can easily be calculated for arbitrary reward functions since no integration using the density function is needed.
 
 The first approach to incorporating uncertainties into planning with PSO-P presented in this thesis is a direct extension of the MAP approach.
-Instead of discarding them at every time step, the uncertrainties returned by the transition model are used to evaluate the expected reward.
-These uncertainties are still not propagated however, as the algorithm for deriving long-term predictions essentially remains the same compared to the previous technique.
+Instead of discarding them at every time step, the uncertainties returned by the transition model are used to evaluate the expected reward.
+These uncertainties are still not propagated however, as the algorithm for deriving intermediate states in long-term predictions essentially remains the same compared to the previous technique.
 
-If the predictive state distributions $\Prob{\mat{s_1}}$ to $\Prob{\mat{s_T}}$ are no longer assumed to be delta-distributions (or deterministic states), the expected reward is no longer trivial to calculate.
+If states are not considered to be deterministic, it is no longer clear when an episode should be considered to be over.
+For every time step, the predictive state distributions $\Prob{\mat{s_1}}$ to $\Prob{\mat{s_T}}$ can have their probability mass spread over both terminal and non-terminal states.
+After introducing how the expected reward can be evaluated locally for every predictive state, this section considers how the probability that the predictive trajectory has already ended can be calculated with respect to the whole trajectory.
 
-\subsection{Probabilistic Bicycle Reward Function}
-Given any reward function, we have to be able to solve
-\begin{align}
-    \Moment*{\E_{\rv{s}}}{\Rwd(\rv{s})} &= \int \Rwd(\rv{s}) \Prob{\rv{s}} \diff \rv{s} \\
-    &= \int \Rwd(\rv{s}) \Gaussian{\rv{s} \given \mat{\mu_s}, \mat{\Sigma_s}} \diff \rv{s}
-\end{align}
-
-\begin{definition}[Probabilistic Bicycle Reward Function]
-    Given the set $\Es^+$ of possible states of the bicycle benchmark, the \emph{probabilistic bicycle reward function} is defined as
-    \begin{align}
-        \RwdBicycleProb : \left\{
-            \begin{aligned}
-                \Es^+ &\to \R \\
-                \rv{s} &\mapsto \left\{ \begin{alignedat}{3}
-                &&& 2 &&\cdot \Indicator{\rv{s} \in \Goal} \\
-                &&{}+{}& 0 &&\cdot \Indicator{\rv{s} \not\in\Goal, \rv{s} \in \Fallen} \\
-                &&{}+{}& \sqrt{2\pi\sigma_{\text{angle}}^2}\Gaussian{\Delta_\psi \given 0, \sigma_{\text{angle}}^2} &&\cdot \Indicator{\rv{s} \not\in\Goal, \rv{s} \not\in\Fallen}
-                \end{alignedat}\right.
-            \end{aligned}
-        \right.
-    \end{align}
-    where $\Delta_\psi = \abs{\psi_{\mat{s}} - \varphi_{\mat{s}}}$ denotes the difference between the bicycle's heading and the goal given a state $\mat{s}$ and $\sigma_{\text{angle}}^2$ is a postive real constant and the Gaussian density function is normalized to a maximum value of 1.
-
-    The reward function assigns constant reward for terminal states and reward based on the angle between the bicycle's angle towards the goal.
-\end{definition}
 \subsection{Long-Term predictions}
 Given a state distribution $\rv{s} \sim \Gaussian{\mat{\mu_s}, \mat{\Sigma_s}}$, the distribution of $\Delta_\psi$ can be calculated via the projection
 \begin{align}
     \pi = \left( 0, 0, 0, 0, -1, 0, 1 \right).
 \end{align}
 It is given by $\rv{\Delta_\psi} \sim \Gaussian{\pi^T\mat{\mu_s}, \pi^T \mat{\Sigma_s} \pi}$.
+
+\begin{align}
+    \Moment*{\E_{\rv{s}}}{\Rwd(\rv{s})} &= \int \Rwd(\rv{s}) \Prob{\rv{s}} \diff \rv{s} \\
+    &= \int \Rwd(\rv{s}) \Gaussian{\rv{s} \given \mat{\mu_s}, \mat{\Sigma_s}} \diff \rv{s}
+\end{align}
+
+\begin{align}
+    \RwdBicycle : \left\{
+        \begin{aligned}
+            \Es^+ &\to \R \\
+            \rv{s} &\mapsto \left\{ \begin{alignedat}{3}
+            &&& 2 &&\cdot \Indicator{\rv{s} \in \Goal} \\
+            &&{}+{}& 0 &&\cdot \Indicator{\rv{s} \not\in\Goal, \rv{s} \in \Fallen} \\
+            &&{}+{}& \sqrt{2\pi\sigma_{\text{angle}}^2}\Gaussian{\Delta_\psi \given 0, \sigma_{\text{angle}}^2} &&\cdot \Indicator{\rv{s} \not\in\Goal, \rv{s} \not\in\Fallen}
+        \end{alignedat}\right.
+    \end{aligned}
+    \right.
+\end{align}
+
+\begin{itemize}
+    \item Propagation of stop probabilities
+\end{itemize}
 \subsection{Results}
 \section{Predictions with Multi-Step Uncertainties}
 \subsection{Linearization}
 \subsection{Long-Term predictions}
-\begin{itemize}
-    \item Propagation of stop probabilities
-\end{itemize}
 \subsection{Truncation of Gaussians}
 \subsection{Results}
