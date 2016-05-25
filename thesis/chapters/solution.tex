@@ -516,10 +516,53 @@ If the model predicts that with a large probability, the true system dynamics le
 The following section introduces how the deterministic reward function can be extended to believes about states and uses the uncertainty predicted by the transition model in planning without propagating it through multiple time steps.
 
 \section{Predictions with One-Step Uncertainties}
+PSO-P on the basis of MAP-predictions discards all information about model uncertainties by assuming that the mean of the predictive distribution produced by the transition model is the correct successive state.
+Long-term predictions for states multiple time steps into the future can be obtained by iterative application of the transition model since all intermediate states are deterministic.
+In the same way, the expected reward for every time step can easily be calculated for arbitrary reward functions since no integration using the density function is needed.
+
+The first approach to incorporating uncertainties into planning with PSO-P presented in this thesis is a direct extension of the MAP approach.
+Instead of discarding them at every time step, the uncertrainties returned by the transition model are used to evaluate the expected reward.
+These uncertainties are still not propagated however, as the algorithm for deriving long-term predictions essentially remains the same compared to the previous technique.
+
+If the predictive state distributions $\Prob{\mat{s_1}}$ to $\Prob{\mat{s_T}}$ are no longer assumed to be delta-distributions (or deterministic states), the expected reward is no longer trivial to calculate.
+
 \subsection{Probabilistic Bicycle Reward Function}
+Given any reward function, we have to be able to solve
+\begin{align}
+    \Moment*{\E_{\rv{s}}}{\Rwd(\rv{s})} &= \int \Rwd(\rv{s}) \Prob{\rv{s}} \diff \rv{s} \\
+    &= \int \Rwd(\rv{s}) \Gaussian{\rv{s} \given \mat{\mu_s}, \mat{\Sigma_s}} \diff \rv{s}
+\end{align}
+
+\begin{definition}[Probabilistic Bicycle Reward Function]
+    Given the set $\Es^+$ of possible states of the bicycle benchmark, the \emph{probabilistic bicycle reward function} is defined as
+    \begin{align}
+        \RwdBicycleProb : \left\{
+            \begin{aligned}
+                \Es^+ &\to \R \\
+                \rv{s} &\mapsto \left\{ \begin{alignedat}{3}
+                &&& 2 &&\cdot \Indicator{\rv{s} \in \Goal} \\
+                &&{}+{}& 0 &&\cdot \Indicator{\rv{s} \not\in\Goal, \rv{s} \in \Fallen} \\
+                &&{}+{}& \sqrt{2\pi\sigma_{\text{angle}}^2}\Gaussian{\Delta_\psi \given 0, \sigma_{\text{angle}}^2} &&\cdot \Indicator{\rv{s} \not\in\Goal, \rv{s} \not\in\Fallen}
+                \end{alignedat}\right.
+            \end{aligned}
+        \right.
+    \end{align}
+    where $\Delta_\psi = \abs{\psi_{\mat{s}} - \varphi_{\mat{s}}}$ denotes the difference between the bicycle's heading and the goal given a state $\mat{s}$ and $\sigma_{\text{angle}}^2$ is a postive real constant and the Gaussian density function is normalized to a maximum value of 1.
+
+    The reward function assigns constant reward for terminal states and reward based on the angle between the bicycle's angle towards the goal.
+\end{definition}
 \subsection{Long-Term predictions}
+Given a state distribution $\rv{s} \sim \Gaussian{\mat{\mu_s}, \mat{\Sigma_s}}$, the distribution of $\Delta_\psi$ can be calculated via the projection
+\begin{align}
+    \pi = \left( 0, 0, 0, 0, -1, 0, 1 \right).
+\end{align}
+It is given by $\rv{\Delta_\psi} \sim \Gaussian{\pi^T\mat{\mu_s}, \pi^T \mat{\Sigma_s} \pi}$.
 \subsection{Results}
 \section{Predictions with Multi-Step Uncertainties}
 \subsection{Linearization}
+\subsection{Long-Term predictions}
+\begin{itemize}
+    \item Propagation of stop probabilities
+\end{itemize}
 \subsection{Truncation of Gaussians}
 \subsection{Results}
