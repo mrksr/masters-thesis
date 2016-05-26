@@ -492,7 +492,7 @@ In order to compare different implementations of the action value function $\AVl
 \begin{figure}[tp]
     \centering
     \missingfigure[figheight=.35\textheight]{MAP results}
-    \caption{MAP results, M vs mean-mean-reward}
+    \caption{MAP results, M vs mean-mean-reward or goal-percentage}
     \label{fig:map_results}
 \end{figure}
 \begin{figure}[tp]
@@ -662,6 +662,9 @@ Together these results give a closed form solution for the expected reward for t
     \Moment*{\E}{\RwdBicycle(\rv{s_t})} &= 2 \cdot \PGoal_t + (1 - \PGoal_t)(1 - \PFallen_t) \int \RwdBicycleHat(\rv{s_t}) \Prob{\rv{s_t}} \diff \rv{s_t} \\
     &= 2 \cdot \PGoal_t + (1 - \PGoal_t)(1 - \PFallen_t) \sqrt{2\pi\sigma_{\text{angle}}^2} \Gaussian{\pi^T \mat{\mu_t} \given 0, \sigma_{\text{angle}}^2 + \pi^T \mat{\Sigma_t}\pi}.
 \end{align}
+Note that for states with very low uncertainty, that is states for which $\pi^T \mat{\Sigma_t} \pi$ goes to zero, the expected value converges towards the original reward function.
+Similarly, for deterministic states, both $\PGoal_t$ and $\PFallen_t$ are either zero or one.
+This behaviour can also be observed for states with very low uncertainty, where the position of the mean is the decisive factor for their value.
 Using the one-step uncertainties, the action value function can be calculated as
 \begin{align}
     \label{eq:os_action_value_function}
@@ -674,6 +677,45 @@ Using the one-step uncertainties, the action value function can be calculated as
 \end{align}
 
 \subsection{Results}
+\begin{figure}[tp]
+    \centering
+    \missingfigure[figheight=.35\textheight]{OS results}
+    \caption{OS and MAP results, M vs mean-mean-reward or goal-percentage}
+    \label{fig:os_results}
+\end{figure}
+\begin{figure}[tp]
+    \centering
+    \missingfigure[figheight=.35\textheight]{OS uncertainties}
+    \caption{Some visualization of the OS uncertainties}
+    \label{fig:os_uncertainties}
+\end{figure}
+\begin{figure}[p]
+    \centering
+    \missingfigure[figheight=.8\textheight]{OS trajectories}
+    \caption{Multiple OS trajectories, X-Y-Plot}
+    \label{fig:os_trajectories}
+\end{figure}
+\Cref{fig:os_trajectories} shows a number of trajectories generated with PSO-P applied to the one-step action value function $\os{\AVlu}$.
+The trajectories generated look very similar to the MAP-trajectories shown in \cref{fig:map_trajectories}.
+Both figures were created using the same transition model and starting states.
+Comparing the two figures, more trajectories were successful using the approach with one-step uncertainties.
+\Cref{fig:os_results} shows that this is a statistically significant result.
+
+For all numbers of pseudo inputs, and therefore for all different levels of model expressiveness, considering even one-step uncertainties in planning is beneficial.
+PSO-P aggressively exploits model bias and creates trajectories where the bicycle is nearly falling over.
+Since the predictive distribution is Gaussian and therefore symmetric, half of the plausible successive states are more extreme than the predictive mean.
+The expected reward reflects that these more extreme realizations might cause the bicycle to fall down and therefore the trajectory to end.
+This incentivizes PSO-P to choose actions where most possible posterior states for every time step are not failure states.
+
+The newly introduced uncertainties do not prompt PSO-P to establish a noticeable safety margin towards the maximum value of $\omega$ however.
+\Cref{fig:os_uncertainties} shows why this is the case:
+Since the transition model is very confident about predicting one single step into the future, the predictive uncertainties (and therefore the safety margin) are very small.
+This is to be expected however, since a model which is supposed to be able to predict multiple steps into the future must show very good performance for a single step in order to not quickly deviate from the correct trajectory.
+
+Small errors in the single predictions accumulate and after multiple time steps very close to the correct trajectory, predicted trajectories tend to diverge from the truth very rapidly.
+While for every time step the transition model only makes small mistakes compared to the correct transition function, iterating it means that later invocations create predictions based on a wrong assumption about the intermediate state which up to now has been assumed to be deterministic.
+The next section introduces how this accumulation of errors can be modelled by propagating the uncertainty about the current state through the Gaussian process model to produce a more correct posterior distribution.
+
 \section{Predictions with Multi-Step Uncertainties}
 \subsection{Linearization}
 \subsection{Long-Term predictions}
