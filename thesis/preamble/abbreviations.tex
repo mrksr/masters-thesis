@@ -41,12 +41,15 @@
 % Bicycle
 \DeclareMathOperator{\DynBicycle}{\Dyn_{\text{bicycle}}}
 \DeclareMathOperator{\RwdBicycle}{\Rwd_{\text{bicycle}}}
-\DeclareMathOperator{\Goal}{\Tee_{\text{goal}}}
-\DeclareMathOperator{\Fallen}{\Tee_{\text{fallen}}}
+\DeclareMathOperator{\RwdBicycleHat}{\hat{\Rwd}_{\text{bicycle}}}
 \DeclareMathOperator{\squeeze}{\rho}
 \newcommand{\Trajectory}{\mat{\tau}}
-\newcommand{\onestep}[1]{#1^{\text{OS}}}
-\newcommand{\multistep}[1]{#1^{\text{MS}}}
+\newcommand{\os}[1]{#1^{\text{OS}}}
+\newcommand{\ms}[1]{#1^{\text{MS}}}
+\newcommand{\Goal}{\Tee_{\text{goal}}}
+\newcommand{\Fallen}{\Tee_{\text{fallen}}}
+\newcommand{\PGoal}{\mathcal{G}}
+\newcommand{\PFallen}{\mathcal{F}}
 
 % RL
 \DeclareMathOperator{\Dists}{\mathcal{P}}

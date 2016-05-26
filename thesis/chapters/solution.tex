@@ -343,6 +343,7 @@ Instead, the reward is zero, which is equal to pointing away from the goal.
 The agent is still punished when falling down though, since the episode has to end and the agent is not able to collect additional reward by driving towards the goal.
 
 \subsection{Long-Term predictions}
+\label{sub:map_predictions}
 The models for the bicycle transition dynamics are Gaussian processes with the assumption that their underlying space is $\R^7$, an infinite vector space.
 The set $\Es$ of valid non-terminal states in the bicycle benchmark is an axis-parallel cuboid however, whose axis-wise boundaries are defined by the vectors $\mat{s}^{\text{min}}$ and $\mat{s}^{\text{max}}$.
 The minimal and maximal values for every variable can be found in \cref{tab:bicycle_variables}.
@@ -384,7 +385,7 @@ With a deterministic state $\mat{s_t}$ and an action $\mat{a_t}$, this MAP estim
     &= \argmax_{\mat{s_{t+1}} \in \R^7} \Gaussian{\mat{s_{t+1}} \given \mat{\mu_{t+1}}, \mat{\Sigma_{t+1}}} \\
     &= \Set{\mat{\mu_{t+1}}}.
 \end{align}
-A Gaussian distribution density function has a unique maximum at the mean.
+A Gaussian distribution's density function has a unique maximum at the mean.
 The transition model is trained using observations in $\Es$ and is unaware of terminal states.
 Since states at all time steps are deterministic, terminal states can easily be modelled as fixed points in the function defined as
 \begin{align}
@@ -399,7 +400,7 @@ Since states at all time steps are deterministic, terminal states can easily be 
     \right.
 \end{align}
 where $\mat{\mu_{t+1}}$ is the mean of the distribution $f(\mat{s_t}, \mat{a_t})$ returned by the transition model.
-Given a time horizon $T$ and a starting state $\mat{s_0}$ and a vector $(\mat{a_0}, \dots, \mat{a_{T-1}})$ of actions, this function can be used to calculate the intermediate states $\map{\mat{s_1}}$ to $\map{\mat{s_T}}$ using dynamic programming. \Cref{fig:map_predictions} compares these iterated MAP-predictions with the correct evolution of the bicycle system.
+Given a time horizon $T$, a starting state $\mat{s_0}$ and a vector $(\mat{a_0}, \dots, \mat{a_{T-1}})$ of actions, this function can be used to calculate the intermediate states $\map{\mat{s_1}}$ to $\map{\mat{s_T}}$ using dynamic programming. \Cref{fig:map_predictions} compares these iterated MAP-predictions with the correct evolution of the bicycle system.
 
 With these intermediate states and the reward function $\RwdBicycle$ from \cref{sub:reward_function}, it is possible to evaluate the action value function $\AVlu$ defined in \cref{eq:action_value_function} and therefore apply PSO-P to the bicycle system.
 Using the MAP-estimates for intermediate states, the action value function can be calculated as
@@ -422,6 +423,9 @@ Since all states are deterministic, all expected values collapse to applications
         \toprule
         Part & Parameter & Description & Values \\
         \midrule
+        Simulation & $\tau$ & Time Discretization & \SI[mode=text]{0.01}{\second} \\
+        & & Successive Steps & 10 \\
+        \addlinespace
         Evaluation & $I$ & Number of data sets & 43 \\
         & $S$ & Number of trajectories & 15 \\
         & $L$ & Maximum trajectory length & 200 \\
@@ -540,33 +544,100 @@ For every time step, the predictive state distributions $\Prob{\mat{s_1}}$ to $\
 After introducing how the expected reward can be evaluated locally for every predictive state, this section considers how the probability that the predictive trajectory has already ended can be calculated with respect to the whole trajectory.
 
 \subsection{Long-Term predictions}
+\label{sub:os_predictions}
+Similar to the MAP predictions defined in \cref{sub:map_predictions}, long-term predictions with one-step uncertainties are based on iterating the transition model using the means of the predicted Gaussian distributions.
+The intermediate states are no longer assumed to be deterministic however.
+They are random variables with the distribution returned by the transition model.
+The function mapping a pair of a state distribution $\mat{s_t}$ and an action $\mat{a_t}$ to the successive state distribution $\mat{s_{t+q}}$ is given by
+\begin{align}
+    \os{\mat{s_{t+1}}} : \left\{
+        \begin{aligned}
+            \Dists(\Es^+) \times \Ah &\to \Dists(\Es^+) \\
+            (\mat{s_t} \sim \Gaussian{\mat{\mu_t}, \mat{\Sigma_t}}, \mat{a_t}) &\mapsto \squeeze(f(\mat{\mu_t}, \mat{a_t})),
+    \end{aligned}
+    \right.
+\end{align}
+where $\squeeze(f(\mat{\mu_t}, \mat{a_t})) = \squeeze(\Gaussian{\mat{\mu_{t+1}}, \mat{\Sigma_{t+1}}}) = \Gaussian{\squeeze(\mat{\mu_{t+1}}), \mat{\Sigma_{t+1}}}$ denotes the elimination of physically impossible states by correcting the posterior mean.
+Note that there can still be probability mass assigned to impossible states since the Gaussian is symmetric around the mean.
+Since only the mean is used for predictions, this does not cause problem in this setting however.
+
+The intermediate states $\os{\mat{s_1}}$ to $\os{\mat{s_T}}$ can again be calculated using dynamic programming.
+Terminal states are no longer modelled using fixed points in the transition function.
+Since the intermediate states are probabilistic, it is no longer clear when the predicted trajectory has ended.
+Instead, for every state, the probability of having reached the goal can be calculated as
+\begin{align}
+    \Prob*{\os{\mat{s_t}} \in \Goal} &= \Prob*{r_{\os{\mat{s_t}}} \leq 5}, \\
+    \Prob*{\os{\mat{s_t}} \in \Fallen} &= \Prob*{\abs{\omega_{\os{\mat{s_t}}}} > \frac{\pi}{15}}
+\end{align}
+respectively.
+Since the intermediate state distributions are Gaussian, the marginal distributions for every variable in the state are (not necessarily independent) univariate Gaussian distributions.
+Given a state distribution $\rv{s} \sim \Gaussian{\mat{\mu_s}, \mat{\Sigma_s}}$, the distribution of the $i$th state variable is given by
+\begin{align}
+    \rv{s_i} \sim \Gaussian*{\mu_{s}^{(i)}, \Sigma_{s}^{(i,i)}}.
+\end{align}
+Probabilities of the form $\Prob{\rv{s_i} \leq k}$ are then given by
+\begin{align}
+    \Prob*{\rv{s_i} \leq k} &= \Phi\!\left( \frac{k - \mu_s^{(i)}}{\sqrt{\Sigma_s^{(i,i)}}} \right),
+\end{align}
+where $\Phi$ denotes the cumulative distribution function of the standard normal distribution.
+
+The probability $\Prob{\os{\mat{s_t}} \in \Fallen}$ denotes the transition model's believe that given that the bicycle has not fallen down in the past, it will fall down exactly at time step $t$.
+Now consider the state $\os{\mat{s_{t+1}}}$ one time step later.
+Again, the probability $\Prob{\os{\mat{s_{t+1}}} \in \Fallen}$ denotes the believe that the bicycle will fall down at exactly time step $t+1$.
+The state for time step $t+1$ was calculated under the assumption that the trajectory has not already ended, since the transition model does not know about terminal states.
+However, the correct trajectory could have also ended at time step $t$.
+In this case, the trajectory should be considered to have been stuck at the terminal state.
+The probability $\Prob{\os{\mat{s_t}} \in \Fallen}$ then looses its significance, since it has been calculated using wrong assumptions.
+
+In order to correctly calculate the probability that the trajectory has already ended at time step $t+1$, the probabilities of falling down or reaching the goal at any of the previous time steps have to be considered.
+Let
+\begin{align}
+    \Prob*{\PGoal_t} &\coloneqq \Prob*{\exists i \leq t : \mat{s_i} \in \Goal}, \\
+    \Prob*{\PFallen_t} &\coloneqq \Prob*{\exists i \leq t : \mat{s_i} \in \Fallen}
+\end{align}
+denote the probabilities that at any point before or at $t$, the trajectory has already ended.
+In other words, they denote the accumulated believe of the transition model that the trajectory has at some point hit a terminal state.
+These probabilities can also be calculated using dynamic programming.
+They are given by
+\begin{align}
+    \Prob*{\PGoal_{t+1}} &= \Prob*{\PGoal_{t}} + \left( 1 - \Prob*{\PGoal_{t}}  \right) \cdot \Prob*{\mat{s_t} \in \Goal}, \\
+    \Prob*{\PFallen_{t+1}} &= \Prob*{\PFallen_{t}} + \left( 1 - \Prob*{\PFallen_{t}}  \right) \cdot \Prob*{\mat{s_t} \in \Fallen},
+\end{align}
+respectively, where the probabilities $\Prob*{\PGoal_{0}}$ and $\Prob*{\PFallen_{0}}$ can be calculated directly.
+
+With this probabilities describing the overall believe that the predictive trajectory has not already ended, the expected reward for every state in the trajectory can be calculated.
+Consider the state $\mat{s_t}$ with the Gaussian distribution $\Gaussian{\mat{\mu_t}, \mat{\Sigma_t}}$.
+Its expected reward is given by
+\begin{align}
+    \Moment*{\E}{\RwdBicycle(\rv{s_t})} &= \int \RwdBicycle(\rv{s_t}) \Prob{\rv{s_t}} \diff \rv{s_t} \\
+    &= \int \RwdBicycle(\rv{s_t}) \Gaussian{\rv{s_t} \given \mat{\mu_t}, \mat{\Sigma_t}} \diff \rv{s_t}.
+\end{align}
+In \cref{sub:reward_function}, $\RwdBicycle$ was specified using a definition by cases, separating the terminal states.
+To simplify the integration, it can be rewritten to a single sum using the indicator function $\Ind$ in
+\begin{align}
+    \RwdBicycle(\mat{s}) = \left\{ \begin{alignedat}{3}
+            &&& 2 &&\cdot \Indicator{\rv{s} \in \Goal} \\
+            &&{}+{}& 0 &&\cdot \Indicator{\rv{s} \not\in\Goal, \rv{s} \in \Fallen} \\
+            &&{}+{}& \sqrt{2\pi\sigma_{\text{angle}}^2}\Gaussian{\Delta_\psi \given 0, \sigma_{\text{angle}}^2} &&\cdot \Indicator{\rv{s} \not\in\Goal, \rv{s} \not\in\Fallen}.
+        \end{alignedat}\right.
+\end{align}
+
+In the integration required for the expected reward, the indicator functions are replaced by their corresponding probabilities according to the law of total probability.
+The integral is given by
+\begin{align}
+    \int \RwdBicycle(\rv{s_t}) \Prob{\rv{s_t}} \diff \rv{s_t} &= 2 \cdot \PGoal_t + 0 \cdot (1 - \PGoal_t) \PFallen_t \\
+    &\qquad + (1 - \PGoal_t)(1 - \PFallen_t) \int \RwdBicycleHat(\rv{s_t}) \Prob{\rv{s_t}} \diff \rv{s_t} \\
+    &= 2 \cdot \PGoal_t + (1 - \PGoal_t)(1 - \PFallen_t) \int \RwdBicycleHat(\rv{s_t}) \Prob{\rv{s_t}} \diff \rv{s_t} \\
+    \intertext{where $\RwdBicycleHat$ denotes the reward term for states which are not terminal and is defined as}
+    \RwdBicycleHat(\rv{s_t}) &\coloneqq \sqrt{2\pi\sigma_{\text{angle}}^2} \Gaussian{\Delta_\psi(\rv{s_t}) \given 0, \sigma_{\text{angle}}^2}.
+\end{align}
+
+
 Given a state distribution $\rv{s} \sim \Gaussian{\mat{\mu_s}, \mat{\Sigma_s}}$, the distribution of $\Delta_\psi$ can be calculated via the projection
 \begin{align}
     \pi = \left( 0, 0, 0, 0, -1, 0, 1 \right).
 \end{align}
 It is given by $\rv{\Delta_\psi} \sim \Gaussian{\pi^T\mat{\mu_s}, \pi^T \mat{\Sigma_s} \pi}$.
-
-\begin{align}
-    \Moment*{\E_{\rv{s}}}{\Rwd(\rv{s})} &= \int \Rwd(\rv{s}) \Prob{\rv{s}} \diff \rv{s} \\
-    &= \int \Rwd(\rv{s}) \Gaussian{\rv{s} \given \mat{\mu_s}, \mat{\Sigma_s}} \diff \rv{s}
-\end{align}
-
-\begin{align}
-    \RwdBicycle : \left\{
-        \begin{aligned}
-            \Es^+ &\to \R \\
-            \rv{s} &\mapsto \left\{ \begin{alignedat}{3}
-            &&& 2 &&\cdot \Indicator{\rv{s} \in \Goal} \\
-            &&{}+{}& 0 &&\cdot \Indicator{\rv{s} \not\in\Goal, \rv{s} \in \Fallen} \\
-            &&{}+{}& \sqrt{2\pi\sigma_{\text{angle}}^2}\Gaussian{\Delta_\psi \given 0, \sigma_{\text{angle}}^2} &&\cdot \Indicator{\rv{s} \not\in\Goal, \rv{s} \not\in\Fallen}
-        \end{alignedat}\right.
-    \end{aligned}
-    \right.
-\end{align}
-
-\begin{itemize}
-    \item Propagation of stop probabilities
-\end{itemize}
 \subsection{Results}
 \section{Predictions with Multi-Step Uncertainties}
 \subsection{Linearization}
