@@ -224,7 +224,7 @@ With the predictive distribution for the single dimension being Gaussian, the jo
     \end{pmatrix} \\
     \mat{\Sigma_f} &= \diag\left(
         \Moment*{\var}{f_1(\mat{s_\ast}, \mat{a_\ast}) \given \mat{s_\ast}, \mat{a_\ast}},
-        \cdots,
+        \ldots,
         \Moment*{\var}{f_D(\mat{s_\ast}, \mat{a_\ast}) \given \mat{s_\ast}, \mat{a_\ast}}
     \right).
 \end{align}
@@ -250,7 +250,7 @@ Therefore, the internal representation of a bicycle state in the simulation is g
 \begin{align}
     \mat{s} &= \Bicycle{\theta, \dot{\theta}, \omega, \dot{\omega}, \varphi, r, \psi} \in \R^7 \\
     \intertext{which is transformed to}
-    \mat{\hat{s}} &= \Bicycle{\theta, \dot{\theta}, \omega, \dot{\omega}, \sin\varphi, \cos\varphi, r, \sin\psi, \cos\psi} \in \R^9
+    \mat{\hat{s}} &= \Bicycle{\theta, \dot{\theta}, \omega, \dot{\omega}, \sin\varphi, \cos\varphi, r, \sin\psi, \cos\psi} \in \R^9 \label{eq:augmented_state}
 \end{align}
 when presented to the GPs.
 The transition model consists of seven Gaussian processes, each with nine-dimensional input.
@@ -723,96 +723,145 @@ Over the course of multiple time steps, small errors nevertheless accumulate and
 
 In order to arrive at more reliable estimates of the true uncertainty about predictions several steps into the future, the uncertainty about the state $\rv{s_t}$ has to be taken into account when predicting the distribution of the state $\rv{s_{t+1}}$.
 Since the transition dynamics $\DynBicycle$ are highly nonlinear, calculating the propagation of the prior uncertainty through the Gaussian process directly is not analytically tractable as the resulting distribution usually is not a Gaussian.
-This section introduces an approximation of this propagation via linearization of the transition model around the predictive mean.
+This section introduces an approximation of this propagation via linearization of the transition model around the predictive mean as presented in \cite{ko_gp-bayesfilters:_2009, deisenroth_gaussian_2015}.
 This approximation can be used to create long-term predictions with accumulated uncertainties.
 
 \subsection{Propagation of Uncertainties using Linearization}
-\begin{algorithm}[tp]
-    \caption{Computing the successive state distribution}
-    \label{alg:successive_distribution}
-    Let $\rv{s_t} \sim \Gaussian{\mat{\mu_t}, \mat{\Sigma_t}}$ denote a Gaussian state distribution and $\mat{a_t} \in \Ah$ a deterministic action.
-    \begin{algorithmic}[1]
-        \State Compute the augmented state distribution $\Prob{\rv{\hat{s}_t}}$
-        \State Compute the state-action distribution $\Prob{\rv{\tilde{s}_t}} = \Prob{\rv{\hat{s}_t}, \mat{a_t}}$
-        \State Compute the predictive GP distribution $\Prob{\rv{\Delta_t}}$
-        \State Compute the successive state distribution $\Prob{\rv{s_{t+1}}}$
-    \end{algorithmic}
-\end{algorithm}
-\begin{figure}[p]
+A transition model $f$ described in \cref{sub:gp_models} consists of a group of Gaussian processes $f_d$, one for every dimension $d$ in a bicycle state.
+Instead of predicting the successive state $\mat{s_{t+1}}$ directly given a pair of deterministic state $\mat{s_t}$ and action $\mat{a_t}$, the GPs are used to predict $\mat{\Delta_t} = \mat{s_{t+1}} - \mat{s_t}$, the difference between the two states.
+The model $f_d$ is used to predict the $d$-th entry of this vector.
+
+Using the MAP-predictions, $\mat{\Delta_t}$ was assumed to be one deterministic value, while for using the one-step uncertainties, the complete Gaussian distribution $\rv{\Delta_t} \sim \Gaussian{\mat{\mu_\Delta}, \mat{\Sigma_\Delta}}$ was used to compute the distribution of the successive state.
+Since $\mat{s_t}$ was assumed constant, the distribution of $\os{\rv{s_{t+1}}}$ was given by
+\begin{align}
+    \os{\rv{s_{t+1}}} &= \mat{s_t} + \rv{\Delta_t}, \\
+    \os{\rv{s_{t+1}}} &\sim \Gaussian{\mat{s_t} + \mat{\mu_\Delta}, \mat{\Sigma_\Delta}}.
+\end{align}
+In both cases, the state was again assumed to be deterministic and at $\Moment{\E}{\rv{s_{t+1}}}$ in order to derive the distribution of the next state $\rv{s_{t+2}}$, preventing the accumulation of uncertainties.
+
+\begin{figure}[t]
     \centering
     \missingfigure[figheight=.4\textheight]{Linearization Visualization}
     \caption{Linearization Visualization}
     \label{fig:linearization}
 \end{figure}
+Now assume the state $\rv{s_t} \sim \Gaussian{\mat{\mu_t}, \mat{\Sigma_t}}$ is already uncertain.
+In order to propagate this uncertainty through the transition model, the distribution $\Prob{\rv{\Delta_t}}$ is computed by solving the integral
+\begin{align}
+    \Prob{\rv{\Delta_t}} = \iint \Prob{f(\rv{s_t}, \mat{a_t}) \given \rv{s_t}} \Prob{\rv{s_t}} \diff f \diff \rv{s_t},
+\end{align}
+that is, by marginalizing both the believe over the current state $\rv{s_t}$ and all plausible transition models $f$.
+\Cref{fig:linearization} illustrates that computing the exact predictive distribution is analytically intractable, since the GP models are highly nonlinear.
 
-Let $\alpha \sim \Gaussian{\mu, \sigma^2}$ be a normally distributed angle.
-Then
-\begin{align}
-    \Moment{\E}{\sin \alpha} &= \exp\!\left( -\frac{\sigma^2}{2} \right)\sin\mu \\
-    \Moment{\E}{\cos \alpha} &= \exp\!\left( -\frac{\sigma^2}{2} \right)\cos\mu
-\end{align}
-\begin{align}
-    \Moment{\var}{\sin \alpha} &= \frac{1}{2} - \frac{1}{2} \exp\!\left( -2 \sigma^2 \right) \cos(2\mu) - \exp(- \sigma^2) \sin^2\mu \\
-    \Moment{\var}{\cos \alpha} &= \frac{1}{2} + \frac{1}{2} \exp\!\left( -2 \sigma^2 \right) \cos(2\mu) - \exp(- \sigma^2) \cos^2\mu
-\end{align}
-We assume $\Moment{\cov}{\sin \psi, \omega} = 0$ etc.
-
-We would like to calculate
-\begin{align}
-    \Prob{\rv{\Delta_t}} = \iint \Prob{f(\rv{\tilde{s}_t}) \given \rv{\tilde{s}_t}} \Prob{\rv{\tilde{s}_t}} \diff f \diff \rv{\tilde{s}_t}
-\end{align}
-however, this is not exactly nice, see \cref{fig:linearization}.
-Therefore, we approximate it with a Gaussian.
-Assuming we know this, then $\rv{s_{t+1}} \coloneqq \rv{s_t} + \rv{\Delta_t}$ and
+\begin{algorithm}[t]
+    \caption{Computing the successive state distribution}
+    \label{alg:linearization}
+    Let $\rv{s_t} \sim \Gaussian{\mat{\mu_t}, \mat{\Sigma_t}}$ denote a Gaussian state distribution and $\mat{a_t} \in \Ah$ a deterministic action.
+    \begin{algorithmic}[1]
+        \State Compute the augmented state distribution $\Prob{\rv{\hat{s}_t}}$
+        \State Compute the predictive GP distribution $\Prob{\rv{\Delta_t}}$
+        \State Compute the successive state distribution $\Prob{\rv{s_{t+1}}}$
+    \end{algorithmic}
+\end{algorithm}
+Instead, the distribution is approximated by a Gaussian.
+Assume that the distribution $\rv{\Delta_t} \sim \Gaussian{\mat{\mu_\Delta}, \mat{\Sigma_\Delta}}$ is known.
+Since $\rv{s_{t+1}}$ is the sum of $\rv{s_t}$ and $\rv{\Delta_t}$, a Gaussian approximation of its distribution is given by
 \begin{align}
     \rv{s_{t+1}} &\sim \Gaussian{\mat{\mu_{t+1}}, \mat{\Sigma_{t+1}}} \text{, where} \\
     \mat{\mu_{t+1}} &= \mat{\mu_t} + \mat{\mu_\Delta} \\
-    \mat{\Sigma_{t+1}} &= \mat{\Sigma_t} + \mat{\Sigma_\Delta} + \Moment{\cov}{\rv{s_t}, \rv{\Delta_t}} + \Moment{\cov}{\rv{\Delta_t}, \rv{s_t}}
+    \mat{\Sigma_{t+1}} &= \mat{\Sigma_t} + \mat{\Sigma_\Delta} + \Moment{\cov}{\rv{s_t}, \rv{\Delta_t}} + \Moment{\cov}{\rv{\Delta_t}, \rv{s_t}},
 \end{align}
+where $\Moment{\cov}{\rv{s_t}, \rv{\Delta_t}}$ denotes the covariance between the current state and the state change.
+\Cref{alg:linearization} shows the different steps necessary to compute this predictive distribution.
 
-So how do we get this?
-Well, we just assume that
+The first step is to compute the augmented state distribution $\Prob{\rv{\hat{s}_t}} \sim \Gaussian{\mat{\hat{\mu}_t}, \mat{\hat{\Sigma}_t}}$.
+Instead of using the state $\rv{s_t}$ directly, the Gaussian process models are presented with the augmented state $\rv{\hat{s}_t}$ when used for predictions.
+This distinction is made since in general, the Gaussian processes may have been trained on data which has been preprocessed, for example using dimensionality reduction techniques.
+In this thesis, augmenting a state means replacing the angles $\varphi$ and $\psi$ by their sine and cosine values as shown in \cref{eq:augmented_state}.
+Equivalently, the angles have to be replaced in the joint distribution of the state.
+Let $\alpha \sim \Gaussian{\mu, \sigma^2}$ denote an angle with a Gaussian distribution.
+Using Euler's identity, it can be shown that the expected values of its sine and cosine are given by
 \begin{align}
-    \rv{\mu_\Delta} = \Moment{\E}{f(\rv{\tilde{\mu}_t})}
+    \Moment{\E}{\sin \alpha} &= \exp\!\left( -\frac{\sigma^2}{2} \right)\sin\mu, \\
+    \Moment{\E}{\cos \alpha} &= \exp\!\left( -\frac{\sigma^2}{2} \right)\cos\mu,
 \end{align}
+respectively \cite{deisenroth_efficient_2010}.
+The variances of the two random variables can be calculated as
 \begin{align}
-    \rv{\mu_\Delta}^d = \Moment{\E}{f_d(\rv{\tilde{\mu}_t})} = \K_a( \rv{\tilde{\mu}_t}, \mat{\tilde{X}})\mat{\beta_a}
+    \Moment{\var}{\sin \alpha} &= \frac{1}{2} - \frac{1}{2} \exp\!\left( -2 \sigma^2 \right) \cos(2\mu) - \exp(- \sigma^2) \sin^2\mu, \\
+    \Moment{\var}{\cos \alpha} &= \frac{1}{2} + \frac{1}{2} \exp\!\left( -2 \sigma^2 \right) \cos(2\mu) - \exp(- \sigma^2) \cos^2\mu.
 \end{align}
-an explicitly linearize the posterior GP mean function around $\rv{\tilde{\mu}_t}$.
-This linearization is given by
-\begin{align}
-    V &= \frac{\partial}{\partial \rv{\tilde{\mu}_t}} \rv{\mu_\Delta} = \frac{\partial \K(\rv{\tilde{\mu}_t}, \mat{\tilde{X}})}{\partial \rv{\tilde{\mu}_t}}\mat{\beta}
-\end{align}
-We calculate the predictive variances as
-\begin{alignat}{2}
-    \mat{\Sigma_\Delta} &= \Moment{\var}{V \rv{\tilde{s}_t}} &&+ \mat{\tilde{\Sigma}_f} \\
-    &= V \mat{\tilde{\Sigma}_t} V\tran &&+ \diag\left(
-        \Moment*{\var}{f_1(\rv{\tilde{\mu}_t})},
-        \cdots,
-        \Moment*{\var}{f_D(\rv{\tilde{\mu}_t})}
-    \right)
-\end{alignat}
-using standard results about Gaussian transformations.
-Also,
-\begin{align}
-    \Moment{\cov}{\rv{s_t}, \rv{\Delta_t}} = \Moment{\cov}{\rv{s_t}, V\rv{s_t}} = \Moment{\cov}{\rv{s_t}, \rv{s_t}}V\tran = \mat{\tilde{\Sigma}_t}V\tran
-\end{align}
-and equivalently, $\Moment{\cov}{\rv{\Delta_t}, \rv{s_t}} = V \mat{\tilde{\Sigma}_t}$.
+The mean $\mat{\hat{\mu}_t}$ and covariance matrix $\mat{\hat{\Sigma}_t}$ of the augmented are calculated by inserting these values into the original mean $\rv{\mu_t}$ and covariance matrix $\rv{\Sigma_t}$ instead of the respective angles.
+Since the sine and cosine functions are nonlinear, the covariances of the transformed angles with all other variables is assumed to be zero.
 
-For the RBF-Kernel, we have
+The second step in the algorithm is to calculate $\Prob{\rv{\Delta_t}}$ from the augmented state distributrion.
+Since it cannot be calculated directly, the distribution is approximated with a Gaussian.
+This approximation is obtained by linearizing the predictive mean function of the transition model around the mean of the prior distribution.
+The mean function $\mu_f$ of the transition model $f$ is therefore approximated by its first-order Taylor expansion $\lin{f}$ around $\mat{\hat{\mu}}$ which is given by
+\begin{align}
+    \mu_f(\mat{\hat{s}_t}, \mat{a_t}) \approx \lin{f}(\mat{\hat{s}_t}, \mat{a_t}) = \mu_f(\mat{\hat{\mu}}, \mat{a_t}) + \frac{\partial \mu_f(\mat{\hat{\mu}}, \mat{a_t})}{\partial \mat{\hat{\mu}}} (\mat{\hat{s}_t} - \mat{\hat{\mu_t}}).
+\end{align}
+Using this representation, $\rv{\Delta_t}$ is given as the affine transformation of $\rv{\hat{s}_t}$ defined by $\lin{f}$, which is a Gaussian $\Gaussian{\mat{\mu_\Delta}, \mat{\Sigma_\Delta}}$.
+
+The predictive mean $\rv{\mu_\Delta}$ is obtained by evaluating the linearization at the prior mean and is given by
+\begin{align}
+    \rv{\mu_\Delta} = \lin{f}(\mat{\hat{\mu}_t}, \mat{a_t}) = \mu_f(\mat{\hat{\mu}_t}, \mat{a_t}) = \Moment{\E}{f(\rv{\hat{\mu}_t}, \mat{a_t})}.
+\end{align}
+The $d$-th component of this vector is calculated using the predictive mean of the Gaussian process $f_d$ in the transition model.
+Using \cref{lem:gp_posterior}, it can be computed as
+\begin{align}
+    \rv{\mu_\Delta}^d = \mu_f^d(\rv{\hat{\mu}_t}, \mat{a_t}) = \Moment{\E}{f_d(\rv{\hat{\mu}_t}, \mat{a_t})} = \K_d( \rv{\hat{\mu}_t}, \mat{\hat{X}})\mat{\beta}_d,
+\end{align}
+where $\K_d$ denotes the kernel function of $f_d$, $\mat{\beta}_d$ is a precomputed vector and $\mat{\hat{X}}$ is the augmented set of training points (or pseudo-inputs).
+
+Using the different Gaussian process models, the derivative of the predictive mean function can be calculated explicitly.
+It is a matrix
+\begin{align}
+    V \coloneqq \frac{\partial}{\partial \mat{\hat{\mu}}} \mu_f(\mat{\hat{\mu}}, \mat{a_t})
+\end{align}
+whose $d$-th line is determined by $f_d$.
+It is given by
+\begin{align}
+    V_d &= \frac{\partial}{\partial \mat{\hat{\mu}_t}}\mu_f^d(\mat{\hat{\mu}_t}, \mat{a_t}) = \frac{\partial \K_d(\rv{\hat{\mu}_t}, \mat{\hat{X}})}{\partial \rv{\hat{\mu}_t}}\mat{\beta}_d
+\end{align}
+and depends on the derivative of the kernel function with respect to the augmented mean.
+The Gaussian processes used in this thesis only make the prior assumption that the transition dynamics of the bicycle benchmark are a smooth function.
+They are therefore trained using a squared exponential kernel.
+For the squared exponential kernel as shown in \cref{def:rbf_kernel}, this derivation can be calculated as
 \begin{align}
     \frac{\partial}{\partial \mat{\mu}}\K_{\text{SE}}(\mat{\mu}, \mat{x}) &= \frac{\partial}{\partial \mat{\mu}} \sigma_f^2 \exp\!\left( -\frac{1}{2} (\mat{\mu} - \mat{x})\tran \mat{\Lambda}^{-1} (\mat{\mu} - \mat{x}) \right) \\
     &= \K_{\text{SE}}(\mat{\mu}, \mat{x}) \frac{\partial}{\partial \mat{\mu}}\!\left( -\frac{1}{2} (\mat{\mu} - \mat{x})\tran \mat{\Lambda}^{-1} (\mat{\mu} - \mat{x}) \right) \\
-    &= -\K_{\text{SE}}(\mat{\mu}, \mat{x}) \mat{\Lambda}^{-1} (\mat{\mu} - \mat{x})
+    &= -\K_{\text{SE}}(\mat{\mu}, \mat{x}) \mat{\Lambda}^{-1} (\mat{\mu} - \mat{x}).
 \end{align}
 
-Putting it all together, we get
+The predictive variance $\mat{\Sigma_\Delta}$ consists of two components, the propagated uncertainty about the prior state and the newly added model uncertainties for this transition.
+Since the transition model is linearized, the propagation of the prior uncertainties is equivalent to a linear transformation of the prior state distribution using the predictive mean's derivative $V$.
+Since the transition model is only evaluated for the prior mean $\mat{\hat{\mu}_t}$ and not for all other possible states, the true model uncertainty is unknown.
+Instead, it is assumed to be constant and equal to the uncertainty for the prior mean.
+The two components are independent given the prior distribution and therefore, the predictive variance is given by
+\begin{alignat}{2}
+    \mat{\Sigma_\Delta} &= \Moment{\var}{V \rv{\hat{s}_t}} &&+ \Moment{\var}{f(\rv{\hat{\mu}_t}, \mat{a_t})} \\
+    &= V \mat{\hat{\Sigma}_t} V\tran &&+ \diag\left(
+        \Moment*{\var}{f_1(\rv{\hat{\mu}_t}, \mat{a_t})},
+        \ldots,
+        \Moment*{\var}{f_D(\rv{\hat{\mu}_t}, \mat{a_t})}
+    \right),
+\end{alignat}
+since $\mat{\hat{s}_t}$ is Gaussian \cite{petersen_matrix_2008}.
+The covariance of the augmented state and the state change is given by
+\begin{align}
+    \Moment{\cov}{\rv{s_t}, \rv{\Delta_t}} = \Moment{\cov}{\rv{s_t}, V\rv{s_t}} = \Moment{\cov}{\rv{s_t}, \rv{s_t}}V\tran = \mat{\hat{\Sigma}_t}V\tran,
+\end{align}
+using the linearity of expectations. Equivalently, it holds that $\Moment{\cov}{\rv{\Delta_t}, \rv{s_t}} = V \mat{\hat{\Sigma}_t}$.
+
+Using the linearization of the predictive mean function, all components necessary to approximate the posterior distribution $\Prob{\rv{s_{t+1}}}$ can be calculated.
+The believe about the successive state is a Gaussian distribution characterized by
 \begin{align}
     \rv{s_{t+1}} &\sim \Gaussian{\mat{\mu_{t+1}}, \mat{\Sigma_{t+1}}} \text{, where} \\
     \mat{\mu_{t+1}} &= \mat{\mu_t} + \mat{\mu_\Delta} \\
-    &= \mat{\mu_t} + \Moment{\E}{f(\rv{\tilde{\mu}_t})} \\
+    &= \mat{\mu_t} + \Moment{\E}{f(\rv{\hat{\mu}_t}, \mat{a_t})} \\
     \mat{\Sigma_{t+1}} &= \mat{\Sigma_t} + \mat{\Sigma_\Delta} + \Moment{\cov}{\rv{s_t}, \rv{\Delta_t}} + \Moment{\cov}{\rv{\Delta_t}, \rv{s_t}} \\
-    &= \mat{\Sigma_t} + V\mat{\tilde{\Sigma}_t}V\tran + \mat{\tilde{\Sigma}_f} + \mat{\tilde{\Sigma}_t}V\tran + V\mat{\tilde{\Sigma}_t}
+    &= \mat{\Sigma_t} + V\mat{\hat{\Sigma}_t}V\tran + \Moment{\var}{f(\rv{\hat{\mu}_t}, \mat{a_t})} + \mat{\hat{\Sigma}_t}V\tran + V\mat{\hat{\Sigma}_t}.
 \end{align}
 
 \subsection{Long-Term predictions}
