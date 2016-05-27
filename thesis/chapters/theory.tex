@@ -306,7 +306,7 @@ A simple example of such a non-stationary kernel is the linear kernel.
 \begin{definition}[Linear Kernel]
     For a finite dimensional euclidean vector space $\R^d$, the \emph{linear kernel} is defined as
     \begin{align}
-        \K_{\text{linear}}(\mat{x}, \mat{y}) \coloneqq \mat{x}^T \mat{y} = \left\langle \mat{x}, \mat{y}\right\rangle.
+        \K_{\text{linear}}(\mat{x}, \mat{y}) \coloneqq \mat{x}\tran \mat{y} = \left\langle \mat{x}, \mat{y}\right\rangle.
     \end{align}
 \end{definition}
 Consider a function $f : \R \to \R$ which is distributed according to a Gaussian process with the linear kernel $f \sim \GP\Cond{\mat{0}, \K_{\text{linear}}}$.
@@ -363,7 +363,7 @@ The most important stationary kernel is the squared exponential kernel.
     \label{def:rbf_kernel}
     For a finite dimensional euclidean vector space $\R^d$, the \emph{squared exponential kernel} (or \emph{RBF kernel}) is defined as
     \begin{align}
-        \K_{\text{SE}}(\mat{x}, \mat{y}) \coloneqq \sigma_f^2 \cdot \exp \left( -\frac{1}{2} (\mat{x} - \mat{y})^T \mat{\Lambda}^{-1} (\mat{x} - \mat{y}) \right).
+        \K_{\text{SE}}(\mat{x}, \mat{y}) \coloneqq \sigma_f^2 \cdot \exp \left( -\frac{1}{2} (\mat{x} - \mat{y})\tran \mat{\Lambda}^{-1} (\mat{x} - \mat{y}) \right).
     \end{align}
     The parameter $\sigma_f^2 \in \R_{>0}$ is called the \emph{signal variance} and $\mat{\Lambda} = \diag(l_1^2, \dots, l_d^2)$ is a diagonal matrix of the squared \emph{length scales} $l_i \in \R_{>0}$.
 \end{definition}
@@ -532,7 +532,7 @@ The solution of this integral is a Gaussian density function \cite{petersen_matr
 For practical reasons, it is convenient to minimize the negative logarithm of the likelihood which is given by
 \begin{align}
     \Ell(\mat{\theta}) = -\log\Prob{\mat{y} \given \mat{X}, \mat{\theta}} =
-    \frac{1}{2} \mat{y^T} \left( \mat{K_N} + \sigma_n^2 \Eye \right)^{-1} \mat{y} +
+    \frac{1}{2} \mat{y\tran} \left( \mat{K_N} + \sigma_n^2 \Eye \right)^{-1} \mat{y} +
     \frac{1}{2} \log \abs{\mat{K_N} + \sigma_n^2 \Eye} +
     \frac{N}{2} \log(2\pi).
 \end{align}
@@ -591,8 +591,8 @@ The marginalization is stated as the integral of a product of two Gaussian distr
 \begin{align}
     \Prob{\mat{y} \given \mat{X}, \ps{\mat{X}}, \mat{\theta}} &= \int \Prob{\mat{y} \given \mat{X}, \ps{\mat{X}}, \ps{\mat{f}}, \mat{\theta}} \Prob{\ps{\mat{f}} \given \ps{\mat{X}}} \diff \ps{\mat{f}} \\
     &= \int \Prob{\mat{y} \given \mat{X}, \ps{\mat{X}}, \ps{\mat{f}}, \mat{\theta}} \Gaussian{\ps{\mat{f}} \given \mat{0}, \mat{K_M}} \diff \ps{\mat{f}} \\
-    &= \Gaussian*{\mat{y} \given \mat{0}, \mat{K_{NM}} \mat{K_M}^{-1} \mat{K_M} \left( \mat{K_{NM}} \mat{K_M}^{-1} \right)^T + \diag\left( \mat{K_N} - \mat{Q_N} \right) + \sigma_n^2 \Eye} \\
-    &= \Gaussian*{\vphantom{\left( \mat{K_M}^{-1} \right)^T} \mat{y} \given \mat{0}, \mat{Q_N} + \diag\left( \mat{K_N} - \mat{Q_N} \right) + \sigma_n^2 \Eye}.
+    &= \Gaussian*{\mat{y} \given \mat{0}, \mat{K_{NM}} \mat{K_M}^{-1} \mat{K_M} \left( \mat{K_{NM}} \mat{K_M}^{-1} \right)\tran + \diag\left( \mat{K_N} - \mat{Q_N} \right) + \sigma_n^2 \Eye} \\
+    &= \Gaussian*{\vphantom{\left( \mat{K_M}^{-1} \right)\tran} \mat{y} \given \mat{0}, \mat{Q_N} + \diag\left( \mat{K_N} - \mat{Q_N} \right) + \sigma_n^2 \Eye}.
 \end{align}
 This \emph{SPGP marginal likelihood} can be interpreted as the marginal likelihood of a Gaussian process given the original data set $(\mat{X}, \mat{y})$ in \cref{eq:gp_marginal_likelihood}.
 In this Gaussian process, the original kernel $\K$ is replaced by the kernel $\K_{\text{SPGP}}$.

@@ -636,13 +636,13 @@ The angle between the bicycle's heading and the goal $\Delta_\psi$ can be calcul
 Equivalently, it is the result of applying a linear transformation to the Gaussian state distribution.
 Since $\Delta_\psi = \psi - \varphi$ and the variables in the state vector are organized as presented in \cref{sub:gp_models}, this linear transformation has the form
 \begin{align}
-    \pi &= \left( 0, 0, 0, 0, -1, 0, 1 \right), \\
-    \rv{\Delta_\psi} &= \pi^T \rv{s_t}.
+    \pi &= \left( 0, 0, 0, 0, -1, 0, 1 \right)\tran, \\
+    \rv{\Delta_\psi} &= \pi\tran \rv{s_t}.
 \end{align}
 Linear transformations of Gaussians are also Gaussian \cite{petersen_matrix_2008}.
 The distribution of $\rv{\Delta_\psi}$ is given by
 \begin{align}
-    \rv{\Delta_\psi} \sim \Gaussian{\pi^T\mat{\mu_t}, \pi^T \mat{\Sigma_t} \pi}.
+    \rv{\Delta_\psi} \sim \Gaussian{\pi\tran\mat{\mu_t}, \pi\tran \mat{\Sigma_t} \pi}.
 \end{align}
 
 The expected reward for non-terminal states can then be rewritten as the integral of a product of univariate Gaussian distributions.
@@ -651,8 +651,8 @@ With $c \coloneqq \sqrt{2\pi\sigma_{\text{angle}}^2}$ it is given by
     \int \RwdBicycleHat(\rv{s_t}) \Prob{\rv{s_t}} \diff \rv{s_t} &=  \int c \Gaussian{\Delta_\psi(\rv{s_t}) \given 0, \sigma_{\text{angle}}^2} \Prob{\rv{s_t}} \diff \rv{s_t} \\
     &= c \int \Gaussian{\Delta_\psi(\rv{s_t}) \given 0, \sigma_{\text{angle}}^2} \Prob{\rv{s_t}} \diff \rv{s_t} \\
     &= c \int \Gaussian{\rv{\Delta_\psi} \given 0, \sigma_{\text{angle}}^2} \Prob{\rv{\Delta_\psi}} \diff \rv{\Delta_\psi} \\
-    &= c \int \Gaussian{\rv{\Delta_\psi} \given 0, \sigma_{\text{angle}}^2} \Gaussian{\rv{\Delta_\psi} \given \pi^T \mat{\mu_t}, \pi^T \mat{\Sigma_t} \pi} \diff \rv{\Delta_\psi} \\
-    &= c \Gaussian{\pi^T \mat{\mu_t} \given 0, \sigma_{\text{angle}}^2 + \pi^T \mat{\Sigma_t} \pi}.
+    &= c \int \Gaussian{\rv{\Delta_\psi} \given 0, \sigma_{\text{angle}}^2} \Gaussian{\rv{\Delta_\psi} \given \pi\tran \mat{\mu_t}, \pi\tran \mat{\Sigma_t} \pi} \diff \rv{\Delta_\psi} \\
+    &= c \Gaussian{\pi\tran \mat{\mu_t} \given 0, \sigma_{\text{angle}}^2 + \pi\tran \mat{\Sigma_t} \pi}.
 \end{align}
 The product of two Gaussian density functions is another unnormalized Gaussian density function.
 The normalization constant can in turn be written in terms of Gaussian densities and is the result of the integration \cite{petersen_matrix_2008}.
@@ -660,9 +660,9 @@ The normalization constant can in turn be written in terms of Gaussian densities
 Together these results give a closed form solution for the expected reward for the state $\rv{s_t}$ which is given by
 \begin{align}
     \Moment*{\E}{\RwdBicycle(\rv{s_t})} &= 2 \cdot \PGoal_t + (1 - \PGoal_t)(1 - \PFallen_t) \int \RwdBicycleHat(\rv{s_t}) \Prob{\rv{s_t}} \diff \rv{s_t} \\
-    &= 2 \cdot \PGoal_t + (1 - \PGoal_t)(1 - \PFallen_t) \sqrt{2\pi\sigma_{\text{angle}}^2} \Gaussian{\pi^T \mat{\mu_t} \given 0, \sigma_{\text{angle}}^2 + \pi^T \mat{\Sigma_t}\pi}.
+    &= 2 \cdot \PGoal_t + (1 - \PGoal_t)(1 - \PFallen_t) \sqrt{2\pi\sigma_{\text{angle}}^2} \Gaussian{\pi\tran \mat{\mu_t} \given 0, \sigma_{\text{angle}}^2 + \pi\tran \mat{\Sigma_t}\pi}.
 \end{align}
-Note that for states with very low uncertainty, that is states for which $\pi^T \mat{\Sigma_t} \pi$ goes to zero, the expected value converges towards the original reward function.
+Note that for states with very low uncertainty, that is states for which $\pi\tran \mat{\Sigma_t} \pi$ goes to zero, the expected value converges towards the original reward function.
 Similarly, for deterministic states, both $\PGoal_t$ and $\PFallen_t$ are either zero or one.
 This behaviour can also be observed for states with very low uncertainty, where the position of the mean is the decisive factor for their value.
 Using the one-step uncertainties, the action value function can be calculated as
@@ -672,7 +672,7 @@ Using the one-step uncertainties, the action value function can be calculated as
         \os{\AVlu}_{\mat{s_0}}(\mat{a_0}, \dots, \mat{a_{T-1}}) &= \Moment*{\E}{\sum_{t=0}^T \gamma^t \RwdBicycle(\mat{s_t}) \given f, \mat{s_0}, \mat{a_0}, \dots, \mat{a_{T-1}}} \\
         &= \sum_{t=0}^T \gamma^t \Moment*{\E}{\RwdBicycle(\mat{s_t}) \given f, \mat{s_0}, \mat{a_0}, \dots, \mat{a_{T-1}}} \\
         &= \sum_{t=0}^T \gamma^t \bigg( 2 \cdot \os{\PGoal}_t + (1 - \os{\PGoal}_t)(1 - \os{\PFallen}_t) \\
-        &\qquad \sqrt{2\pi\sigma_{\text{angle}}^2} \Gaussian{\pi^T \os{\mat{\mu_t}} \given 0, \sigma_{\text{angle}}^2 + \pi^T \os{\mat{\Sigma_t}}\pi} \bigg).
+        &\qquad \sqrt{2\pi\sigma_{\text{angle}}^2} \Gaussian{\pi\tran \os{\mat{\mu_t}} \given 0, \sigma_{\text{angle}}^2 + \pi\tran \os{\mat{\Sigma_t}}\pi} \bigg).
     \end{split}
 \end{align}
 
