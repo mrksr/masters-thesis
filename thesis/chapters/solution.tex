@@ -128,7 +128,7 @@ These data sets are then used to train the Gaussian processes used in PSO-P to f
 \end{figure}
 The bicycle benchmark's dynamics are introduced in \cref{cha:the_bicycle_benchmark} by defining the derivatives of the state variables and choosing values for the relevant constants in \cref{tab:bicycle_constants}.
 Given a starting state and an appropriate number of actions, these derivatives can be used to approximate the future behaviour of the system using iterative numerical methods for approximating ordinary differential equations.
-For this thesis, the bicycle benchmark was implemented in Python \cite{rossum_python_1995} with NumPy \cite{walt_numpy_2011} and using the classical Runge-Kutta scheme \cite{kutta_beitrag_1901}.
+For this thesis, the bicycle benchmark was implemented in Python \cite{van_rossum_python_1995} with NumPy \cite{walt_numpy_2011} and using the classical Runge-Kutta scheme \cite{kutta_beitrag_1901}.
 
 In their experiments, \citeauthor{randlov_learning_1998} chose a time discretization of 0.01 seconds.
 During this time, the action applied by the agent remains constant and after one such time step, the agent can choose a new action
@@ -395,12 +395,12 @@ Since states at all time steps are deterministic, terminal states can easily be 
             \Es^+ \times \Ah &\to \Es^+ \\
             (\mat{s_t}, \mat{a_t}) &\mapsto \begin{cases}
             \mat{s_t} & \text{if $\mat{s_t} \in \Tee$} \\
-            \squeeze(\mat{\mu_{t+1}}) & \text{otherwise,}
+            \squeeze(\Moment{\E}{f(\mat{s_t}, \mat{a_t})}) & \text{otherwise,}
         \end{cases}
     \end{aligned}
     \right.
 \end{align}
-where $\mat{\mu_{t+1}}$ is the mean of the distribution $f(\mat{s_t}, \mat{a_t})$ returned by the transition model.
+where the expected value of $f(\mat{s_t}, \mat{a_t})$ can directly be computed using \cref{lem:gp_posterior}.
 Given a time horizon $T$, a starting state $\mat{s_0}$ and a vector $(\mat{a_0}, \dots, \mat{a_{T-1}})$ of actions, this function can be used to calculate the intermediate states $\map{\mat{s_1}}$ to $\map{\mat{s_T}}$ using dynamic programming. \Cref{fig:map_predictions} compares these iterated MAP-predictions with the correct evolution of the bicycle system.
 
 With these intermediate states and the reward function $\RwdBicycle$ from \cref{sub:reward_function}, it is possible to evaluate the action value function $\AVlu$ defined in \cref{eq:action_value_function} and therefore apply PSO-P to the bicycle system.
@@ -554,7 +554,7 @@ The function mapping a pair of a state distribution $\mat{s_t}$ and an action $\
     \os{\mat{s_{t+1}}} : \left\{
         \begin{aligned}
             \Dists(\Es^+) \times \Ah &\to \Dists(\Es^+) \\
-            (\mat{s_t} \sim \Gaussian{\mat{\mu_t}, \mat{\Sigma_t}}, \mat{a_t}) &\mapsto \squeeze(f(\mat{\mu_t}, \mat{a_t})),
+            (\rv{s_t}, \mat{a_t}) &\mapsto \squeeze(f(\Moment{\E}{\rv{s_t}}, \mat{a_t})),
     \end{aligned}
     \right.
 \end{align}
@@ -732,7 +732,7 @@ This approximation can be used to create long-term predictions with accumulated 
     \label{alg:successive_distribution}
     Let $\rv{s_t} \sim \Gaussian{\mat{\mu_t}, \mat{\Sigma_t}}$ denote a Gaussian state distribution and $\mat{a_t} \in \Ah$ a deterministic action.
     \begin{algorithmic}[1]
-        \State Compute the extended state distribution $\Prob{\rv{\hat{s}_t}}$
+        \State Compute the augmented state distribution $\Prob{\rv{\hat{s}_t}}$
         \State Compute the state-action distribution $\Prob{\rv{\tilde{s}_t}} = \Prob{\rv{\hat{s}_t}, \mat{a_t}}$
         \State Compute the predictive GP distribution $\Prob{\rv{\Delta_t}}$
         \State Compute the successive state distribution $\Prob{\rv{s_{t+1}}}$
@@ -744,6 +744,76 @@ This approximation can be used to create long-term predictions with accumulated 
     \caption{Linearization Visualization}
     \label{fig:linearization}
 \end{figure}
+
+Let $\alpha \sim \Gaussian{\mu, \sigma^2}$ be a normally distributed angle.
+Then
+\begin{align}
+    \Moment{\E}{\sin \alpha} &= \exp\!\left( -\frac{\sigma^2}{2} \right)\sin\mu \\
+    \Moment{\E}{\cos \alpha} &= \exp\!\left( -\frac{\sigma^2}{2} \right)\cos\mu
+\end{align}
+\begin{align}
+    \Moment{\var}{\sin \alpha} &= \frac{1}{2} - \frac{1}{2} \exp\!\left( -2 \sigma^2 \right) \cos(2\mu) - \exp(- \sigma^2) \sin^2\mu \\
+    \Moment{\var}{\cos \alpha} &= \frac{1}{2} + \frac{1}{2} \exp\!\left( -2 \sigma^2 \right) \cos(2\mu) - \exp(- \sigma^2) \cos^2\mu
+\end{align}
+We assume $\Moment{\cov}{\sin \psi, \omega} = 0$ etc.
+
+We would like to calculate
+\begin{align}
+    \Prob{\rv{\Delta_t}} = \iint \Prob{f(\rv{\tilde{s}_t}) \given \rv{\tilde{s}_t}} \Prob{\rv{\tilde{s}_t}} \diff f \diff \rv{\tilde{s}_t}
+\end{align}
+however, this is not exactly nice, see \cref{fig:linearization}.
+Therefore, we approximate it with a Gaussian.
+Assuming we know this, then $\rv{s_{t+1}} \coloneqq \rv{s_t} + \rv{\Delta_t}$ and
+\begin{align}
+    \rv{s_{t+1}} &\sim \Gaussian{\mat{\mu_{t+1}}, \mat{\Sigma_{t+1}}} \text{, where} \\
+    \mat{\mu_{t+1}} &= \mat{\mu_t} + \mat{\mu_\Delta} \\
+    \mat{\Sigma_{t+1}} &= \mat{\Sigma_t} + \mat{\Sigma_\Delta} + \Moment{\cov}{\rv{s_t}, \rv{\Delta_t}} + \Moment{\cov}{\rv{\Delta_t}, \rv{s_t}}
+\end{align}
+
+So how do we get this?
+Well, we just assume that
+\begin{align}
+    \rv{\mu_\Delta} = \Moment{\E}{f(\rv{\tilde{\mu}_t})}
+\end{align}
+\begin{align}
+    \rv{\mu_\Delta}^d = \Moment{\E}{f_d(\rv{\tilde{\mu}_t})} = \K_a( \rv{\tilde{\mu}_t}, \mat{\tilde{X}})\mat{\beta_a}
+\end{align}
+an explicitly linearize the posterior GP mean function around $\rv{\tilde{\mu}_t}$.
+This linearization is given by
+\begin{align}
+    V &= \frac{\partial}{\partial \rv{\tilde{\mu}_t}} \rv{\mu_\Delta} = \frac{\partial \K(\rv{\tilde{\mu}_t}, \mat{\tilde{X}})}{\partial \rv{\tilde{\mu}_t}}\mat{\beta}
+\end{align}
+We calculate the predictive variances as
+\begin{alignat}{2}
+    \mat{\Sigma_\Delta} &= \Moment{\var}{V \rv{\tilde{s}_t}} &&+ \mat{\tilde{\Sigma}_f} \\
+    &= V \mat{\tilde{\Sigma}_t} V\tran &&+ \diag\left(
+        \Moment*{\var}{f_1(\rv{\tilde{\mu}_t})},
+        \cdots,
+        \Moment*{\var}{f_D(\rv{\tilde{\mu}_t})}
+    \right)
+\end{alignat}
+using standard results about Gaussian transformations.
+Also,
+\begin{align}
+    \Moment{\cov}{\rv{s_t}, \rv{\Delta_t}} = \Moment{\cov}{\rv{s_t}, V\rv{s_t}} = \Moment{\cov}{\rv{s_t}, \rv{s_t}}V\tran = \mat{\tilde{\Sigma}_t}V\tran
+\end{align}
+and equivalently, $\Moment{\cov}{\rv{\Delta_t}, \rv{s_t}} = V \mat{\tilde{\Sigma}_t}$.
+
+For the RBF-Kernel, we have
+\begin{align}
+    \frac{\partial}{\partial \mat{\mu}}\K_{\text{SE}}(\mat{\mu}, \mat{x}) &= \frac{\partial}{\partial \mat{\mu}} \sigma_f^2 \exp\!\left( -\frac{1}{2} (\mat{\mu} - \mat{x})\tran \mat{\Lambda}^{-1} (\mat{\mu} - \mat{x}) \right) \\
+    &= \K_{\text{SE}}(\mat{\mu}, \mat{x}) \frac{\partial}{\partial \mat{\mu}}\!\left( -\frac{1}{2} (\mat{\mu} - \mat{x})\tran \mat{\Lambda}^{-1} (\mat{\mu} - \mat{x}) \right) \\
+    &= -\K_{\text{SE}}(\mat{\mu}, \mat{x}) \mat{\Lambda}^{-1} (\mat{\mu} - \mat{x})
+\end{align}
+
+Putting it all together, we get
+\begin{align}
+    \rv{s_{t+1}} &\sim \Gaussian{\mat{\mu_{t+1}}, \mat{\Sigma_{t+1}}} \text{, where} \\
+    \mat{\mu_{t+1}} &= \mat{\mu_t} + \mat{\mu_\Delta} \\
+    &= \mat{\mu_t} + \Moment{\E}{f(\rv{\tilde{\mu}_t})} \\
+    \mat{\Sigma_{t+1}} &= \mat{\Sigma_t} + \mat{\Sigma_\Delta} + \Moment{\cov}{\rv{s_t}, \rv{\Delta_t}} + \Moment{\cov}{\rv{\Delta_t}, \rv{s_t}} \\
+    &= \mat{\Sigma_t} + V\mat{\tilde{\Sigma}_t}V\tran + \mat{\tilde{\Sigma}_f} + \mat{\tilde{\Sigma}_t}V\tran + V\mat{\tilde{\Sigma}_t}
+\end{align}
 
 \subsection{Long-Term predictions}
 \begin{itemize}
