@@ -717,7 +717,37 @@ While for every time step the transition model only makes small mistakes compare
 The next section introduces how this accumulation of errors can be modelled by propagating the uncertainty about the current state through the Gaussian process model to produce a more correct posterior distribution.
 
 \section{Predictions with Multi-Step Uncertainties}
-\subsection{Linearization}
+Considering the one-step uncertainties produced by the transition model for planning using PSO-P shows improved results when compared to only using MAP-predictions.
+\Cref{fig:os_uncertainties} however shows that these uncertainties are very small since the transition models used for the bicycle benchmark are very confident about their predictions.
+Over the course of multiple time steps, small errors nevertheless accumulate and cause large errors in the predicted trajectories which are not reflected well in the one-step uncertainties.
+
+In order to arrive at more reliable estimates of the true uncertainty about predictions several steps into the future, the uncertainty about the state $\rv{s_t}$ has to be taken into account when predicting the distribution of the state $\rv{s_{t+1}}$.
+Since the transition dynamics $\DynBicycle$ are highly nonlinear, calculating the propagation of the prior uncertainty through the Gaussian process directly is not analytically tractable as the resulting distribution usually is not a Gaussian.
+This section introduces an approximation of this propagation via linearization of the transition model around the predictive mean.
+This approximation can be used to create long-term predictions with accumulated uncertainties.
+
+\subsection{Propagation of Uncertainties using Linearization}
+\begin{algorithm}[tp]
+    \caption{Computing the successive state distribution}
+    \label{alg:successive_distribution}
+    Let $\rv{s_t} \sim \Gaussian{\mat{\mu_t}, \mat{\Sigma_t}}$ denote a Gaussian state distribution and $\mat{a_t} \in \Ah$ a deterministic action.
+    \begin{algorithmic}[1]
+        \State Compute the extended state distribution $\Prob{\rv{\hat{s}_t}}$
+        \State Compute the state-action distribution $\Prob{\rv{\tilde{s}_t}} = \Prob{\rv{\hat{s}_t}, \mat{a_t}}$
+        \State Compute the predictive GP distribution $\Prob{\rv{\Delta_t}}$
+        \State Compute the successive state distribution $\Prob{\rv{s_{t+1}}}$
+    \end{algorithmic}
+\end{algorithm}
+\begin{figure}[p]
+    \centering
+    \missingfigure[figheight=.4\textheight]{Linearization Visualization}
+    \caption{Linearization Visualization}
+    \label{fig:linearization}
+\end{figure}
+
 \subsection{Long-Term predictions}
-\subsection{Truncation of Gaussians}
+\begin{itemize}
+    \item Truncation of Gaussians
+\end{itemize}
+
 \subsection{Results}
