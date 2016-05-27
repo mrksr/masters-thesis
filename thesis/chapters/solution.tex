@@ -542,14 +542,14 @@ These uncertainties are still not propagated however, as the algorithm for deriv
 
 If states are not considered to be deterministic, it is no longer clear when an episode should be considered to be over.
 For every time step, the predictive state distributions $\Prob{\mat{s_1}}$ to $\Prob{\mat{s_T}}$ can have their probability mass spread over both terminal and non-terminal states.
-After introducing how the expected reward can be evaluated locally for every predictive state, this section considers how the probability that the predictive trajectory has already ended can be calculated with respect to the whole trajectory.
+Afet defining how to calculate the intermediate state distributions using one-step uncertainties, this section considers how the probability that the predictive trajectory has already ended can be calculated with respect to the whole trajectory.
 
 \subsection{Long-Term predictions}
 \label{sub:os_predictions}
 Similar to the MAP predictions defined in \cref{sub:map_predictions}, long-term predictions with one-step uncertainties are based on iterating the transition model using the means of the predicted Gaussian distributions.
 The intermediate states are no longer assumed to be deterministic however.
 They are random variables with the distribution returned by the transition model.
-The function mapping a pair of a state distribution $\mat{s_t}$ and an action $\mat{a_t}$ to the successive state distribution $\mat{s_{t+q}}$ is given by
+The function mapping a pair of a state distribution $\mat{s_t}$ and an action $\mat{a_t}$ to the successive state distribution $\mat{s_{t+1}}$ is given by
 \begin{align}
     \os{\mat{s_{t+1}}} : \left\{
         \begin{aligned}
@@ -601,8 +601,8 @@ In other words, they denote the accumulated believe of the transition model that
 These probabilities can also be calculated using dynamic programming.
 They are given by
 \begin{align}
-    \Prob*{\PGoal_{t+1}} &= \Prob*{\PGoal_{t}} + \left( 1 - \Prob*{\PGoal_{t}}  \right) \cdot \Prob*{\mat{s_t} \in \Goal}, \\
-    \Prob*{\PFallen_{t+1}} &= \Prob*{\PFallen_{t}} + \left( 1 - \Prob*{\PFallen_{t}}  \right) \cdot \Prob*{\mat{s_t} \in \Fallen},
+    \Prob*{\PGoal_{t+1}} &= \Prob*{\PGoal_{t}} + \left( 1 - \Prob*{\PGoal_{t}}  \right) \cdot \Prob*{\mat{s_{t+1}} \in \Goal}, \\
+    \Prob*{\PFallen_{t+1}} &= \Prob*{\PFallen_{t}} + \left( 1 - \Prob*{\PFallen_{t}}  \right) \cdot \Prob*{\mat{s_{t+1}} \in \Fallen},
 \end{align}
 respectively, where the probabilities $\Prob*{\PGoal_{0}}$ and $\Prob*{\PFallen_{0}}$ can be calculated directly.
 
@@ -630,7 +630,7 @@ The integral is then given by
     &\qquad + (1 - \PGoal_t)(1 - \PFallen_t) \int \RwdBicycleHat(\rv{s_t}) \Prob{\rv{s_t}} \diff \rv{s_t} \\
     &= 2 \cdot \PGoal_t + (1 - \PGoal_t)(1 - \PFallen_t) \int \RwdBicycleHat(\rv{s_t}) \Prob{\rv{s_t}} \diff \rv{s_t} \\
     \intertext{where $\RwdBicycleHat$ denotes the reward term for states which are not terminal and is defined as}
-    \RwdBicycleHat(\rv{s_t}) &\coloneqq \sqrt{2\pi\sigma_{\text{angle}}^2} \Gaussian{\Delta_\psi(\rv{s_t}) \given 0, \sigma_{\text{angle}}^2}.
+    \RwdBicycleHat(\rv{s}) &\coloneqq \sqrt{2\pi\sigma_{\text{angle}}^2} \Gaussian{\Delta_\psi(\rv{s}) \given 0, \sigma_{\text{angle}}^2}.
 \end{align}
 The angle between the bicycle's heading and the goal $\Delta_\psi$ can be calculated as the difference of two entries of the state vector.
 Equivalently, it is the result of applying a linear transformation to the Gaussian state distribution.
