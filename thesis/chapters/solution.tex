@@ -630,9 +630,9 @@ To simplify the integration, it can be rewritten as a single sum using the indic
 In the integration required for the expected reward, the indicator functions are replaced by their corresponding probabilities according to the law of total probability.
 The integral is then given by
 \begin{align}
-    \int \RwdBicycle(\rv{s_t}) \Prob{\rv{s_t}} \diff \rv{s_t} &= 2 \cdot \PGoal_t + 0 \cdot (1 - \PGoal_t) \PFallen_t \\
-    &\qquad + (1 - \PGoal_t)(1 - \PFallen_t) \int \RwdBicycleHat(\rv{s_t}) \Prob{\rv{s_t}} \diff \rv{s_t} \\
-    &= 2 \cdot \PGoal_t + (1 - \PGoal_t)(1 - \PFallen_t) \int \RwdBicycleHat(\rv{s_t}) \Prob{\rv{s_t}} \diff \rv{s_t} \\
+    \int \RwdBicycle(\rv{s_t}) \Prob{\rv{s_t}} \diff \rv{s_t} &= 2 \cdot \Prob{\PGoal_t} + 0 \cdot (1 - \Prob{\PGoal_t}) \Prob{\PFallen_t} \\
+    &\qquad + (1 - \Prob{\PGoal_t})(1 - \Prob{\PFallen_t}) \int \RwdBicycleHat(\rv{s_t}) \Prob{\rv{s_t}} \diff \rv{s_t} \\
+    &= 2 \cdot \Prob{\PGoal_t} + (1 - \Prob{\PGoal_t})(1 - \Prob{\PFallen_t}) \int \RwdBicycleHat(\rv{s_t}) \Prob{\rv{s_t}} \diff \rv{s_t} \\
     \intertext{where $\RwdBicycleHat$ denotes the reward term for states which are not terminal and is defined as}
     \RwdBicycleHat(\rv{s}) &\coloneqq \sqrt{2\pi\sigma_{\text{angle}}^2} \Gaussian{\Delta_\psi(\rv{s}) \given 0, \sigma_{\text{angle}}^2}.
 \end{align}
@@ -663,11 +663,12 @@ The normalization constant can in turn be written in terms of Gaussian densities
 
 Together these results give a closed form solution for the expected reward for the state $\rv{s_t}$ which is given by
 \begin{align}
-    \Moment*{\E}{\RwdBicycle(\rv{s_t})} &= 2 \cdot \PGoal_t + (1 - \PGoal_t)(1 - \PFallen_t) \int \RwdBicycleHat(\rv{s_t}) \Prob{\rv{s_t}} \diff \rv{s_t} \\
-    &= 2 \cdot \PGoal_t + (1 - \PGoal_t)(1 - \PFallen_t) \sqrt{2\pi\sigma_{\text{angle}}^2} \Gaussian{\pi\tran \mat{\mu_t} \given 0, \sigma_{\text{angle}}^2 + \pi\tran \mat{\Sigma_t}\pi}.
+    \Moment*{\E}{\RwdBicycle(\rv{s_t})} &= 2 \cdot \Prob{\PGoal_t} + (1 - \Prob{\PGoal_t})(1 - \Prob{\PFallen_t}) \int \RwdBicycleHat(\rv{s_t}) \Prob{\rv{s_t}} \diff \rv{s_t} \\
+    &= 2 \cdot \Prob{\PGoal_t} + (1 - \Prob{\PGoal_t})(1 - \Prob{\PFallen_t}) \\
+    &\qquad\qquad\qquad\qquad\sqrt{2\pi\sigma_{\text{angle}}^2} \Gaussian{\pi\tran \mat{\mu_t} \given 0, \sigma_{\text{angle}}^2 + \pi\tran \mat{\Sigma_t}\pi}.
 \end{align}
 Note that for states with very low uncertainty, that is states for which $\pi\tran \mat{\Sigma_t} \pi$ goes to zero, the expected value converges towards the original reward function.
-Similarly, for deterministic states, both $\PGoal_t$ and $\PFallen_t$ are either zero or one.
+Similarly, for deterministic states, both $\Prob{\PGoal_t}$ and $\Prob{\PFallen_t}$ are either zero or one.
 This behaviour can also be observed for states with very low uncertainty, where the position of the mean is the decisive factor for their value.
 Using the one-step uncertainties, the action value function can be calculated as
 \begin{align}
@@ -675,7 +676,7 @@ Using the one-step uncertainties, the action value function can be calculated as
     \begin{split}
         \os{\AVlu}_{\mat{s_0}}(\mat{a_0}, \dots, \mat{a_{T-1}}) &= \Moment*{\E}{\sum_{t=0}^T \gamma^t \RwdBicycle(\mat{s_t}) \given f, \mat{s_0}, \mat{a_0}, \dots, \mat{a_{T-1}}} \\
         &= \sum_{t=0}^T \gamma^t \Moment*{\E}{\RwdBicycle(\mat{s_t}) \given f, \mat{s_0}, \mat{a_0}, \dots, \mat{a_{T-1}}} \\
-        &= \sum_{t=0}^T \gamma^t \bigg( 2 \cdot \os{\PGoal}_t + (1 - \os{\PGoal}_t)(1 - \os{\PFallen}_t) \\
+        &= \sum_{t=0}^T \gamma^t \bigg( 2 \cdot \Prob{\os{\PGoal}_t} + (1 - \Prob{\os{\PGoal}_t})(1 - \Prob{\os{\PFallen}_t}) \\
         &\qquad \sqrt{2\pi\sigma_{\text{angle}}^2} \Gaussian{\pi\tran \os{\mat{\mu_t}} \given 0, \sigma_{\text{angle}}^2 + \pi\tran \os{\mat{\Sigma_t}}\pi} \bigg).
     \end{split}
 \end{align}
@@ -903,18 +904,18 @@ At the same time however, the predicted mean is no longer close to the correct t
 The model correctly identifies the decline in accuracy of its predictions.
 
 Large uncertainties about $\omega$ lead to probability mass in the tail of the Gaussian being placed outside of the valid range of values.
-For every such time step, the accumulated probability $\ms{\PFallen}_t$ of already having fallen down at some time before or at time step~$t$ increases.
+For every such time step, the accumulated probability $\Prob{\ms{\PFallen}_t}$ of already having fallen down at some time before or at time step~$t$ increases.
 This probability is calculated via dynamic programming using the rules presented in \cref{sub:os_predictions}.
 While falling down does not cause a direct punishment (since the associated reward is zero), a higher probability of an ended trajectory lowers the amount of reward which can be earned for the later time steps in the prediction.
 
 Given the intermediate state distributions $\ms{\rv{s_t}} \sim \Gaussian{\ms{\mat{\mu_t}}, \ms{\mat{\Sigma_t}}}$, the action value function using multi-step uncertainties is calculated analogously to the one-step action value function presented in \cref{eq:os_action_value_function}, since only the way of calculating the state distributions has changed.
-Having calculated the terminal probabilities $\ms{\PGoal_t}$ and $\ms{\PFallen_t}$ it is given by
+Having calculated the terminal probabilities $\Prob{\ms{\PGoal_t}}$ and $\Prob{\ms{\PFallen_t}}$ it is given by
 \begin{align}
     \label{eq:ms_action_value_function}
     \begin{split}
         \ms{\AVlu}_{\mat{s_0}}(\mat{a_0}, \dots, \mat{a_{T-1}}) &= \Moment*{\E}{\sum_{t=0}^T \gamma^t \RwdBicycle(\mat{s_t}) \given f, \mat{s_0}, \mat{a_0}, \dots, \mat{a_{T-1}}} \\
         &= \sum_{t=0}^T \gamma^t \Moment*{\E}{\RwdBicycle(\mat{s_t}) \given f, \mat{s_0}, \mat{a_0}, \dots, \mat{a_{T-1}}} \\
-        &= \sum_{t=0}^T \gamma^t \bigg( 2 \cdot \ms{\PGoal}_t + (1 - \ms{\PGoal}_t)(1 - \ms{\PFallen}_t) \\
+        &= \sum_{t=0}^T \gamma^t \bigg( 2 \cdot \Prob{\ms{\PGoal}_t} + (1 - \Prob{\ms{\PGoal}_t})(1 - \Prob{\ms{\PFallen}_t}) \\
     &\qquad \sqrt{2\pi\sigma_{\text{angle}}^2} \Gaussian{\pi\tran \ms{\mat{\mu_t}} \given 0, \sigma_{\text{angle}}^2 + \pi\tran \ms{\mat{\Sigma_t}}\pi} \bigg).
     \end{split}
 \end{align}
@@ -931,7 +932,7 @@ For any state $\mat{s_t}$ in the set of terminal states $\Tee$, the successive s
     \caption{Multi-Step predictions with truncation}
     \label{fig:ms_truncation_predictions}
 \end{figure}
-In the action value function, this is reflected by the accumulative probabilities $\PGoal$ and $\PFallen$.
+In the action value function, this is reflected by the accumulative probabilities $\Prob{\PGoal}$ and $\Prob{\PFallen}$.
 Any probability mass which falls to their respective terminal states is assumed to stay there for the remaining time steps, since their respective trajectories end at that point.
 When predicting successive states using the function $\ms{\mat{s_{t+1}}}$, this information is not considered however.
 The prior Gaussian distribution used for linearization can have considerable probability mass attributed to terminal states.
@@ -962,7 +963,7 @@ After every time step, the mean of the prediction for $\omega$ tends more toward
 For every time step, the probability mass spread over terminal states represents steps from a non-terminal state at time step $t$ (ensured by the conditional probability in the function $\tg{\mat{s_{t+1}}}$) to a terminal state at $t+1$.
 The probabilities $\Prob{\tg{\rv{s_{t+1}}} \in \Goal}$ and $\Prob{\tg{\rv{s_{t+1}}} \in \Fallen}$ therefore correctly represents the probability of reaching the goal or falling exactly at time step $t+1$ respectively.
 In contrast, the probabilities $\Prob{\ms{\rv{s_{t+1}}} \in \Goal}$ and $\Prob{\ms{\rv{s_{t+1}}} \in \Fallen}$ also contain instances where $\ms{\rv{s_t}}$ already was in the respective sets.
-The multi-step uncertainties without the truncation of Gaussians therefore overestimate the terminal probabilities $\PGoal_t$ and $\PFallen_t$.
+The multi-step uncertainties without the truncation of Gaussians therefore overestimate the terminal probabilities $\Prob{\PGoal_t}$ and $\Prob{\PFallen_t}$.
 
 \subsection{Results}
 \begin{figure}[p]
