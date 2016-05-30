@@ -568,8 +568,11 @@ Terminal states are no longer modelled using fixed points in the transition func
 Since the intermediate states are probabilistic, it is no longer clear when the predicted trajectory has ended.
 Instead, for every state, the probability of having reached the goal can be calculated as
 \begin{align}
-    \Prob*{\os{\mat{s_t}} \in \Goal} &= \Prob*{r_{\os{\mat{s_t}}} \leq 5}, \\
-    \Prob*{\os{\mat{s_t}} \in \Fallen} &= \Prob*{\abs{\omega_{\os{\mat{s_t}}}} > \frac{\pi}{15}}
+    \label{eq:terminal_probabilies}
+    \begin{split}
+        \Prob*{\os{\mat{s_t}} \in \Goal} &= \Prob*{r_{\os{\mat{s_t}}} \leq 5}, \\
+        \Prob*{\os{\mat{s_t}} \in \Fallen} &= \Prob*{\abs{\omega_{\os{\mat{s_t}}}} > \frac{\pi}{15}}
+    \end{split}
 \end{align}
 respectively.
 Since the intermediate state distributions are Gaussian, the marginal distributions for every variable in the state are (not necessarily independent) univariate Gaussian distributions.
@@ -917,29 +920,58 @@ Having calculated the terminal probabilities $\ms{\PGoal_t}$ and $\ms{\PFallen_t
 \end{align}
 Since the starting state $\mat{s_0}$ is deterministic, the reward function $\RwdBicycle$ can either be evaluated directly or the state can be approximated using a distribution $\Gaussian{\mat{s_0}, \epsilon\Eye}$ with $\epsilon \to 0$.
 
-\begin{align}
-    \tg{\mat{s_{t+1}}} : \left\{
-        \begin{aligned}
-            \Dists(\Es^+) \times \Ah &\to \Dists(\Es^+) \\
-            (\rv{s_t}, \mat{a_t}) &\mapsto \squeeze(f\Cond{\rv{s_t}, \mat{a_t} \given \rv{s_t} \not\in \Tee}),
-    \end{aligned}
-    \right.
-\end{align}
+Using the intermediate state distributions $\Prob{\ms{\rv{s_t}}}$ directly when predicting successive states is a good approximation in most cases but is not correct when the probabilities $\Prob{\rv{s_t} \in \Fallen}$ or $\Prob{\rv{s_t} \in \Goal}$ are large.
+The transition model $f$ is trained using only non-terminal state transitions, that is, state transitions where neither the prior nor the posterior state is terminal.
+This implies the assumption that the transition model only operates on non-terminal states, similar to transition dynamics $\Dyn$ being defined on $\Es$, the set of non terminal states, in general in \cref{def:transition_dynamics}.
+For any state $\mat{s_t}$ in the set of terminal states $\Tee$, the successive state $\mat{s_{t+1}}$ is always defined to be equal to $\mat{s_t}$, regardless of the action performed by the agent.
+
 \begin{figure}[t]
     \centering
     \missingfigure[figheight=.55\textheight]{Multi-Step predictions with truncation}
     \caption{Multi-Step predictions with truncation}
-    \label{fig:ms_predictions}
+    \label{fig:ms_truncation_predictions}
 \end{figure}
+In the action value function, this is reflected by the accumulative probabilities $\PGoal$ and $\PFallen$.
+Any probability mass which falls to their respective terminal states is assumed to stay there for the remaining time steps, since their respective trajectories end at that point.
+When predicting successive states using the function $\ms{\mat{s_{t+1}}}$, this information is not considered however.
+The prior Gaussian distribution used for linearization can have considerable probability mass attributed to terminal states.
+Consulting the transition model however implies the condition that the trajectory has not yet ended.
+This condition is encoded in the successive state function $\tg{\mat{s_{t+1}}}$ given by
+\begin{align}
+    \tg{\mat{s_{t+1}}} : \left\{
+        \begin{aligned}
+            \Dists(\Es^+) \times \Ah &\to \Dists(\Es^+) \\
+            (\rv{s_t}, \mat{a_t}) &\mapsto \squeeze(f\Cond{\rv{s_t}, \mat{a_t} \given \rv{s_t} \not\in \Tee}).
+    \end{aligned}
+    \right.
+\end{align}
+
+Given a Gaussian state distribution $\rv{s_t} \sim \Gaussian{\mat{\mu_t}, \mat{\Sigma_t}}$, the probability distribution
+\begin{align}
+    \Prob{\rv{s_t} \given \rv{s_t} \not\in\Tee}
+\end{align}
+can in general not be calculated analytically and is approximated with another Gaussian using moment matching.
+In the bicycle benchmark, the density function of this distribution can be obtained by truncating the original Gaussian distribution using the hyperplanes defined by \cref{eq:terminal_probabilies} and renormalizing the result.
+Algorithms to calculate the moments of the resulting distribution are described in \cite{herbrich_gaussian_2005} and \cite{toussaint_technical_2009}.
+The action value function $\tg{\AVlu}_{\mat{s_0}}$ is equivalent to the action value function without the truncation of Gaussians $\ms{\AVlu}_{\mat{s_0}}$.
+
+\Cref{fig:ms_truncation_predictions} shows predictions using multi-step uncertainties and the truncation of the state distribution Gaussian after every time step.
+While the predictions with small uncertainties are almost identical to the predictions in \cref{fig:ms_predictions}, they differ once the uncertainties are large enough to distribute mass over terminal states.
+After every time step, the mean of the prediction for $\omega$ tends more towards the middle of the value range and thus towards the most uninformative prediction with a mean at zero and the uncertainty spread over the complete range of possible values.
+
+For every time step, the probability mass spread over terminal states represents steps from a non-terminal state at time step $t$ (ensured by the conditional probability in the function $\tg{\mat{s_{t+1}}}$) to a terminal state at $t+1$.
+The probabilities $\Prob{\tg{\rv{s_{t+1}}} \in \Goal}$ and $\Prob{\tg{\rv{s_{t+1}}} \in \Fallen}$ therefore correctly represents the probability of reaching the goal or falling exactly at time step $t+1$ respectively.
+In contrast, the probabilities $\Prob{\ms{\rv{s_{t+1}}} \in \Goal}$ and $\Prob{\ms{\rv{s_{t+1}}} \in \Fallen}$ also contain instances where $\ms{\rv{s_t}}$ already was in the respective sets.
+The multi-step uncertainties without the truncation of Gaussians therefore overestimate the terminal probabilities $\PGoal_t$ and $\PFallen_t$.
 
 \subsection{Results}
-\begin{figure}[tp]
+\begin{figure}[p]
     \centering
     \missingfigure[figheight=.35\textheight]{Multi-Step results}
     \caption{Multi-Step results, M vs mean-mean-reward or goal-percentage}
     \label{fig:ms_results}
 \end{figure}
-\begin{figure}[tp]
+\begin{figure}[p]
     \centering
     \missingfigure[figheight=.35\textheight]{Multi-Step trajectory}
     \caption{Single successful Multi-Step trajectory, all variables}
