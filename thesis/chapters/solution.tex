@@ -551,6 +551,7 @@ The intermediate states are no longer assumed to be deterministic however.
 They are random variables with the distribution returned by the transition model.
 The function mapping a pair of a state distribution $\mat{s_t}$ and an action $\mat{a_t}$ to the successive state distribution $\mat{s_{t+1}}$ is given by
 \begin{align}
+    \label{eq:os_dynamic_programming}
     \os{\mat{s_{t+1}}} : \left\{
         \begin{aligned}
             \Dists(\Es^+) \times \Ah &\to \Dists(\Es^+) \\
@@ -727,6 +728,7 @@ This section introduces an approximation of this propagation via linearization o
 This approximation can be used to create long-term predictions with accumulated uncertainties.
 
 \subsection{Propagation of Uncertainties using Linearization}
+\label{sub:linearization}
 A transition model $f$ described in \cref{sub:gp_models} consists of a group of Gaussian processes $f_d$, one for every dimension $d$ in a bicycle state.
 Instead of predicting the successive state $\mat{s_{t+1}}$ directly given a pair of deterministic state $\mat{s_t}$ and action $\mat{a_t}$, the GPs are used to predict $\mat{\Delta_t} = \mat{s_{t+1}} - \mat{s_t}$, the difference between the two states.
 The model $f_d$ is used to predict the $d$-th entry of this vector.
@@ -865,8 +867,93 @@ The believe about the successive state is a Gaussian distribution characterized 
 \end{align}
 
 \subsection{Long-Term predictions}
-\begin{itemize}
-    \item Truncation of Gaussians
-\end{itemize}
+Using the linearization presented in \cref{sub:linearization} to propagate state distributions through the transition model, it is possible to create long-term predictions with accumulated uncertainties.
+While the starting state $\mat{s_0}$ is always deterministic since it is an observation of the real system, the intermediate states $\rv{s_1}$ to $\rv{s_T}$ are random variables.
+In the case of the bicycle benchmark, the transition dynamics $\DynBicycle$ are completely deterministic, so all uncertainties in the predictions stem from the transition model's confidence about its predictions.
+
+Using linearization, the intermediate states' distributions $\Prob{\rv{s_1}}$ to $\Prob{\rv{s_T}}$ are multivariate Gaussians.
+Given a pair of a state distribution $\rv{s_t}$ and an action $\mat{a_t}$, the distribution of the successive state is given by
+\begin{align}
+    \ms{\mat{s_{t+1}}} : \left\{
+        \begin{aligned}
+            \Dists(\Es^+) \times \Ah &\to \Dists(\Es^+) \\
+            (\rv{s_t}, \mat{a_t}) &\mapsto \squeeze(f(\rv{s_t}, \mat{a_t})),
+    \end{aligned}
+    \right.
+\end{align}
+where $\squeeze$ denotes the elimination of physically impossible states by correcting the posterior mean, equivalent to \cref{eq:os_dynamic_programming}.
+With multi-step uncertainties it is no longer necessary to fall back to deterministic intermediate states for prediction.
+
+\begin{figure}[t]
+    \centering
+    \missingfigure[figheight=.55\textheight]{Multi-Step predictions}
+    \caption{Multi-Step predictions}
+    \label{fig:ms_predictions}
+\end{figure}
+\Cref{fig:ms_predictions} shows an example for long-term predictions using multi-step uncertainties.
+As with the other approaches presented in this thesis, all intermediate states $\ms{\rv{s_1}}$ to $\ms{\rv{s_T}}$ can be calculated using dynamic programming.
+In contrast to the one-step uncertainties presented shown in \cref{fig:os_uncertainties}, the state distributions obtained using linearization quite accurately estimate the predictive error.
+The uncertainties reach the same order of magnitude as the dynamic range of their variable after a few time steps and become visible in the plot after a few time steps.
+After about \todo{Fix this number} ten time steps, the uncertainties about $\omega$ explode and two standard deviations cover most of the value range.
+At this point, the model's predictions can be interpreted as almost complete uncertainty about the correct state.
+At the same time however, the predicted mean is no longer close to the correct trajectory.
+The model correctly identifies the decline in accuracy of its predictions.
+
+Large uncertainties about $\omega$ lead to probability mass in the tail of the Gaussian being placed outside of the valid range of values.
+For every such time step, the accumulated probability $\ms{\PFallen}_t$ of already having fallen down at some time before or at time step~$t$ increases.
+This probability is calculated via dynamic programming using the rules presented in \cref{sub:os_predictions}.
+While falling down does not cause a direct punishment (since the associated reward is zero), a higher probability of an ended trajectory lowers the amount of reward which can be earned for the later time steps in the prediction.
+
+Given the intermediate state distributions $\ms{\rv{s_t}} \sim \Gaussian{\ms{\mat{\mu_t}}, \ms{\mat{\Sigma_t}}}$, the action value function using multi-step uncertainties is calculated analogously to the one-step action value function presented in \cref{eq:os_action_value_function}, since only the way of calculating the state distributions has changed.
+Having calculated the terminal probabilities $\ms{\PGoal_t}$ and $\ms{\PFallen_t}$ it is given by
+\begin{align}
+    \label{eq:ms_action_value_function}
+    \begin{split}
+        \ms{\AVlu}_{\mat{s_0}}(\mat{a_0}, \dots, \mat{a_{T-1}}) &= \Moment*{\E}{\sum_{t=0}^T \gamma^t \RwdBicycle(\mat{s_t}) \given f, \mat{s_0}, \mat{a_0}, \dots, \mat{a_{T-1}}} \\
+        &= \sum_{t=0}^T \gamma^t \Moment*{\E}{\RwdBicycle(\mat{s_t}) \given f, \mat{s_0}, \mat{a_0}, \dots, \mat{a_{T-1}}} \\
+        &= \sum_{t=0}^T \gamma^t \bigg( 2 \cdot \ms{\PGoal}_t + (1 - \ms{\PGoal}_t)(1 - \ms{\PFallen}_t) \\
+    &\qquad \sqrt{2\pi\sigma_{\text{angle}}^2} \Gaussian{\pi\tran \ms{\mat{\mu_t}} \given 0, \sigma_{\text{angle}}^2 + \pi\tran \ms{\mat{\Sigma_t}}\pi} \bigg).
+    \end{split}
+\end{align}
+Since the starting state $\mat{s_0}$ is deterministic, the reward function $\RwdBicycle$ can either be evaluated directly or the state can be approximated using a distribution $\Gaussian{\mat{s_0}, \epsilon\Eye}$ with $\epsilon \to 0$.
+
+\begin{align}
+    \tg{\mat{s_{t+1}}} : \left\{
+        \begin{aligned}
+            \Dists(\Es^+) \times \Ah &\to \Dists(\Es^+) \\
+            (\rv{s_t}, \mat{a_t}) &\mapsto \squeeze(f\Cond{\rv{s_t}, \mat{a_t} \given \rv{s_t} \not\in \Tee}),
+    \end{aligned}
+    \right.
+\end{align}
+\begin{figure}[t]
+    \centering
+    \missingfigure[figheight=.55\textheight]{Multi-Step predictions with truncation}
+    \caption{Multi-Step predictions with truncation}
+    \label{fig:ms_predictions}
+\end{figure}
 
 \subsection{Results}
+\begin{figure}[tp]
+    \centering
+    \missingfigure[figheight=.35\textheight]{Multi-Step results}
+    \caption{Multi-Step results, M vs mean-mean-reward or goal-percentage}
+    \label{fig:ms_results}
+\end{figure}
+\begin{figure}[tp]
+    \centering
+    \missingfigure[figheight=.35\textheight]{Multi-Step trajectory}
+    \caption{Single successful Multi-Step trajectory, all variables}
+    \label{fig:ms_successful_trajectory}
+\end{figure}
+\begin{figure}[p]
+    \centering
+    \missingfigure[figheight=.8\textheight]{Multi-Step trajectories}
+    \caption{Multiple Multi-Step trajectories, X-Y-Plot}
+    \label{fig:ms_trajectories}
+\end{figure}
+\begin{figure}[p]
+    \centering
+    \missingfigure[figheight=.8\textheight]{Multi-Step trajectories with truncation}
+    \caption{Multiple Multi-Step trajectories with truncation, X-Y-Plot}
+    \label{fig:ms_truncation_trajectories}
+\end{figure}
