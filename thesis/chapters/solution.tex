@@ -190,7 +190,7 @@ Approximating successive states requires multivariate predictions however.
 While there do exist extensions of Gaussian processes for multidimensional output \cite{rasmussen_gaussian_2006}, a common solution is to train $D$ separate GPs, one for every dimension in the state space $\R^D$.
 While this requires longer training time, it allows choosing a different set of hyperparameters for every dimension.
 Since the training set does not contain transitions which result in terminal states, the transition models do not know about them.
-The signature of the function represented by the transition model is $f : \Es \times \Ah \to \Es$, where $\Es = \R^D$ and $\Ah = R^k$.
+The signature of the function represented by the transition model is $f \colon \Es \times \Ah \to \Es$, where $\Es = \R^D$ and $\Ah = R^k$.
 Similar to the absence of terminal states, the transition models are also not aware of the rectangular boundaries of the state space described in \cref{tab:bicycle_variables}, which means that it is possible for the transition models to predict illegal states, which also have to be handled separately.
 
 All models are trained using the squared exponential kernel presented in \cref{def:rbf_kernel}.
@@ -326,7 +326,7 @@ Similarly, the reward for any state where the bicycle has fallen over is zero, w
 \begin{definition}[Bicycle Reward Function]
     Given the set $\Es^+$ of possible states of the bicycle benchmark, the \emph{bicycle reward function} is defined as
     \begin{align}
-        \RwdBicycle : \left\{
+        \RwdBicycle \colon \left\{
             \begin{aligned}
                 \Es^+ &\to \R \\
                 \mat{s} &\mapsto \begin{cases}
@@ -360,7 +360,7 @@ Using these constraints, the set of terminal states $\Tee$ and the set of non-te
 \begin{align}
     \Goal &\coloneqq \Set*{\mat{s} \in \R^7 \with r_{\mat{s}} \leq 5 \vphantom{\frac{\pi}{15}}}, \\
     \Fallen &\coloneqq \Set*{\mat{s} \in \R^7 \with \abs{\omega_{\mat{s}}} > \frac{\pi}{15}} \setminus \Goal, \\
-    \Es &\coloneqq \Set*{\mat{s} \in \R^7 \with \forall i : \mat{s}_i \in \left[ \mat{s}_i^{\text{min}}, \mat{s}_i^{\text{max}} \right]} \setminus \Goal,
+    \Es &\coloneqq \Set*{\mat{s} \in \R^7 \with \forall i \colon \mat{s}_i \in \left[ \mat{s}_i^{\text{min}}, \mat{s}_i^{\text{max}} \right]} \setminus \Goal,
 \end{align}
 respectively, where $\Tee \coloneqq \Goal \cup \Fallen$.
 The set of all possible states in the bicycle benchmark is given by $\Es^+ \coloneqq \Es \cup \Tee$.
@@ -369,7 +369,7 @@ A state where $\psi$ is greater than $\pi$ or where $\theta$ is greater than $\s
 This is unknown to the transition models and it is possible for them to predict impossible states.
 Since these extreme states are rare, this thesis considers all physically impossible predictions to be predictions of the closest possible value.
 A prediction of $\sfrac{\pi}{2} + \epsilon$ for $\theta$ is interpreted as a prediction of $\sfrac{\pi}{2}$.
-Notationally, this thesis uses a projection function $\squeeze : \R^7 \to \Es^+$ to indicate the correction of impossible states.
+Notationally, this thesis uses a projection function $\squeeze \colon \R^7 \to \Es^+$ to indicate the correction of impossible states.
 
 Gaussian processes are Bayesian models which predict values by averaging over all plausible latent functions, resulting in a Gaussian believe about the prediction.
 In order to simulate a deterministic transition model to use as a baseline for comparison, this first approach for lon-term predictions discards this believe and only predicts a single successive state.
@@ -391,7 +391,7 @@ A Gaussian distribution's density function has a unique maximum at the mean.
 The transition model is trained using observations in $\Es$ and is unaware of terminal states.
 Since states at all time steps are deterministic, terminal states can easily be modelled as fixed points in the function defined as
 \begin{align}
-    \map{\mat{s_{t+1}}} : \left\{
+    \map{\mat{s_{t+1}}} \colon \left\{
         \begin{aligned}
             \Es^+ \times \Ah &\to \Es^+ \\
             (\mat{s_t}, \mat{a_t}) &\mapsto \begin{cases}
@@ -553,7 +553,7 @@ They are random variables with the distribution returned by the transition model
 The function mapping a pair of a state distribution $\mat{s_t}$ and an action $\mat{a_t}$ to the successive state distribution $\mat{s_{t+1}}$ is given by
 \begin{align}
     \label{eq:os_dynamic_programming}
-    \os{\mat{s_{t+1}}} : \left\{
+    \os{\mat{s_{t+1}}} \colon \left\{
         \begin{aligned}
             \Dists(\Es^+) \times \Ah &\to \Dists(\Es^+) \\
             (\rv{s_t}, \mat{a_t}) &\mapsto \squeeze(f(\Moment{\E}{\rv{s_t}}, \mat{a_t})),
@@ -598,8 +598,8 @@ The probability $\Prob{\os{\mat{s_t}} \in \Fallen}$ then looses its significance
 In order to correctly calculate the probability that the trajectory has already ended at time step $t+1$, the probabilities of falling down or reaching the goal at any of the previous time steps have to be considered.
 Let
 \begin{align}
-    \Prob*{\PGoal_t} &\coloneqq \Prob*{\exists i \leq t : \mat{s_i} \in \Goal}, \\
-    \Prob*{\PFallen_t} &\coloneqq \Prob*{\exists i \leq t : \mat{s_i} \in \Fallen}
+    \Prob*{\PGoal_t} &\coloneqq \Prob*{\exists i \leq t \colon \mat{s_i} \in \Goal}, \\
+    \Prob*{\PFallen_t} &\coloneqq \Prob*{\exists i \leq t \colon \mat{s_i} \in \Fallen}
 \end{align}
 denote the probabilities that at any point before or at $t$, the trajectory has already ended.
 In other words, they denote the accumulated believe of the transition model that the trajectory has at some point hit a terminal state.
@@ -879,7 +879,7 @@ In the case of the bicycle benchmark, the transition dynamics $\DynBicycle$ are 
 Using linearization, the intermediate states' distributions $\Prob{\rv{s_1}}$ to $\Prob{\rv{s_T}}$ are multivariate Gaussians.
 Given a pair of a state distribution $\rv{s_t}$ and an action $\mat{a_t}$, the distribution of the successive state is given by
 \begin{align}
-    \ms{\mat{s_{t+1}}} : \left\{
+    \ms{\mat{s_{t+1}}} \colon \left\{
         \begin{aligned}
             \Dists(\Es^+) \times \Ah &\to \Dists(\Es^+) \\
             (\rv{s_t}, \mat{a_t}) &\mapsto \squeeze(f(\rv{s_t}, \mat{a_t})),
@@ -941,7 +941,7 @@ The prior Gaussian distribution used for linearization can have considerable pro
 Consulting the transition model however implies the condition that the trajectory has not yet ended.
 This condition is encoded in the successive state function $\tg{\mat{s_{t+1}}}$ given by
 \begin{align}
-    \tg{\mat{s_{t+1}}} : \left\{
+    \tg{\mat{s_{t+1}}} \colon \left\{
         \begin{aligned}
             \Dists(\Es^+) \times \Ah &\to \Dists(\Es^+) \\
             (\rv{s_t}, \mat{a_t}) &\mapsto \squeeze(f\Cond{\rv{s_t}, \mat{a_t} \given \rv{s_t} \not\in \Tee}).

@@ -61,7 +61,7 @@ Policies are often encoded in closed forms such as linear functions \cite{deisen
     A \emph{policy $\pi$} an agent follows encodes the choice it makes when faced with a decision.
     It is a function
     \begin{align}
-        \pi : \Es \to \Ah
+        \pi \colon \Es \to \Ah
     \end{align}
     which maps the current state of the system to the action the agent will perform.
 \end{definition}
@@ -83,7 +83,7 @@ A task which does not have terminal states is called \emph{continuous} and has e
     The \emph{transition dynamics $\Dyn$} of a system encode its physical behaviour.
     These dynamics
     \begin{align}
-        \Dyn : \Es \times \Ah \to \Dists(\Es^+)
+        \Dyn \colon \Es \times \Ah \to \Dists(\Es^+)
     \end{align}
     mapping a state and an action to a distribution over possibly terminal states stay constant over time but can be probabilistic in nature.
 \end{definition}
@@ -100,7 +100,7 @@ It is obtained from a real-valued \emph{reward function $\Rwd$} such that $r_{t+
     \label{def:reward_function}
     The \emph{reward function $\Rwd$} assigns a quality to each state in the extended state space and has the signature
     \begin{align}
-        \Rwd : \Es^+ \to \R.
+        \Rwd \colon \Es^+ \to \R.
     \end{align}
     This reward is the immediate feedback an agent receives when interacting with the system.
 \end{definition}
@@ -134,7 +134,7 @@ In the case of an infinite time horizon, $\gamma$ must be chosen smaller than on
     \label{def:value_function}
     Given transition dynamics $\Dyn$, a policy $\pi$, a time horizon $T \in \N \cup \left\{ \infty \right\}$ and a discount factor $0 \leq \gamma \leq 1$, the \emph{value function $\Vlu^\pi$} denotes the expected long-term reward of a state and is given by
     \begin{align}
-        \Vlu^\pi : \left\{
+        \Vlu^\pi \colon \left\{
             \begin{aligned}
                 \Es^+ &\to \R \\
                 s &\mapsto \Moment*{\E}{\sum_{t=0}^T \gamma^t \Rwd(\rv{s_t}) \given \Dyn, \pi, \rv{s_0} = s }.
@@ -190,7 +190,7 @@ The last part of this chapter will be concerned with introducing a policy-repres
 
 \section{Gaussian Process Regression}
 \label{sec:gp_regression}
-The transition dynamics $\Dyn : \Es \times \Ah \to \Dists(\Es^+)$ are a function mapping states and actions to a probability distribution of following states.
+The transition dynamics $\Dyn \colon \Es \times \Ah \to \Dists(\Es^+)$ are a function mapping states and actions to a probability distribution of following states.
 In order to estimate them using Gaussian processes, some assumptions about the structure of this function are needed.
 First, it will be assumed that both the set of states $\Es$ and the set of actions $\Ah$ are euclidean real valued vector spaces and that the set of terminal states $\Tee$ is empty, that is, $\Es^+$ and $\Es$ are assumed equal, requiring that episode endings have to be modelled separately.
 And secondly, the probability distribution of the following state is assumed to be unimodal.
@@ -235,7 +235,7 @@ An infinite number of possibly dependent random variables mapping from the same 
     \label{def:stochastic_process}
     Given a probability space $(\Omega, \mathcal{F}, P)$, an index set $T$ and a measurable space $Y$, a \emph{stochastic process $\rv{X}$} is a function
     \begin{align}
-        \rv{X} : \left\{\begin{aligned}
+        \rv{X} \colon \left\{\begin{aligned}
             T \times \Omega &\to Y \\
             (t, \omega) &\mapsto \rv{X_t}(\omega)
         \end{aligned}\right.
@@ -251,7 +251,7 @@ A Gaussian process is a particular stochastic process.
     \label{def:gaussian_process}
     A stochastic process $\rv{X}$ is called a \emph{Gaussian process} if for any finite subset $\tau \subseteq T$ of its index set, the random variables $\rv{X}_\tau$ have a joint Gaussian distribution \cite{astrom_introduction_1971}.
 \end{definition}
-When using a Gaussian process $\rv{X}$ to model a function $f : A \to B$, the index set $T$ is assumed to be $A$ and all random variables are $B$-valued.
+When using a Gaussian process $\rv{X}$ to model a function $f \colon A \to B$, the index set $T$ is assumed to be $A$ and all random variables are $B$-valued.
 The random variable $\rv{X_a}$ then models the function value $f(a)$ for all $a \in A$.
 Sampling a trajectory from $\rv{X}$ corresponds to sampling one possible function $f^\ast$.
 
@@ -278,7 +278,7 @@ For any pair $(\rv{X_i}, \mat{X_j})$ of these random variables, their covariance
 The pairwise covariances in a multivariate Gaussian $\Gaussian{\mat{\mu}, \mat{\Sigma}}$ are given by its \emph{covariance matrix} $\mat{\Sigma}$.
 For any finite set of random variables, the matrix obtained by pairwise application of the covariance function is called the \emph{Gram matrix}.
 \begin{definition}[Gram Matrix]
-    Given a non-empty set $A$, a function $\K : A^2 \to \R$ and two sets $X = \Set*{x_i \in A \with i \in [n]}$ and $Y = \Set*{y_j \in A \with j \in [m]}$.
+    Given a non-empty set $A$, a function $\K \colon A^2 \to \R$ and two sets $X = \Set*{x_i \in A \with i \in [n]}$ and $Y = \Set*{y_j \in A \with j \in [m]}$.
     The $n \times m$ matrix
     \begin{align}
         \K(X, Y) = \mat{K_{XY}} \coloneqq \bigg( \K(x_i, y_j) \bigg)_{\substack{i \in [n], \\ j \in [m]}}
@@ -290,7 +290,7 @@ In order for the Gram matrix to be a valid covariance matrix $\mat{\Sigma}$ of a
 \begin{definition}[Kernel]
     Given a non-empty set $A$, a function
     \begin{align}
-        \K : A^2 \to \R
+        \K \colon A^2 \to \R
     \end{align}
     is called a \emph{(positive definite) kernel} or \emph{covariance function}, if for any finite subset $X \subseteq A$, the Gram matrix $\K(X, X)$ is positive definite \cite{scholkopf_learning_2002}.
 \end{definition}
@@ -310,7 +310,7 @@ A simple example of such a non-stationary kernel is the linear kernel.
         \K_{\text{linear}}(\mat{x}, \mat{y}) \coloneqq \mat{x}\tran \mat{y} = \left\langle \mat{x}, \mat{y}\right\rangle.
     \end{align}
 \end{definition}
-Consider a function $f : \R \to \R$ which is distributed according to a Gaussian process with the linear kernel $f \sim \GP\Cond{\mat{0}, \K_{\text{linear}}}$.
+Consider a function $f \colon \R \to \R$ which is distributed according to a Gaussian process with the linear kernel $f \sim \GP\Cond{\mat{0}, \K_{\text{linear}}}$.
 According to the definition of Gaussian processes, for any two input numbers $x$, $y \in \R$ their corresponding random variables $\rv{f_x}$ and $\rv{f_y}$ have a joint Gaussian distribution
 \begin{align}
     \begin{pmatrix}
@@ -678,7 +678,7 @@ For a finite time horizon $T$, finding an optimal parametric policy using the ap
 In contrast to this, PSO-P directly examines the \emph{action-value-function $\AVlu$} given by
 \begin{align}
     \label{eq:action_value_function}
-    \AVlu_{\mat{s_0}} : \left\{
+    \AVlu_{\mat{s_0}} \colon \left\{
         \begin{aligned}
             \Ah^T &\to \R \\
             \left( \mat{a_0}, \dots, \mat{a_{T-1}} \right) &\mapsto \Moment*{\E}{\sum_{t=0}^T \gamma^t \Rwd(\mat{s_t}) \given f, \mat{s_0}, \mat{a_0}, \dots, \mat{a_{T-1}}}
@@ -728,7 +728,7 @@ Every individual, or \emph{particle}, flies in the search space with a velocity 
 While they are initialized randomly throughout the space, they are expected to collapse on a single point which, ideally, should be the optimum.
 
 More formally, PSO is mostly used in a non-convex optimization setting.
-Given some function $f : \X \to \R$, the problem is to find an $\mat{x^\ast} \in \X$ such that
+Given some function $f \colon \X \to \R$, the problem is to find an $\mat{x^\ast} \in \X$ such that
 \begin{align}
     \mat{x^\ast} \in \argmax_{\mat{x} \in \X} f(x).
 \end{align}
@@ -746,15 +746,15 @@ At every such time step, the objective function value is evaluated for every par
 Since PSO models social interaction and communication, every particle has a neighbourhood of particles it communicates with.
 This communication influences the particle's velocity as it is attracted by particles with good performance.
 \begin{definition}[PSO Instance]
-    An instance of the \emph{particle swarm optimization (PSO)} scheme on the objective function $f : \R^d \to \R$ is defined by the set of particles $\Pe$.
+    An instance of the \emph{particle swarm optimization (PSO)} scheme on the objective function $f \colon \R^d \to \R$ is defined by the set of particles $\Pe$.
     For every time step in $\Tee$, the particles' positions and velocities are given by the functions
     \begin{align}
-        \Pos &: \Pe \times \Tee \to \R^d \text{\quad and} \\
-        \Vel &: \Pe \times \Tee \to \R^d
+        \Pos &\colon \Pe \times \Tee \to \R^d \text{\quad and} \\
+        \Vel &\colon \Pe \times \Tee \to \R^d
     \end{align}
     respectively. The position of particle $i$ at time step $t$ is denoted as $\Pos_i(t)$ and its velocity as $\Vel_i(t)$. A particle can be influenced by the set of its neighbours given by the neighbourhood function
     \begin{align}
-        \Neigh &: \Pe \to \Powerset{\Pe}.
+        \Neigh \colon \Pe \to \Powerset{\Pe}.
     \end{align}
 \end{definition}
 
