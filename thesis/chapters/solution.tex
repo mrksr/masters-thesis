@@ -42,12 +42,12 @@ These data sets are then used to train the Gaussian processes used in PSO-P to f
 \begin{figure}[tp]
     \centering
     \begin{subfigure}{\subfigurewidth}
-        \missingfigure[figheight=.35\textheight]{Length of Episodes}
+        \includegraphics[height=.35\textheight]{data_set_length_histogram.png}
         \caption{Length of Episodes}
         \label{fig:data_set_properties:episode_length}
     \end{subfigure}
     \begin{subfigure}{\subfigurewidth}
-        \missingfigure[figheight=.35\textheight]{Omega-Plot for one episode}
+        \includegraphics[height=.35\textheight]{data_set_omega_plot.png}
         \caption{Omega-Plot for one episode}
         \label{fig:data_set_properties:omega_example}
     \end{subfigure}
@@ -123,7 +123,7 @@ These data sets are then used to train the Gaussian processes used in PSO-P to f
 \end{algorithm}
 \begin{figure}[tp]
     \centering
-    \missingfigure[figheight=.5\textheight]{Positional Plot of a few Episodes}
+    \includegraphics{data_set_positions.png}
     \caption{Positional Plot of a few Episodes}
     \label{fig:data_set_plot}
 \end{figure}
@@ -178,7 +178,7 @@ If a query is made to the model in a part of the state space in which it has not
     \label{fig:gp_transition_models}
 \end{figure}
 The Gaussian processes presented in \cref{sec:gp_regression} represent a distribution over all plausible transition dynamics given a data set.
-In figure \cref{fig:gp_transition_models}, the x-axis represents pairs of states and actions while the y-axis represents the successive state.
+In \cref{fig:gp_transition_models}, the x-axis represents pairs of states and actions while the y-axis represents the successive state.
 Since the observations are noise-free, the GP is completely certain about predicting them and, since it assumed a smooth RBF-prior, it is also confident about predicting states closed to the observed data.
 Between the data points, uncertainties are higher since there are many different models which are plausible.
 Gaussian processes are called \emph{non-degenerate}, since for predictions far away from the training set, the predicted uncertainty does not converge to zero.
@@ -377,7 +377,7 @@ The most plausible choice for this single successive state is the maximum-a-post
 
 \begin{figure}[t]
     \centering
-    \missingfigure[figheight=.55\textheight]{MAP predictions}
+    \includegraphics[height=.55\textheight]{predictions_1.png}
     \caption{MAP predictions}
     \label{fig:map_predictions}
 \end{figure}
@@ -492,19 +492,19 @@ In order to compare different implementations of the action value function $\AVl
 \subsection{Results}
 \begin{figure}[tp]
     \centering
-    \missingfigure[figheight=.35\textheight]{MAP results}
+    \includegraphics[height=.35\textheight]{map_goal_percentage.png}
     \caption{MAP results, M vs mean-mean-reward or goal-percentage}
     \label{fig:map_results}
 \end{figure}
 \begin{figure}[tp]
     \centering
-    \missingfigure[figheight=.35\textheight]{MAP trajectory}
+    \includegraphics[height=.35\textheight]{map_single_trajectory.png}
     \caption{Single successful MAP trajectory, all variables}
     \label{fig:map_successful_trajectory}
 \end{figure}
 \begin{figure}[p]
     \centering
-    \missingfigure[figheight=.8\textheight]{MAP trajectories}
+    \includegraphics{positions_2.png}
     \caption{Multiple MAP trajectories, X-Y-Plot}
     \label{fig:map_trajectories}
 \end{figure}
@@ -685,7 +685,7 @@ Using the one-step uncertainties, the action value function can be calculated as
 \subsection{Results}
 \begin{figure}[tp]
     \centering
-    \missingfigure[figheight=.35\textheight]{OS results}
+    \includegraphics[height=.35\textheight]{os_goal_percentage.png}
     \caption{OS and MAP results, M vs mean-mean-reward or goal-percentage}
     \label{fig:os_results}
 \end{figure}
@@ -697,7 +697,7 @@ Using the one-step uncertainties, the action value function can be calculated as
 \end{figure}
 \begin{figure}[p]
     \centering
-    \missingfigure[figheight=.8\textheight]{OS trajectories}
+    \includegraphics{positions_3.png}
     \caption{Multiple OS trajectories, X-Y-Plot}
     \label{fig:os_trajectories}
 \end{figure}
@@ -891,7 +891,7 @@ With multi-step uncertainties it is no longer necessary to fall back to determin
 
 \begin{figure}[t]
     \centering
-    \missingfigure[figheight=.55\textheight]{Multi-Step predictions}
+    \includegraphics[height=.55\textheight]{predictions_3.png}
     \caption{Multi-Step predictions}
     \label{fig:ms_predictions}
 \end{figure}
@@ -930,7 +930,7 @@ For any state $\mat{s_t}$ in the set of terminal states $\Tee$, the successive s
 
 \begin{figure}[t]
     \centering
-    \missingfigure[figheight=.55\textheight]{Multi-Step predictions with truncation}
+    \includegraphics[height=.55\textheight]{predictions_0.png}
     \caption{Multi-Step predictions with truncation}
     \label{fig:ms_truncation_predictions}
 \end{figure}
@@ -970,25 +970,25 @@ The multi-step uncertainties without the truncation of Gaussians therefore overe
 \subsection{Results}
 \begin{figure}[p]
     \centering
-    \missingfigure[figheight=.35\textheight]{Multi-Step results}
+    \includegraphics[height=.35\textheight]{ms_goal_percentage.png}
     \caption{Multi-Step results, M vs mean-mean-reward or goal-percentage}
     \label{fig:ms_results}
 \end{figure}
 \begin{figure}[p]
     \centering
-    \missingfigure[figheight=.35\textheight]{Multi-Step trajectory}
+    \includegraphics[height=.35\textheight]{ms_single_trajectory.png}
     \caption{Single successful Multi-Step trajectory, all variables}
     \label{fig:ms_successful_trajectory}
 \end{figure}
 \begin{figure}[p]
     \centering
-    \missingfigure[figheight=.8\textheight]{Multi-Step trajectories}
+    \includegraphics{positions_0.png}
     \caption{Multiple Multi-Step trajectories, X-Y-Plot}
     \label{fig:ms_trajectories}
 \end{figure}
 \begin{figure}[p]
     \centering
-    \missingfigure[figheight=.8\textheight]{Multi-Step trajectories with truncation}
+    \includegraphics{positions_1.png}
     \caption{Multiple Multi-Step trajectories with truncation, X-Y-Plot}
     \label{fig:ms_truncation_trajectories}
 \end{figure}
