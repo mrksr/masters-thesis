@@ -214,7 +214,7 @@ Accounting for all possible effects can make the model very complicated.
 This means that both the number of parameters becomes large and it may be hard to interpret the model in a physical sense.
 
 \emph{Non-parametric models} are not based on insights about the concrete structure of the function to be modelled but rather only make assumptions about properties of the function itself, such as smoothness or differentiability.
-Instead of modelling a distribution of parameter values, a Bayesian non-parametric model is concerned with finding a distribution $\Prob{f^\ast}$ of probable functions which represents the believe of the model about the function $f$ to be estimated.
+Instead of modeling a distribution of parameter values, a Bayesian non-parametric model is concerned with finding a distribution $\Prob{f^\ast}$ of probable functions which represents the believe of the model about the function $f$ to be estimated.
 
 \emph{Gaussian processes (GPs)} are a state-of-the-art framework for non-parametric regression.
 They are a way of representing a probability distribution over functions in a way which is both computationally feasible and allows for Bayesian inference.
@@ -228,7 +228,7 @@ A multivariate Gaussian $\mat{x} \sim \Gaussian{\mat{\mu}, \mat{\Sigma}}$ descri
 Every such element $\rv{x_i}$ is normally distributed according to $\rv{x_i} \sim \Gaussian{\mu_i, \Sigma_{ii}}$ with a particular dependency structure between them.
 For every pair $(\rv{x_i}, \rv{x_j})$, their covariance is given by $\Moment{\cov}{\rv{x_i}, \rv{x_j}} = \mat{\Sigma}_{ij}$.
 
-Modelling functions in general requires an infinite number of random variables, one for every function value.
+Modeling functions in general requires an infinite number of random variables, one for every function value.
 An infinite number of possibly dependent random variables mapping from the same probability space to the same value space is called a \emph{stochastic process} and is represented via a function.
 
 \begin{definition}[Stochastic Process]
@@ -658,7 +658,7 @@ As an alternative to the optimization of the SPGP marginal likelihood, \citeauth
 Instead of choosing a sparse model which explains the data well, this optimization chooses a sparse model which is as close as possible to the original full GP.
 Since this strategy leads to better convergence and more robust results in practice, these variational sparse approximation of full Gaussian processes is used to model transition dynamics within this thesis.
 
-In order to solve the control problem of the bicycle benchmark, the next step after modelling the transition dynamics using Gaussian processes is to find a policy representation.
+In order to solve the control problem of the bicycle benchmark, the next step after modeling the transition dynamics using Gaussian processes is to find a policy representation.
 Instead of a closed form representation of the policy, the choice of which action to take is made by directly optimizing over the value function using particle swarm optimization.
 This technique is presented in the next section.
 
