@@ -59,13 +59,27 @@
 %%%%%%%%%%%
 %  Boxes  %
 %%%%%%%%%%%
+\mdfsetup{skipabove=0pt,skipbelow=0pt}
 \newenvironment{defaultColourFrame}[2]
 {
-\vspace*{\parskip}
-    \begin{mdframed}[innerleftmargin=4pt, innerrightmargin=4pt, innertopmargin=4pt, innerbottommargin=4pt, linecolor=#1, middlelinewidth=0.5pt, backgroundcolor=#2, splitbottomskip=4pt, splittopskip=12pt, innermargin=4pt]
+    \begin{mdframed}[
+            innerleftmargin=8pt,
+            innerrightmargin=8pt,
+            innertopmargin=4pt,
+            innerbottommargin=4pt,
+            linecolor=#1,
+            middlelinewidth=0.5pt,
+            backgroundcolor=#2,
+            splitbottomskip=4pt,
+            splittopskip=12pt,
+            innermargin=0pt,
+            outermargin=0pt,
+            skipabove=\parskip,
+            skipbelow=0pt,
+        ]
 }
 {
-    \end{mdframed}
+    \end{mdframed}%
 }
 
 %%%%%%%%%%%%%%%%%%%
