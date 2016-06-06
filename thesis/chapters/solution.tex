@@ -21,7 +21,6 @@ These models are then interpreted as deterministic to obtain a base-line for com
 The last two sections describe how to use uncertainties in the planning process.
 The first approach is to use the one-step uncertainties of the Gaussian process models in the reward function but to still create long-term predictions using deterministic states.
 The second fully Bayesian approach completely propagates state uncertainties both to the reward function and subsequent states.
-\todo{add note about comparison section}
 
 \section{Transition Models}
 The goal in the bicycle benchmark is to learn to both balance a bicycle and to ride it to a target position.
@@ -728,6 +727,7 @@ The intermediate prior states have up to now been assumed to be deterministic.
 The next section introduces how this accumulation of errors can be modelled by propagating the uncertainty about the current state through the Gaussian process model to produce a more correct posterior distribution.
 
 \section{Predictions with Multi-Step Uncertainties}
+\label{sub:ms_predictions}
 Considering the one-step uncertainties produced by the transition model for planning using PSO-P shows improved results when compared to only using MAP-predictions.
 \Cref{fig:os_uncertainties} however shows that these uncertainties are very small since the transition models used for the bicycle benchmark are very confident about their predictions.
 Over the course of multiple time steps, small errors nevertheless accumulate and cause large errors in the predicted trajectories which are not reflected well in the one-step uncertainties.
@@ -1027,10 +1027,71 @@ It therefore becomes harder for the optimization process to identify good action
 While for weaker models, this can be beneficial because is avoids the exploitation of model bias, it might prevent the exploitation of model knowledge for better models.
 
 \section{Discussion of the Approaches}
-\begin{itemize}
-    \item More comparative plots
-    \item Differnt metrics
-\end{itemize}
+\begin{table}[t]
+    \centering
+    \caption{Comparison of the results of the evaluation.}
+    \label{tab:evaluation_results}
+    \begin{tabularx}{\tablewidth}{>{\hsize=2.6\hsize}X>{\centering\hsize=.6\hsize}X>{\centering\hsize=.6\hsize}X>{\centering\hsize=.6\hsize}X>{\centering\hsize=.6\hsize\arraybackslash}X}
+        \toprule
+        Metric & MAP & OS & MS & MS-TG \\
+        \midrule
+        Number of Trajectories & 9660 & 9660 & 9660 & 9660 \\
+        \addlinespace
+        Success Rate & \SI[mode=text]{53.4}{\percent} & \SI[mode=text]{63.8}{\percent} & \textbf{\SI[mode=text,detect-weight]{75.8}{\percent}} & \SI[mode=text]{52.5}{\percent} \\
+        Failure Rate & \SI[mode=text]{46.6}{\percent} & \SI[mode=text]{36.2}{\percent} & \textbf{\SI[mode=text,detect-weight]{24.2}{\percent}} & \SI[mode=text]{47.5}{\percent} \\
+        \addlinespace
+        Mean Mean-Reward & 0.87 & 1.01 & \textbf{1.17} & 0.91 \\
+        Median Mean-Reward & 0.85 & 1.00 & \textbf{1.24} & 0.96 \\
+        \addlinespace
+        Mean Time to Goal & \textbf{59.9} & 62.0 & 66.5 & 68.1 \\
+        Median Time to Goal & \textbf{60} & \textbf{60} & 63 & 63 \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+In \cref{tab:evaluation_results}, the results of the evaluation of the four approaches presented in this thesis are compared.
+These approaches are using maximum-a-posteriori predictions only (\emph{MAP}) as described in \cref{sub:map_predictions}, using one-step uncertainties (\emph{OS}) as described in \cref{sub:os_predictions} and using multi-step uncertainties, both without (\emph{MS}) and with the truncation of Gaussians (\emph{MS-TG}), both of which are detailed in \cref{sub:ms_predictions}.
+All evaluations were performed according to \cref{alg:evaluation_setup} and \cref{tab:evaluation_parameters}.
+To create the respective 9660 trajectories, the same data sets, models and starting states were used for all techniques.
+
+Considering the model uncertainties provided by the Gaussian process transition models during planning with PSO-P can improve the generated trajectories.
+Both the knowledge about one-step uncertainties and multi-step uncertainties allows the policy to account for errors in the transition model and prevent the exploitation of model bias to some extent.
+In the bicycle benchmark, exploiting model bias mostly means planning trajectories for which the model assumes that the resulting value of $\omega$ will be equal to its maximum value as precisely as possible.
+In this setting, even small mistakes of the models cause the bicycle to fall down and the trajectory to fail.
+
+\begin{figure}[tp]
+    \centering
+    \includegraphics[height=.35\textheight]{ms_goal_percentage.png}
+    \caption{Overall results, M vs mean-mean-reward}
+    \label{fig:results_mean_mean_reward}
+\end{figure}
+\begin{figure}[tp]
+    \centering
+    \includegraphics[height=.35\textheight]{ms_goal_percentage.png}
+    \caption{Overall results, M vs goal-percentage}
+    \label{fig:results_goal_percentage}
+\end{figure}
+\Cref{tab:evaluation_results} shows that multi-step uncertainties improve the overall success rate of PSO-P in the bicycle benchmark from about half the trajectories to about 75 percent.
+However, the results when using the truncation of Gaussians are comparable with only using MAP-predictions.
+In \cref{fig:results_goal_percentage}, the success rates of models with different complexities are compared.
+While both the one-step and multi-step approaches without the truncation of Gaussians consistently perform better than the classic alternative, the last technique only shows some improvement for less expressive models.
+
+This trend continues when comparing the mean rewards earned throughout a trajectory.
+Given a series of observed (and therefore deterministic) states beginning with the starting state $\mat{s_0}$, the mean reward earned throughout a trajectory is defined as
+\begin{align}
+    \MeanRwdBicycle(\mat{s_0}, \dots, \mat{s_T}) \coloneqq \frac{1}{T} \sum_{t=0}^T \RwdBicycle(\mat{s_t}).
+\end{align}
+Note that $T$ is a constant defined in \cref{tab:evaluation_parameters} and can be larger than the length of the trajectory.
+In this case, the terminal state at the end of the trajectory is repeated infinitely as defined in \cref{eq:rl_successive_state}.
+\Cref{fig:results_mean_mean_reward} shows the mean mean reward of all trajectories created with the different classes of models.
+Especially for less expressive models which are forced to generalize more, the techniques which consider model uncertainties perform better.
+While both OS and MS earn significantly more reward, MS-TG only slightly outperforms the baseline.
+
+The increase in performance of MS comes with a price however.
+When comparing the mean number of time steps required to reach the goal in successful trajectories, it can be seen that MAP is able to reach the goal more quickly on average than either OS or MS.
+Using MAP, PSO-P plans trajectories which are as short and aggressive as possible, therefore minimizing the required time.
+With MS, the bicycle drives much more defensive but takes more time to reach the goal, as can be seen in \cref{fig:ms_trajectories}.
+The mean time to goal presented in \cref{tab:evaluation_results} are somewhat biased though, as PSO-P with MAP tends to fail more often for longer or more complex trajectories which require long curves.
+The median time to goal suggests that for similar situations, the time difference between the two approaches could be smaller.
 
 \section{Summary}
 This chapter applied the mathematical foundations presented in \cref{cha:theory} to the bicycle benchmark problem.
@@ -1045,7 +1106,3 @@ The solution proposed in this thesis is to calculate accumulative probabilities 
 Since one-step uncertainties cannot correctly model the iterated confidence of the transition model, the next approach is to propagate the state uncertainties through the nonlinear transition models using linearization.
 These accumulated uncertainties reduce model bias since they give an accurate measure of the correctness of long-term trajectories and reduce model bias.
 Using PSO-P with multi-step uncertainties results in more defensive trajectories which are more often successful.
-
-\todo{this will be a section in this chapter}
-The next chapter compares the different results in more detail and discusses their interpretability concerning other problems in reinforcement learning.
-Lastly, it presents possible improvements and further directions of research.

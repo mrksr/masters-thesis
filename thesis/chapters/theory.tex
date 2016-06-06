@@ -115,6 +115,7 @@ Given a distribution of the state $\rv{s_t}$, the distribution for the next stat
 \begin{align}
     \Prob{\rv{s_{t+1}}} &= \int \Prob{\rv{s_{t+1}} \given \rv{s_t}, \pi}\Prob{\rv{s_t}} \diff \rv{s_t} \\
     \intertext{where}
+    \label{eq:rl_successive_state}
     \Prob{\rv{s_{t+1}} \given \rv{s_t}, \pi} &= \begin{cases}
         \delta_{\rv{s_t}, \rv{s_{t+1}}} & \text{ if $\rv{s_t} \in \Tee$} \\
         \Dyn\Cond{\rv{s_{t+1}} \given \rv{s_t}, \pi(\rv{s_t})} & \text{ otherwise.}
