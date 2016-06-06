@@ -42,8 +42,8 @@
 \newcommand\TitleLogoHeight{2cm}
 
 \renewcommand\maketitle{
-
     \begin{titlepage}%
+        \newgeometry{hmargin=3cm}
 
         \let\footnotesize\small
         \let\footnoterule\relax
@@ -63,12 +63,12 @@
         %    \studiesText \ (\matNoText) \\
         %    \eMailText
         %  }
-        % \hspace*{-.1\linewidth}
-        % \parbox{1.2\linewidth}
-        % {
-        %     \raggedleft
-        %     \small \null%\@date
-        % }
+        \hspace*{-.1\linewidth}
+        \parbox{1.2\linewidth}
+        {
+            \raggedleft
+            \small \@date
+        }
         \vspace*{\fill}
         %\vskip 2em%
 
@@ -149,6 +149,7 @@
 
         %\vfil\null
 
+        \restoregeometry
     \end{titlepage}%
     \setcounter{footnote}{0}%
     %\global\let\thanks\relax
