@@ -9,15 +9,15 @@ Gaussian processes make predictions about successive states by marginalizing the
 Instead of learning a closed policy representation using these transition models, this thesis used the PSO-Policy, which chooses actions by directly optimizing the expected long-term reward.
 
 The deterministic bicycle system by \citeauthor{randlov_learning_1998} was used as a benchmark problem to illustrate the challenges introduced by considering uncertain predictions.
-While Gaussian processes directly provide a measure of uncertain predictions given a certain input, there is no analytical solution to propagating already uncertain believe about the current state through the transition model to obtain the believe about the successive state.
+While Gaussian processes directly provide a measure of uncertain predictions given a certain input, there is no analytical solution to propagating already uncertain belief about the current state through the transition model to obtain the belief about the successive state.
 Besides considering classic deterministic predictions without any uncertainty, this thesis considered using both one-step and multi-step uncertainties.
-While for one-step uncertainties, long-term predictions are obtained by assuming the state to be deterministic before every application of the transition model, multi-step uncertainties approximate the posterior distribution with a Gaussian by linearizing the transition model around the mean of the believe about the prior state, thereby propagating uncertainty through the nonlinear transition function.
+While for one-step uncertainties, long-term predictions are obtained by assuming the state to be deterministic before every application of the transition model, multi-step uncertainties approximate the posterior distribution with a Gaussian by linearizing the transition model around the mean of the belief about the prior state, thereby propagating uncertainty through the nonlinear transition function.
 
 In the bicycle benchmark, the controller has to balance a bicycle to keep it from falling over and navigate towards a goal region.
 This introduces the possibility of failure and the concept of terminal states.
-In contrast to deterministic long-term predictions, where for every time step the predictive state is either terminal or not, uncertain predictions can spread probability mass over both regions of the state space, which represents the believe that the trajectory could both have ended or not.
-Since the transition models only handle non-terminal states, this thesis proposed a technique which models and propagates this believe separately in order to correctly calculate the expected long-term reward.
-Additionally, this believe can be used to refine the state distributions by truncating the Gaussian to non-terminal states.
+In contrast to deterministic long-term predictions, where for every time step the predictive state is either terminal or not, uncertain predictions can spread probability mass over both regions of the state space, which represents the belief that the trajectory could both have ended or not.
+Since the transition models only handle non-terminal states, this thesis proposed a technique which models and propagates this belief separately in order to correctly calculate the expected long-term reward.
+Additionally, this belief can be used to refine the state distributions by truncating the Gaussian to non-terminal states.
 
 This thesis provided experimental evidence that considering model uncertainties during planning is beneficial when creating trajectories for the bicycle benchmark using PSO-P.
 Instead of aggressively exploiting the model and therefore falling victim to model bias, multi-step uncertainties incentivize the controller to choose actions where the transition model is confident about its predictions and where small mistakes of the models do not cause the trajectory to fail.
