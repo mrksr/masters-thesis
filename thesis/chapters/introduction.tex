@@ -1,1 +1,53 @@
 \chapter{Introduction}
+Machine learning can be understood as a combination of artificial intelligence and modern statistics.
+It is concerned with the development of algorithms which allow computers to find structure in data and extract relationships within it to represent it compactly.
+This allows the computer to generalize the observations presented and predict the distribution of data in unknown regions without being explicitly programmed.
+One branch of machine learning is reinforcement learning (RL).
+In RL, the task is to learn how to control a system by interaction and to find a strategy to achieve high-level goals.
+In contrast to other kinds of machine learning, reinforcement learning usually assumes that neither prior knowledge about the behaviour of the system nor an expert teacher are available.
+Instead, an uninformed agent starts off by taking suboptimal actions in order to explore and learn about the system.
+Having built a good understanding of the system, the agent can start exploiting this knowledge in order to achieve its goals.
+
+Reinforcement learning is well-suited to solve problems which are easy to measure and generate data about but hard to describe and solve mathematically.
+These include both tasks in artificial intelligence traditionally solved by the development of specialized algorithms and problems in optimal control theory, where a dynamic physical system should be influenced in order to minimize long-term costs.
+In 1996, the chess computer Deep Blue was the first artificial intelligence to defeat a world champion in chess \cite{hsu_behind_2002}.
+This victory was achieved using tree search and a mostly hand-crafted evaluation function able to judge the current board in a chess game.
+In contrast, the game of Go remained out of reach for artificial intelligences for a long time, since formulating an equivalent evaluation function is a hard task.
+In 2016, AlphaGo was the first AI to defeat a professional Go player \cite{silver_mastering_2016}.
+Instead of relying on expert knowledge, AlphaGo was trained using reinforcement learning techniques.
+Starting off with information gathered from professional matches, AlphaGo gathered experience about Go by playing against itself and developed its strategies independently.
+
+Dynamic systems in control theory are assumed to be described by a set of known differential equations.
+Optimal controllers are obtained by analyzing their algebraic structure and deriving solutions to the optimization problem of minimizing a cost function.
+While such controllers can be shown to be provably correct given the differential equations, these dynamics are often idealized or simplified.
+For sufficiently complicated systems, they cannot be formulated at all.
+In contrast, reinforcement learning does not require intricate knowledge about the dynamics but rather relies on interaction to identify its behaviour.
+In recent years, RL has successfully been used to control cars in autonomous driving \cite{kolter_probabilistic_2010} and to control complex industrial systems such as wind or gas turbines \todo{get some citation?}\cite{siemens_citation} whose behaviour cannot be described analytically in full detail.
+
+Besides its roots in AI and control, reinforcement learning has historically been studied in the context of psychology and animal learning \cite{sutton_reinforcement_1998}.
+Trial and error is the most natural form of learning for humans and animals.
+An infant learning how to move has no explicit teacher but rather interacts with the environment and observes its responses.
+This way, the infant can obtain knowledge both about the world around them and their own body.
+Humans continue to learn by trial and error throughout their lives.
+When learning a new skill such as riding a unicycle, humans explore their task through play in order to get a feeling for the system to be controlled.
+A human might be careful at first in order to avoid accidents, but after enough training, their confidence increases and more complicated maneuvers become possible.
+
+This thesis is concerned with enabling computational agents to develop a measure of confidence about their understanding of a system.
+The combined experience an agent has gathered via interaction can be represented in a model of the world.
+Since there is only a limited amount of observations available, such a model is always imperfect and there may be multiple plausible explanations of the observations.
+Classical deterministic approaches of representing such a model have to decide on one explanation of the data and must trust it to always be correct.
+During decision-making, an agent may be forced to generalize and make predictions about the system without having observed appropriate data.
+If this generalization is wrong, the agent makes decisions based on wrong information, which introduces a bias.
+
+Instead of trusting one single model, more reliable information could be obtained by considering the predictions of all plausible models and combining their results.
+The distribution of predictions of the different models yields a measure of uncertainty the agent has about the future development of the system.
+This uncertainty can be used during planning to avoid actions whose impact on the system is unknown and enables the agent to choose a conservative strategy to avoid risk.
+
+In \cref{cha:the_bicycle_benchmark}, this thesis presents the bicycle benchmark, a simulation of a dynamic system.
+In this system, the agent takes the place of a cyclist and has to solve the task of both balancing a bicycle and navigating it towards a goal.
+This system is used throughout the thesis as an example of a reinforcement learning problem of optimal control.
+\Cref{cha:theory} introduces a mathematical formulation of the general RL problem and presents both Gaussian processes and the PSO-Policy.
+Gaussian processes are a Bayesian framework which can be used to represent probability distributions over functions and are used in this thesis to represent the knowledge of an agent about the system to be controlled.
+Based on this representation, the PSO-Policy allows the formulation of a controller.
+Having established the main tools used in this thesis, \cref{cha:solution} describes how they can be applied to the bicycle benchmark.
+It first introduces a deterministic approach to solving the benchmark and then discusses how information about uncertainties can be used to improve the agent's strategy.
