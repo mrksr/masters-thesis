@@ -40,13 +40,18 @@ It formalizes the ideas of and agent, it's interaction with a system and the pos
 
 \subsection{Problem Statement}
 Reinforcement learning is meant to describe the general problem of learning to control a system by interaction in order to achieve a predefined goal.
-In order to achieve this goal, the learning entity or \emph{agent} has to decide on specific actions to influence its \emph{environment}, which is everything outside of the agent.
+In order to achieve this goal, the learning entity or \emph{agent} has to decide on specific actions to influence its \emph{environment} which is everything outside of the agent.
 The boundary between agent and environment is a well-defined and narrow interface illustrated in \cref{fig:agent_environment_interaction}.
 They interact via this interface at specific discrete \emph{time steps}, usually indexed with the natural numbers $\N$.
-\begin{figure}[tb]
+\begin{figure}[t]
     \centering
     \includestandalone{figures/theory_agent_environment}
-    \caption{Agent-Environment-Interaction}
+    \caption{
+        The interaction between an agent and its environment in reinforcement learning happens at discrete time steps.
+        At every time step $t$, the agent observes the current state of the environment $s_t$ and decides on an action $a_t$ which should be performed.
+        Based on this action, the environment evolves and is observed to be at the state $s_{t+1}$ at the next time step.
+        Additionally, the agent receives immediate feedback about this new state in form of the numeric reward $r_{t+1}$.
+    }
     \label{fig:agent_environment_interaction}
 \end{figure}
 

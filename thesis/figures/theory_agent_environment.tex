@@ -1,11 +1,22 @@
-\documentclass[tikz]{standalone}
+\documentclass[tikz, border=1cm]{standalone}
 \input{tikz_common.tex}
 \input{tikz_standalone.tex}
 
 \begin{document}
 \begin{tikzpicture}
-    \node at (0, 2) {Hello!};
-    \node at (0, 1) {Hello!};
-    \node at (0, 0) {Hello!};
+    \tikzstyle{entity} = [draw, fill=tumblue!15, thick, inner sep=6pt];
+    \tikzstyle{edge} = [draw, arrows={-latex}, very thick, shorten >=2pt];
+
+    \node[entity, text height=1.5ex, text depth=0ex] (agent) at (0, 3) {Agent};
+    \node[entity, text height=1.5ex, text depth=0ex] (env) at (0, 0) {Environment};
+
+    \draw[edge] (agent.east) -- ++(2, 0) -- node[midway, right] {Action \\ $a_t$} ++(0, -3) -- (env.east);
+
+    \draw[edge] (env.185)++(-1.25, 0) -- ++(-0.75, 0) |- node[pos=0.25, left] {State \\ $s_t$} node[pos=0.25, right, shift={(0.3, 0)}] {Reward \\ $r_t$} (agent.170);
+    \draw[edge, thick] (env.175)++(-1.25, 0) -- ++(-0.45, 0) |- (agent.190);
+
+    \draw[preaction={draw, line width=5pt, white}, thick, densely dashed] (env.west) ++(-1.25, -0.5) -- ++(0, 1);
+    \draw[edge] (env.185) -- node[below] {$s_{t+1}$} ++(-1.25, 0);
+    \draw[edge, thick] (env.175) -- node[above] {$r_{t+1}$} ++(-1.25, 0);
 \end{tikzpicture}
 \end{document}
