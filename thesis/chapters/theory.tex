@@ -851,16 +851,21 @@ To ensure good coverage of this space, which for the bicycle benchmark is about 
 \begin{figure}[t]
     \centering
     \begin{subfigure}{\subfigurewidth}
-        \missingfigure[figheight=.25\textheight]{Ring topology}
+        \includestandalone{figures/theory_pso_ring_topology}
         \caption{Ring topology}
         \label{fig:pso_topology:ring}
     \end{subfigure}
     \begin{subfigure}{\subfigurewidth}
-        \missingfigure[figheight=.25\textheight]{Star topology}
+        \includestandalone{figures/theory_pso_star_topology}
         \caption{Star topology}
         \label{fig:pso_topology:star}
     \end{subfigure}
-    \caption{PSO topologies}
+    \caption{
+        Neighbourhood topologies define the social interaction between particles in a swarm.
+        \Cref{fig:pso_topology:ring} shows a ring topology with six particles, where every particle is connected to its neighbours and itself.
+        Since every particle is connected to exactly three other particles, the average degree of connectivity $\lambda_{\Neigh}$ is one half.
+        The special case of the ring topology where every particle is connected to every other particle is called the start topology and shown in \cref{fig:pso_topology:star}.
+    }
     \label{fig:pso_topology}
 \end{figure}
 The feature separating PSO from other population-based optimization schemes is social interaction.

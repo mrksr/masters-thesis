@@ -4,5 +4,11 @@
 
 \usetikzlibrary{calc}
 \usetikzlibrary{shapes.multipart}
+\usetikzlibrary{positioning}
 
+\tikzstyle{edge} = [draw, thick, shorten >=2pt, shorten <=2pt]
+\tikzstyle{directed} = [edge, arrows={-latex}, shorten >=2pt, shorten <=0pt]
+\tikzstyle{marked} = [tumred]
+\tikzstyle{marked edge} = [very thick, marked]
+\tikzstyle{marked node} = [very thick, draw=tumred, fill=tumred!15]
 \tikzstyle{every text node part} = [align=center, execute at begin node=\setlength{\baselineskip}{2ex}]

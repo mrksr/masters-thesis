@@ -1,0 +1,26 @@
+\documentclass[border=1cm]{standalone}
+\input{tikz_common.tex}
+\input{tikz_standalone.tex}
+
+\begin{document}
+\begin{tikzpicture}
+    \tikzstyle{particle} = [draw, circle, fill=tumblue!15, thick, inner sep=5pt];
+    \tikzstyle{my loop} = [edge, in=30, out=80, looseness=8, min distance=5mm];
+
+    \foreach \num/\angle in {1/30,3/150,4/210,5/270,6/330} {
+        \node[particle] (p\num) at (\angle:2) {\num};
+    }
+    \foreach \from/\to in {3/4,4/5,5/6,6/1} {
+        \draw[edge] (p\from) -- (p\to);
+    }
+    \foreach \num/\in/\out in {1/5/55,3/125/175,4/185/235,5/245/295,6/305/355} {
+        \draw (p\num) edge[loop, my loop, in=\in, out=\out] (p\num);
+    }
+
+    \node[particle, marked node] (p2) at (90:2) {2};
+    \draw[edge, marked edge] (p1) -- (p2);
+    \draw[edge, marked edge] (p2) -- (p3);
+    \draw (p2) edge[loop, my loop, in=65, out=115, marked edge] (p2);
+    \node[marked, above right=0em and 1em of p2] {$\lambda_\mathcal{N} = \frac{3}{6}$};
+\end{tikzpicture}
+\end{document}
