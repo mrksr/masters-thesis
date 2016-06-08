@@ -1,4 +1,5 @@
 \input{preamble/packages.tex}
+\input{figures/tikz_common.tex}
 \input{preamble/layout.tex}
 \input{preamble/title.tex}
 \input{preamble/abbreviations.tex}
@@ -26,9 +27,12 @@
 
 \addbibresource{sources.bib}
 
-\includeonly{chapters/solution}
+% \includeonly{chapters/bicycle}
 
 \begin{document}
+% Fix for interaction between bable and the tikz quotes library
+\shorthandoff{"}
+
 \frontmatter
 % See https://www.in.tum.de/fuer-studierende/pruefungen-und-formalitaeten/abschlussarbeit.html
 % for formalities concerning the first few pages at TUM

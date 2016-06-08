@@ -76,35 +76,51 @@ And secondly, the equations are not an exact analytical description, as some sec
         \bottomrule
     \end{tabularx}
 \end{table}
-
 \begin{figure}[p]
     \centering
-    \begin{subfigure}{\figurewidth}
-        \missingfigure[figheight=.5\textheight]{Bicycle as seen from above}
-        \caption{Bicycle as seen from above}
-        \label{fig:bicycle:above}
-    \end{subfigure}
-    \begin{subfigure}{\subfigurewidth}
-        \missingfigure[figheight=.35\textheight]{Bicycle as seen from behind}
-        \caption{Bicycle as seen from behind.}
+    \includestandalone{figures/bicycle_from_above}
+    \caption{
+        The bicycle system as seen from above.
+        The position of the bicycle's frame is defined by the $x$ and $y$ coordinates of the blue front tyre and the orientation of the black frame of length $l$ is measured by the angle $\psi$.
+        Both the front and back tyre move along a dashed circular path with a shared center point $C$ but different radii $r_f$ and $r_b$.
+        The radius of the front tyre is influenced by the steering angle $\theta$.
+    }
+    \label{fig:bicycle:above}
+\end{figure}
+\begin{figure}[p]
+    \centering
+    \begin{subfigure}[b]{\subfigurewidth}
+        \centering
+        \includestandalone{figures/bicycle_from_behind}
+        \caption{
+            The bicycle system as seen from behind.
+        }
         \label{fig:bicycle:behind}
     \end{subfigure}
-    \begin{subfigure}{\subfigurewidth}
-        \missingfigure[figheight=.35\textheight]{Moments of inertia}
-        \caption{Moments of inertia.}
+    \begin{subfigure}[b]{\subfigurewidth}
+        \centering
+        \includestandalone{figures/bicycle_moments_of_inertia}
+        \caption{
+            The moments of inertia of a tyre.
+        }
         \label{fig:bicycle:inertia}
     \end{subfigure}
-    \caption{Bicycle dynamics}
+    \caption{
+        \Cref{fig:bicycle:behind} shows the bicycle when viewed from behind.
+        The angle $\omega$ describes the leaning of the bicycle.
+        The center of mass is defined by the blue bicycle's height $h$ and the leaning distance $d$.
+        \Cref{fig:bicycle:inertia} shows the axes of the moments of inertia of the blue tyre.
+    }
     \label{fig:bicycle}
 \end{figure}
 
-An overview of the geometric interpretations of the state variables can be seen in \cref{fig:bicycle}.
+An overview of the geometric interpretations of the state variables can be seen in \cref{fig:bicycle,fig:bicycle:above}.
 The interactions between tilt and lean are based on the conservation of angular momentum which is heavily influenced by the moments of inertia of the system.
 The moments of the tyre as displayed in \cref{fig:bicycle:inertia} and the moment of the bicycle and cyclist combined $I_{\text{BC}}$ were estimated by the original definition~\cite{randlov_learning_1998} as
 \begin{align}
-    I_{dc} &\coloneqq \hphantom{\frac{1}{2}}M_d r^2\\
-    I_{dv} &\coloneqq \frac{3}{2}M_d r^2\\
-    I_{dl} &\coloneqq \frac{1}{2}M_d r^2\\
+    I_{\text{dc}} &\coloneqq \hphantom{\frac{1}{2}}M_d r^2\\
+    I_{\text{dv}} &\coloneqq \frac{3}{2}M_d r^2\\
+    I_{\text{dl}} &\coloneqq \frac{1}{2}M_d r^2\\
     I_{\text{BC}} &\coloneqq \frac{13}{3} M_c h^2 + M_p(h + d_\CM)^2.
 \end{align}
 The dynamics also depend on multiple constants which are detailed in \cref{tab:bicycle_constants}.
@@ -122,7 +138,7 @@ With this, the angular acceleration $\ddot{\omega}$ can be calculated as
 \begin{align}
     \ddot{\omega} \coloneqq \frac{1}{I_{\text{BC}}} \left(
         \sin \varphi \cdot Mgh - \cos \varphi \cdot \left(
-            I_{dc}\dot{\sigma}\cdot\dot{\theta} +
+            I_{\text{dc}}\dot{\sigma}\cdot\dot{\theta} +
             \sgn(\theta) \cdot v^2 \left(
                 \frac{M_dr}{r_f} + \frac{M_d r}{r_b} + \frac{Mh}{r_\CM}
             \right)
@@ -133,7 +149,7 @@ With this, the angular acceleration $\ddot{\omega}$ can be calculated as
 The angular acceleration $\ddot{\theta}$ of the orientation of the front tyre is equal to that of the handlebars because the front fork is assumed to vertical.
 It is dependent on the torque $T$ applied to the handlebars and the conservation of angular momentum introduced via a cross-term dependent on $\dot{\omega}$ and is calculated as
 \begin{align}
-    \ddot{\theta} \coloneqq \frac{T - I_{dv}\dot{\sigma}\cdot\dot{\omega}}{I_{dl}}.
+    \ddot{\theta} \coloneqq \frac{T - I_{\text{dv}}\dot{\sigma}\cdot\dot{\omega}}{I_{\text{dl}}}.
 \end{align}
 
 These differential equations describe how leaning left or right as the driver and turning the handlebars interact with each other.
