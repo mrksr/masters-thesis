@@ -46,7 +46,7 @@ They interact via this interface at specific discrete \emph{time steps}, usually
 \begin{figure}[t]
     \centering
     \includestandalone{figures/theory_agent_environment}
-    \caption{
+    \caption[Agent-environment interaction]{
         The interaction between an agent and its environment in reinforcement learning happens at discrete time steps.
         At every time step $t$, the agent observes the current state of the environment $s_t$ and decides on an action $a_t$ which should be performed.
         Based on this action, the environment evolves and is observed to be at the state $s_{t+1}$ at the next time step.
@@ -860,7 +860,7 @@ To ensure good coverage of this space, which for the bicycle benchmark is about 
         \caption{Star topology}
         \label{fig:pso_topology:star}
     \end{subfigure}
-    \caption{
+    \caption[PSO neighbourhood topologies]{
         Neighbourhood topologies define the social interaction between particles in a swarm.
         \Cref{fig:pso_topology:ring} shows a ring topology with six particles, where every particle is connected to its neighbours and itself.
         Since every particle is connected to exactly three other particles, the average degree of connectivity $\lambda_{\Neigh}$ is one half.
