@@ -339,21 +339,25 @@ Gaussian process regression with a linear kernel is equivalent to Bayesian linea
 \begin{figure}[tb]
     \centering
     \begin{subfigure}{\subfigurewidth}
+        \centering
         \missingfigure[figheight=.2\textheight]{Samples of Linear GP}
         \caption{Samples of Linear GP}
         \label{fig:gp_samples:linear}
     \end{subfigure}
     \begin{subfigure}{\subfigurewidth}
+        \centering
         \missingfigure[figheight=.2\textheight]{Samples of RBF GP, good hyperparameters}
         \caption{Samples of RBF GP, good hyperparameters}
         \label{fig:gp_samples:rbf_normal}
     \end{subfigure}
     \begin{subfigure}{\subfigurewidth}
+        \centering
         \missingfigure[figheight=.2\textheight]{Samples of RBF GP, noisy hyperparameters}
         \caption{Samples of RBF GP, noisy hyperparameters}
         \label{fig:gp_samples:rbf_noisy}
     \end{subfigure}
     \begin{subfigure}{\subfigurewidth}
+        \centering
         \missingfigure[figheight=.2\textheight]{Samples of RBF GP, short lengthscale hyperparameters}
         \caption{Samples of RBF GP, short lengthscale hyperparameters}
         \label{fig:gp_samples:rbf_lengthscale}
@@ -465,11 +469,13 @@ The predictive posterior for the test outputs $\mat{f_\ast}$ can be obtained by 
 \begin{figure}[tb]
     \centering
     \begin{subfigure}{\subfigurewidth}
+        \centering
         \missingfigure[figheight=.25\textheight]{GP Prior}
         \caption{GP Prior}
         \label{fig:gp_posterior:prior}
     \end{subfigure}
     \begin{subfigure}{\subfigurewidth}
+        \centering
         \missingfigure[figheight=.25\textheight]{GP Posterior}
         \caption{GP Posterior}
         \label{fig:gp_posterior:posterior}
@@ -627,11 +633,13 @@ This observation directly yields the SPGP predictive posterior using \cref{lem:g
 \begin{figure}[t]
     \centering
     \begin{subfigure}{\subfigurewidth}
+        \centering
         \missingfigure[figheight=.3\textheight]{GP on some Data}
         \caption{GP on some Data}
         \label{fig:spgp_example:gp}
     \end{subfigure}
     \begin{subfigure}{\subfigurewidth}
+        \centering
         \missingfigure[figheight=.3\textheight]{SPGP on some Data}
         \caption{SPGP on some Data}
         \label{fig:spgp_example:spgp}
@@ -851,11 +859,13 @@ To ensure good coverage of this space, which for the bicycle benchmark is about 
 \begin{figure}[t]
     \centering
     \begin{subfigure}{\subfigurewidth}
+        \centering
         \includestandalone{figures/theory_pso_ring_topology}
         \caption{Ring topology}
         \label{fig:pso_topology:ring}
     \end{subfigure}
     \begin{subfigure}{\subfigurewidth}
+        \centering
         \includestandalone{figures/theory_pso_star_topology}
         \caption{Star topology}
         \label{fig:pso_topology:star}
@@ -864,7 +874,7 @@ To ensure good coverage of this space, which for the bicycle benchmark is about 
         Neighbourhood topologies define the social interaction between particles in a swarm.
         \Cref{fig:pso_topology:ring} shows a ring topology with six particles, where every particle is connected to its neighbours and itself.
         Since every particle is connected to exactly three other particles, the average degree of connectivity $\lambda_{\Neigh}$ is one half.
-        The special case of the ring topology where every particle is connected to every other particle is called the start topology and shown in \cref{fig:pso_topology:star}.
+        The special case of the ring topology where every particle is connected to every other particle is called the start topology and is shown in \cref{fig:pso_topology:star}.
     }
     \label{fig:pso_topology}
 \end{figure}
