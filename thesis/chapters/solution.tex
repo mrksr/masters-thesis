@@ -313,8 +313,11 @@ As the bicycle moves at a constant speed, a successful trajectory which locally 
 
 \begin{figure}[t]
     \centering
-    \missingfigure[figheight=.35\textheight]{Comparison of linear and saturating reward.}
-    \caption{Comparison of linear and saturating reward.}
+    \includestandalone{figures/solution_saturating_reward}
+    \caption[Comparison of linear and saturating reward functions]{
+        The blue quadratic saturating reward function is a Gaussian densityprobability density which has been renormalized to a maximum value of one.
+        When compared to the dashed piecewise linear reward function, the saturating reward is more forgiving for small errors in the angle difference $\Delta^\Psi$, but punishes large deviations more.
+    }
     \label{fig:saturating_reward}
 \end{figure}
 Instead of a linear reward based on the difference, this thesis chooses a quadratic saturating reward function as proposed by \citeauthor*{deisenroth_gaussian_2015} in \cite{deisenroth_gaussian_2015}.

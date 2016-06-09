@@ -1,0 +1,37 @@
+\documentclass[border=1cm]{standalone}
+\input{tikz_common.tex}
+\input{tikz_standalone.tex}
+
+\begin{document}
+\begin{tikzpicture}
+    \begin{axis} [
+            default plot,
+            xlabel={$\Delta^\psi$},
+            ylabel={Reward},
+            ymin=0,
+            xtick={-3.14159, 0, 3.14159},
+            xticklabels={$-\pi$, $0$, $\pi$},
+            width=360pt,
+            height=207pt,
+        ]
+        \addplot[
+            densely dashed,
+            thick,
+            domain=-3.5:3.5,
+            samples=201
+        ]
+        {
+            1 - abs(x) / (5 * pi / 4)
+        };
+        \addplot[
+            thick,
+            tumblue,
+            domain=-3.5:3.5,
+            samples=201
+        ]
+        {
+            exp(-x^2 / (pi * pi / 2))
+        };
+    \end{axis}
+\end{tikzpicture}
+\end{document}

@@ -14,10 +14,18 @@
 
 \tikzstyle{edge} = [draw, thick, shorten >=2pt, shorten <=2pt]
 \tikzstyle{directed} = [arrows={-latex}, shorten >=2pt, shorten <=0pt]
+\tikzstyle{no shorten} = [shorten >=0pt, shorten <=0pt]
 \tikzstyle{marked} = [tumred]
 \tikzstyle{marked edge} = [very thick, marked]
 \tikzstyle{marked node} = [very thick, draw=tumred, fill=tumred!15]
 \tikzstyle{every text node part} = [align=center, execute at begin node=\setlength{\baselineskip}{2ex}]
+
+\pgfplotsset{default plot/.style = {
+    grid=major,
+    minor y tick num=1,
+    minor x tick num=1,
+}}
+
 
 % See
 % https://tex.stackexchange.com/a/21759/34265
