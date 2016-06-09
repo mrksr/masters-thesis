@@ -1,0 +1,22 @@
+\documentclass[border=1cm]{standalone}
+\input{tikz_common.tex}
+\input{tikz_standalone.tex}
+
+\begin{document}
+\begin{tikzpicture}
+    \begin{axis} [
+            posterior plot,
+        ]
+        \addplot[thin, tumblue, name path=c, restrict x to domain=-5:5] table[x=X, y expr=\thisrow{y} + \thisrow{y_2std}] {\datapath/data/posterior_gp.dat};
+        \addplot[thin, tumblue, name path=d, restrict x to domain=-5:5] table[x=X, y expr=\thisrow{y} - \thisrow{y_2std}] {\datapath/data/posterior_gp.dat};
+        \addplot[tumblue!15] fill between[of=c and d, on layer={axis background}];
+        \addplot[very thick, tumblue] table[x=X, y=y] {\datapath/data/posterior_gp.dat};
+
+        \addplot[prior sample, tumviolet] table[x=X, y=y] {\datapath/data/posterior_posterior_sample_0.dat};
+        \addplot[prior sample, tumorange] table[x=X, y=y] {\datapath/data/posterior_posterior_sample_1.dat};
+        \addplot[prior sample, tumgreen] table[x=X, y=y] {\datapath/data/posterior_posterior_sample_2.dat};
+
+        \addplot[only marks] table[x=X, y=y] {\datapath/data/posterior_data.dat};
+    \end{axis}
+\end{tikzpicture}
+\end{document}

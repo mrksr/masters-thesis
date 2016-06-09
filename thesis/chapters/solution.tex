@@ -175,8 +175,13 @@ If a query is made to the model in a part of the state space in which it has not
 
 \begin{figure}[tb]
     \centering
-    \missingfigure[figheight=.25\textheight]{GP Posterior}
-    \caption{GP posterior}
+    \includestandalonewithpath{figures/solution_gp_posterior}
+    \caption[GP transition models]{
+        Since observations are completely certain, the transition models have no uncertainty at the black observations.
+        The further away from observations a test point is, the higher the uncertainty becomes.
+        Since Gaussian processes are non-degenerate, uncertainties do not converge to zero away from the observed data.
+        Instead, for values with absolute value larger than six, the transition model falls back to the prior.
+    }
     \label{fig:gp_transition_models}
 \end{figure}
 The Gaussian processes presented in \cref{sec:gp_regression} represent a distribution over all plausible transition dynamics given a data set.

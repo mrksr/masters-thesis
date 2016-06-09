@@ -1,0 +1,20 @@
+\documentclass[border=1cm]{standalone}
+\input{tikz_common.tex}
+\input{tikz_standalone.tex}
+
+\begin{document}
+\begin{tikzpicture}
+    \begin{axis} [
+            posterior plot,
+        ]
+        \addplot[thin, tumblue, name path=c, domain=-5:5] {5.038};
+        \addplot[thin, tumblue, name path=d, domain=-5:5] {-5.038};
+        \addplot[tumblue!15] fill between[of=c and d, on layer={axis background}];
+        \addplot[very thick, tumblue, domain=-5:5] {0};
+
+        \addplot[prior sample, tumviolet] table[x=X, y=y] {\datapath/data/posterior_prior_sample_0.dat};
+        \addplot[prior sample, tumorange] table[x=X, y=y] {\datapath/data/posterior_prior_sample_1.dat};
+        \addplot[prior sample, tumgreen] table[x=X, y=y] {\datapath/data/posterior_prior_sample_2.dat};
+    \end{axis}
+\end{tikzpicture}
+\end{document}

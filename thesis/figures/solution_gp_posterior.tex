@@ -1,0 +1,30 @@
+\documentclass[border=1cm]{standalone}
+\input{tikz_common.tex}
+\input{tikz_standalone.tex}
+
+\begin{document}
+\begin{tikzpicture}
+    \begin{axis} [
+            default plot,
+            ymin=-6.5,
+            ymax=6.5,
+            xmin=-8,
+            xmax=8,
+            width=360pt,
+            height=207pt,
+            xlabel={$(\bm{s_{\ast}}, \bm{a_{\ast}})$},
+            ylabel={$f(\bm{s_{\ast}}, \bm{a_{\ast}})$},
+            xtick={-6,0,6},
+            ytick={-6,-3,0,3,6},
+            minor x tick num=2,
+            minor y tick num=1,
+        ]
+        \addplot[thin, tumblue, name path=c, restrict x to domain=-8:8] table[x=X, y expr=\thisrow{y} + \thisrow{y_2std}] {\datapath/data/posterior_gp.dat};
+        \addplot[thin, tumblue, name path=d, restrict x to domain=-8:8] table[x=X, y expr=\thisrow{y} - \thisrow{y_2std}] {\datapath/data/posterior_gp.dat};
+        \addplot[tumblue!15] fill between[of=c and d, on layer={axis background}];
+        \addplot[very thick, tumblue] table[x=X, y=y] {\datapath/data/posterior_gp.dat};
+
+        \addplot[only marks] table[x=X, y=y] {\datapath/data/posterior_data.dat};
+    \end{axis}
+\end{tikzpicture}
+\end{document}

@@ -365,7 +365,7 @@ Gaussian process regression with a linear kernel is equivalent to Bayesian linea
         \caption{RBF with $\sigma_f = 1$ and $l=\sfrac{1}{4}$}
         \label{fig:gp_samples:rbf_lengthscale}
     \end{subfigure}
-    \caption{
+    \caption[Samples from GP priors]{
         Since the mean function $\mu_f$ is assumed to be constant zero, the kernel specifies the prior assumptions about the function.
         A dashed sample function can be drawn by sampling a multivariate gaussian with the kernel's Gram matrix using a grid of discrete sampling positions.
         While samples from the linear kernel are always hyperplanes, the RBF kernel describs arbitrary smooth functions.
@@ -478,17 +478,22 @@ The predictive posterior for the test outputs $\mat{f_\ast}$ can be obtained by 
     \centering
     \begin{subfigure}{\subfigurewidth}
         \centering
-        \missingfigure[figheight=.25\textheight]{GP Prior}
+        \includestandalonewithpath{figures/theory_gp_posterior_prior}
         \caption{GP Prior}
         \label{fig:gp_posterior:prior}
     \end{subfigure}
     \begin{subfigure}{\subfigurewidth}
         \centering
-        \missingfigure[figheight=.25\textheight]{GP Posterior}
+        \includestandalonewithpath{figures/theory_gp_posterior_posterior}
         \caption{GP Posterior}
         \label{fig:gp_posterior:posterior}
     \end{subfigure}
-    \caption{GP posterior}
+    \caption[GP posterior]{
+        \Cref{fig:gp_posterior:prior} shows a GP prior with and RBF kernel.
+        After observing the black data points, the mean function of the posterior GP in \cref{fig:gp_posterior:posterior} is no longer constant zero.
+        The dashed function samples of the posterior GP interpolate the data but can be different in-between.
+        The shaded area represents the point wise mean plus and minus two times the standard deviation.
+    }
     \label{fig:gp_posterior}
 \end{figure}
 
