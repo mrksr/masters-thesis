@@ -4,10 +4,10 @@
 
 \begin{document}
 \begin{tikzpicture}
-    \draw[edge, thin] (0, 2) -- (2.5, 2);
-    \draw[very thick, tumblue, fill=white] (0.15, 2) circle[x radius=1.25, y radius=2];
-    \draw[edge, thin, directed] (0, 2) -- node[above, pos=0.9] {$I_{\text{dc}}$} (-2.5, 2);
-    \draw[edge, thin, directed] (0, 0) -- node[right, pos=0.95] {$I_{\text{dl}}$} (0, 5);
-    \draw[edge, directed] (2.5, -.5) -- node[above, pos=0.95] {$I_{\text{dv}}$} (-2.5, .5);
+    \draw[edge, no shorten, thin] (0, 2) -- (2.5, 2);
+    \draw[very thick, tumblue, fill=white] (0, 2) circle[x radius=1.25, y radius=2];
+    \draw[edge, no shorten, thin] (0, 2) -- node[above, pos=0.9] {$I_{\text{dc}}$} (-2.5, 2);
+    \draw[edge, no shorten, thin] (0, 0) -- node[right, pos=0.95] {$I_{\text{dl}}$} (0, 5);
+    \draw[edge, no shorten] (2.5, -.52) -- node[above, pos=0.95] {$I_{\text{dv}}$} (-2.5, .48);
 \end{tikzpicture}
 \end{document}
