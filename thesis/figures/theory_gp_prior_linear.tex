@@ -1,0 +1,20 @@
+\documentclass[border=1cm]{standalone}
+\input{tikz_common.tex}
+\input{tikz_standalone.tex}
+
+\begin{document}
+\begin{tikzpicture}
+    \begin{axis} [
+            prior plot,
+        ]
+        \addplot[thin, tumblue, name path=a, domain=-2:2] {x};
+        \addplot[thin, tumblue, name path=b, domain=-2:2] {-x};
+        \addplot[tumblue!15] fill between[of=a and b, on layer={axis background}];
+        \addplot[very thick, tumblue, domain=-2:2] {0} node[right] {$\mu_f$};
+
+        \addplot[prior sample, tumviolet, domain=-2:2] {0.27 * x};
+        \addplot[prior sample, tumorange, domain=-2:2] {-0.42 * x};
+        \addplot[prior sample, tumgreen, domain=-2:2] {0.67 * x};
+    \end{axis}
+\end{tikzpicture}
+\end{document}

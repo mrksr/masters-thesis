@@ -4,9 +4,12 @@
 
 \usetikzlibrary{angles}
 \usetikzlibrary{calc}
+\usetikzlibrary{decorations}
 \usetikzlibrary{positioning}
 \usetikzlibrary{quotes}
 \usetikzlibrary{shapes.multipart}
+
+\usepgfplotslibrary{fillbetween}
 
 \tikzstyle{very small node} = [draw, circle, fill=tumblue!15, thick, minimum size=3pt, inner sep=0pt]
 \tikzstyle{small node} = [draw, circle, fill=tumblue!15, thick, minimum size=6pt, inner sep=0pt]
@@ -24,6 +27,20 @@
     grid=major,
     minor y tick num=1,
     minor x tick num=1,
+}}
+
+\pgfplotsset{prior plot/.style = {
+    default plot,
+    ymin=-2.5,
+    ymax=2.5,
+    xmin=-2.5,
+    xmax=2.5,
+    width=220pt,
+}}
+
+\pgfplotsset{prior sample/.style = {
+    semithick,
+    densely dashed
 }}
 
 

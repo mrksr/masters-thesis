@@ -336,33 +336,41 @@ A correlation coefficient of plus or minus one implies that the value of one of 
 Any function drawn from this Gaussian process, such as the ones shown in \cref{fig:gp_samples:linear}, is therefore a linear function.
 This observation generalizes to higher dimensions \cite{rasmussen_gaussian_2006}.
 Gaussian process regression with a linear kernel is equivalent to Bayesian linear regression.
-\begin{figure}[tb]
+\begin{figure}[p]
     \centering
-    \begin{subfigure}{\subfigurewidth}
+    \begin{subfigure}[b]{\subfigurewidth}
         \centering
-        \missingfigure[figheight=.2\textheight]{Samples of Linear GP}
-        \caption{Samples of Linear GP}
+        \includestandalonewithpath{figures/theory_gp_prior_linear}
+        \caption{Linear}
         \label{fig:gp_samples:linear}
     \end{subfigure}
-    \begin{subfigure}{\subfigurewidth}
+    \begin{subfigure}[b]{\subfigurewidth}
         \centering
-        \missingfigure[figheight=.2\textheight]{Samples of RBF GP, good hyperparameters}
-        \caption{Samples of RBF GP, good hyperparameters}
+        \includestandalonewithpath{figures/theory_gp_prior_rbf}
+        \caption{RBF with $\sigma_f = 1$ and $l=1$}
         \label{fig:gp_samples:rbf_normal}
     \end{subfigure}
-    \begin{subfigure}{\subfigurewidth}
+
+    \vspace{4ex}
+
+    \begin{subfigure}[b]{\subfigurewidth}
         \centering
-        \missingfigure[figheight=.2\textheight]{Samples of RBF GP, noisy hyperparameters}
-        \caption{Samples of RBF GP, noisy hyperparameters}
+        \includestandalonewithpath{figures/theory_gp_prior_rbf_amplitude}
+        \caption{RBF with $\sigma_f = \sqrt{2}$ and $l=1$}
         \label{fig:gp_samples:rbf_noisy}
     \end{subfigure}
-    \begin{subfigure}{\subfigurewidth}
+    \begin{subfigure}[b]{\subfigurewidth}
         \centering
-        \missingfigure[figheight=.2\textheight]{Samples of RBF GP, short lengthscale hyperparameters}
-        \caption{Samples of RBF GP, short lengthscale hyperparameters}
+        \includestandalonewithpath{figures/theory_gp_prior_rbf_lengthscale}
+        \caption{RBF with $\sigma_f = 1$ and $l=\sfrac{1}{4}$}
         \label{fig:gp_samples:rbf_lengthscale}
     \end{subfigure}
-    \caption{GP samples}
+    \caption{
+        Since the mean function $\mu_f$ is assumed to be constant zero, the kernel specifies the prior assumptions about the function.
+        A dashed sample function can be drawn by sampling a multivariate gaussian with the kernel's Gram matrix using a grid of discrete sampling positions.
+        While samples from the linear kernel are always hyperplanes, the RBF kernel describs arbitrary smooth functions.
+        The hyperparameters $l$ and $\sigma_f$ of the kernel describe the assumed dynamic range in $x$ and $y$ directions respectively.
+    }
     \label{fig:gp_samples}
 \end{figure}
 
@@ -390,7 +398,7 @@ The vector of all hyperparameters in a model is called $\mat{\theta}$.
 The hyperparameters of the RBF kernel describe the expected dynamic range of the function.
 The signal variance $\sigma_f^2$ specifies the average distance of function values from the mean function.
 The different length scale parameters $l_i$ roughly specify the distance of data points along their respective axis required for the function values to change considerably.
-\Cref{fig:gp_samples} compares sample functions drawn from Gaussian processes with squared exponential kernels with different hyperparameters.
+\Cref{fig:gp_samples} compares sample functions drawn from Gaussian processes with the linear kernel and squared exponential kernels with different hyperparameters.
 
 These plots show continuous functions being drawn from their respective processes.
 It is however only possible to evaluate the Gaussian process at finitely many points and then connect the resulting samples.

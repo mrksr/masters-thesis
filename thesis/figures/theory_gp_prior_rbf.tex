@@ -1,0 +1,23 @@
+\documentclass[border=1cm]{standalone}
+\input{tikz_common.tex}
+\input{tikz_standalone.tex}
+
+\begin{document}
+\begin{tikzpicture}
+    \begin{axis} [
+            prior plot,
+        ]
+        \addplot[thin, tumblue, name path=c, domain=-2:2] {1};
+        \addplot[thin, tumblue, name path=d, domain=-2:2] {-1};
+        \addplot[tumblue!15] fill between[of=c and d, on layer={axis background}];
+        \addplot[very thick, tumblue, domain=-2:2] {0} node[right] {$\mu_f$};
+
+        \draw[decorate, decoration={brace, raise=1pt}, thick] (-2,0) -- node[left=2pt] {$\sigma_f$} (-2,1);
+        \draw[decorate, decoration={brace, mirror, raise=1pt}, thick] (0,-1) -- node[below=2pt] {$l$} (1,-1);
+
+        \addplot[prior sample, tumviolet] table[x=X, y=y] {\datapath/data/prior_rbf_sample_0.dat};
+        \addplot[prior sample, tumorange] table[x=X, y=y] {\datapath/data/prior_rbf_sample_1.dat};
+        \addplot[prior sample, tumgreen] table[x=X, y=y] {\datapath/data/prior_rbf_sample_2.dat};
+    \end{axis}
+\end{tikzpicture}
+\end{document}
