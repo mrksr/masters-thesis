@@ -108,7 +108,7 @@ These data sets are then used to train the Gaussian processes used by PSO-P.
 \begin{figure}[p]
     \centering
     \includegraphics{data_set_positions.png}
-    \caption{Positional Plot of a few Episodes}
+    \caption{MISSING: Positional Plot of a few Episodes}
     \label{fig:data_set_plot}
 \end{figure}
 The bicycle benchmark's dynamics are introduced in \cref{cha:the_bicycle_benchmark} by defining the derivatives of the state variables and choosing values for the relevant constants in \cref{tab:bicycle_constants}.
@@ -142,7 +142,7 @@ Instead, this thesis chooses an uninformed controller which applies random actio
         \caption{Omega-Plot for one episode}
         \label{fig:data_set_properties:omega_example}
     \end{subfigure}
-    \caption{Data Set properties}
+    \caption{MISSING: Data Set properties}
     \label{fig:data_set_properties}
 \end{figure}
 \Cref{alg:bicycle_transitions,alg:bicycle_trajectories,alg:bicycle_data_set} describe how data sets were created for the experiments.
@@ -397,7 +397,7 @@ A Gaussian distribution's density function has a unique maximum at the mean.
 \begin{figure}[t]
     \centering
     \includegraphics[height=.55\textheight]{map_predictions.png}
-    \caption{MAP predictions}
+    \caption{MISSING: MAP predictions}
     \label{fig:map_predictions}
 \end{figure}
 The transition model is trained using observations in $\Es$ and is unaware of terminal states.
@@ -507,19 +507,19 @@ In order to compare different implementations of the action value function $\AVl
 \begin{figure}[tp]
     \centering
     \includegraphics[height=.35\textheight]{map_goal_percentage.png}
-    \caption{MAP results, M vs mean-mean-reward or goal-percentage}
+    \caption{MISSING: MAP results, M vs mean-mean-reward or goal-percentage}
     \label{fig:map_results}
 \end{figure}
 \begin{figure}[tp]
     \centering
     \includegraphics[height=.35\textheight]{map_single_trajectory.png}
-    \caption{Single successful MAP trajectory, all variables}
+    \caption{MISSING: Single successful MAP trajectory, all variables}
     \label{fig:map_successful_trajectory}
 \end{figure}
 \begin{figure}[p]
     \centering
     \includegraphics{positions_2.png}
-    \caption{Multiple MAP trajectories, X-Y-Plot}
+    \caption{MISSING: Multiple MAP trajectories, X-Y-Plot}
     \label{fig:map_trajectories}
 \end{figure}
 \Cref{fig:map_successful_trajectory} shows an example of a successful trajectory generated using PSO-P on the maximum-a-posteriori action value function $\map{\AVlu}$ derived in \cref{eq:map_action_value_function}.
@@ -699,19 +699,19 @@ Using the one-step uncertainties, the action value function can therefore be cal
 \begin{figure}[tp]
     \centering
     \includegraphics[height=.35\textheight]{os_goal_percentage.png}
-    \caption{OS and MAP results, M vs mean-mean-reward or goal-percentage}
+    \caption{MISSING: OS and MAP results, M vs mean-mean-reward or goal-percentage}
     \label{fig:os_results}
 \end{figure}
 \begin{figure}[tp]
     \centering
     \missingfigure[figheight=.35\textheight]{OS uncertainties}
-    \caption{Some visualization of the OS uncertainties}
+    \caption{MISSING: Some visualization of the OS uncertainties}
     \label{fig:os_uncertainties}
 \end{figure}
 \begin{figure}[p]
     \centering
     \includegraphics{positions_3.png}
-    \caption{Multiple OS trajectories, X-Y-Plot}
+    \caption{MISSING: Multiple OS trajectories, X-Y-Plot}
     \label{fig:os_trajectories}
 \end{figure}
 \Cref{fig:os_trajectories} shows a number of trajectories generated with PSO-P applied to the one-step action value function $\os{\AVlu}$.
@@ -764,7 +764,7 @@ In both cases, the state was again assumed to be deterministic for the timestep 
 \begin{figure}[t]
     \centering
     \missingfigure[figheight=.4\textheight]{Linearization Visualization}
-    \caption{Linearization Visualization}
+    \caption{MISSING: Linearization Visualization}
     \label{fig:linearization}
 \end{figure}
 Now assume the state $\rv{s_t} \sim \Gaussian{\mat{\mu_t}, \mat{\Sigma_t}}$ is already uncertain.
@@ -907,7 +907,7 @@ With multi-step uncertainties it is no longer necessary to fall back to determin
 \begin{figure}[t]
     \centering
     \includegraphics[height=.55\textheight]{ms_predictions.png}
-    \caption{Multi-Step predictions}
+    \caption{MISSING: Multi-Step predictions}
     \label{fig:ms_predictions}
 \end{figure}
 \Cref{fig:ms_predictions} shows an example for long-term predictions using multi-step uncertainties.
@@ -946,7 +946,7 @@ For any state $\mat{s_t}$ in the set of terminal states $\Tee$, the successive s
 \begin{figure}[t]
     \centering
     \includegraphics[height=.55\textheight]{tg_predictions.png}
-    \caption{Multi-Step predictions with truncation}
+    \caption{MISSING: Multi-Step predictions with truncation}
     \label{fig:ms_truncation_predictions}
 \end{figure}
 In the action value function, this is reflected by the accumulative probabilities $\Prob{\PGoal}$ and $\Prob{\PFallen}$.
@@ -986,25 +986,25 @@ The multi-step uncertainties without the truncation of Gaussians therefore overe
 \begin{figure}[p]
     \centering
     \includegraphics[height=.35\textheight]{ms_goal_percentage.png}
-    \caption{Multi-Step results, M vs mean-mean-reward or goal-percentage}
+    \caption{MISSING: Multi-Step results, M vs mean-mean-reward or goal-percentage}
     \label{fig:ms_results}
 \end{figure}
 \begin{figure}[p]
     \centering
     \includegraphics[height=.35\textheight]{ms_single_trajectory.png}
-    \caption{Single successful Multi-Step trajectory, all variables}
+    \caption{MISSING: Single successful Multi-Step trajectory, all variables}
     \label{fig:ms_successful_trajectory}
 \end{figure}
 \begin{figure}[p]
     \centering
     \includegraphics{positions_0.png}
-    \caption{Multiple Multi-Step trajectories, X-Y-Plot}
+    \caption{MISSING: Multiple Multi-Step trajectories, X-Y-Plot}
     \label{fig:ms_trajectories}
 \end{figure}
 \begin{figure}[p]
     \centering
     \includegraphics{positions_1.png}
-    \caption{Multiple Multi-Step trajectories with truncation, X-Y-Plot}
+    \caption{MISSING: Multiple Multi-Step trajectories with truncation, X-Y-Plot}
     \label{fig:ms_truncation_trajectories}
 \end{figure}
 \Cref{fig:ms_trajectories,fig:ms_truncation_trajectories} show trajectories generated by applying PSO-P to the one-step value functions $\ms{\AVlu}_{\mat{s_0}}$ and $\tg{\AVlu}_{\mat{s_0}}$ respectively.
@@ -1071,13 +1071,13 @@ In this setting, even small mistakes of the models cause the bicycle to fall dow
 \begin{figure}[tp]
     \centering
     \includegraphics[height=.35\textheight]{ms_goal_percentage.png}
-    \caption{Overall results, M vs mean-mean-reward}
+    \caption{MISSING: Overall results, M vs mean-mean-reward}
     \label{fig:results_mean_mean_reward}
 \end{figure}
 \begin{figure}[tp]
     \centering
     \includegraphics[height=.35\textheight]{ms_goal_percentage.png}
-    \caption{Overall results, M vs goal-percentage}
+    \caption{MISSING: Overall results, M vs goal-percentage}
     \label{fig:results_goal_percentage}
 \end{figure}
 \Cref{tab:evaluation_results} shows that multi-step uncertainties improve the overall success rate of PSO-P in the bicycle benchmark from about half the trajectories to about 75 percent.
