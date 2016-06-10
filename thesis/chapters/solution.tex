@@ -142,7 +142,7 @@ Instead, this thesis chooses an uninformed controller which applies random actio
         \caption{The variable $\omega$ for one episode}
         \label{fig:data_set_properties:omega_example}
     \end{subfigure}
-    \caption{
+    \caption[Data set properties]{
         \Cref{fig:data_set_properties:episode_length} shows the distribution of episode lengths in a typical training set.
         Most trajectories are between five and ten time steps long, with a clear peak at six steps.
         \Cref{fig:data_set_properties:omega_example} shows the development of the angle $\omega$ for an exceptionally long episode.
@@ -512,8 +512,11 @@ In order to compare different implementations of the action value function $\AVl
 \subsection{Results}
 \begin{figure}[tp]
     \centering
-    \includegraphics[height=.35\textheight]{map_goal_percentage.png}
-    \caption{MISSING: MAP results, M vs mean-mean-reward or goal-percentage}
+    \includestandalonewithpath{figures/solution_map_goal_percentage}
+    \caption[Results using MAP predictions]{
+        The success rate for different numbers of pseudo inputs with the standard error of the mean.
+        The performance of MAP predictions increases slightly with the number of pseudo inputs but always remains below 60 percent.
+    }
     \label{fig:map_results}
 \end{figure}
 \begin{figure}[tp]
@@ -704,8 +707,11 @@ Using the one-step uncertainties, the action value function can therefore be cal
 \subsection{Results}
 \begin{figure}[tp]
     \centering
-    \includegraphics[height=.35\textheight]{os_goal_percentage.png}
-    \caption{MISSING: OS and MAP results, M vs mean-mean-reward or goal-percentage}
+    \includestandalonewithpath{figures/solution_os_goal_percentage}
+    \caption[Results using one step uncertainties]{
+        The success rate for different numbers of pseudo inputs with the standard error of the mean.
+        Considering one step uncertainties increases the success rate by about 10 percent for all numbers of pseudo inputs.
+    }
     \label{fig:os_results}
 \end{figure}
 \begin{figure}[tp]
@@ -991,8 +997,12 @@ The multi-step uncertainties without the truncation of Gaussians therefore overe
 \subsection{Results}
 \begin{figure}[p]
     \centering
-    \includegraphics[height=.35\textheight]{ms_goal_percentage.png}
-    \caption{MISSING: Multi-Step results, M vs mean-mean-reward or goal-percentage}
+    \includestandalonewithpath{figures/solution_ms_goal_percentage}
+    \caption[Results using multi step uncertainties]{
+        The success rate for different numbers of pseudo inputs with the standard error of the mean.
+        Using multi step uncertainties without truncation considerably improves the performance for the less expressive models and always yields an increase of the success rate of at least 10 percent when compared to MAP predictions.
+        The performance of multi step uncertainties with truncation is comparable to MAP predictions.
+    }
     \label{fig:ms_results}
 \end{figure}
 \begin{figure}[p]
@@ -1076,15 +1086,25 @@ In this setting, even small mistakes of the models cause the bicycle to fall dow
 
 \begin{figure}[tp]
     \centering
-    \includegraphics[height=.35\textheight]{ms_goal_percentage.png}
-    \caption{MISSING: Overall results, M vs mean-mean-reward}
-    \label{fig:results_mean_mean_reward}
+    \includestandalonewithpath{figures/solution_results_goal_percentage}
+    \caption[Success rates of all approaches] {
+        The success rate for different numbers of pseudo inputs with the standard error of the mean.
+        Considering uncertainties during long-term planning can be beneficial.
+        Multi step uncertainties without truncation perform much better with less expressive models when compared to one step uncertainties.
+        For a larger number of pseudo inputs, the two approaches both perform about 10 percent better than MAP predictions.
+    }
+    \label{fig:results_goal_percentage}
 \end{figure}
 \begin{figure}[tp]
     \centering
-    \includegraphics[height=.35\textheight]{ms_goal_percentage.png}
-    \caption{MISSING: Overall results, M vs goal-percentage}
-    \label{fig:results_goal_percentage}
+    \includestandalonewithpath{figures/solution_results_mean_mean_reward}
+    \caption[Mean mean rewards of all approaches]{
+        The mean mean reward for different numbers of pseudo inputs with the standard error of the prediction.
+        The results of the mean mean reward metric are comparable to the success rate.
+        While multi step uncertainties with truncation performs about as good as MAP predictions, both one step and multi step uncertainties without truncation perform considerably better.
+        Considering uncertainties is more beneficial for less expressive models.
+    }
+    \label{fig:results_mean_mean_reward}
 \end{figure}
 \Cref{tab:evaluation_results} shows that multi-step uncertainties improve the overall success rate of PSO-P in the bicycle benchmark from about half the trajectories to about 75 percent.
 However, the results when using the truncation of Gaussians are comparable with only using MAP-predictions.

@@ -1,0 +1,14 @@
+\documentclass[border=1cm]{standalone}
+\input{tikz_common.tex}
+\input{tikz_standalone.tex}
+
+\begin{document}
+\begin{tikzpicture}
+    \begin{axis} [
+            goal percentage plot,
+        ]
+
+        \goalpercentageline{means only}{means_only}{MAP}{triangle*}
+    \end{axis}
+\end{tikzpicture}
+\end{document}

@@ -109,6 +109,98 @@
     y unit={\radian\per\second},
 }}
 
+\pgfplotsset{reward plot/.style = {
+    default plot,
+    ymin=0.55,
+    ymax=1.4,
+    xmin=15,
+    xmax=155,
+    % xtick={20,30,40,50,75,100,150},
+    xlabel={Pseudo Inputs},
+    ylabel={Mean Mean Reward},
+    legend pos=south east,
+}}
+\pgfplotsset{goal percentage plot/.style = {
+    default plot,
+    ymin=20,
+    ymax=100,
+    xmin=15,
+    xmax=155,
+    % xtick={20,30,40,50,75,100,150},
+    xlabel={Pseudo Inputs},
+    ylabel={Success Rate},
+    y unit={\percent},
+    legend pos=south east,
+}}
+\pgfplotsset{with error/.style = {
+    error bars/.cd, y dir=both, y explicit,
+}}
+
+\pgfplotsset{means only/.style = {
+    tumviolet
+}}
+\pgfplotsset{means only fill/.style = {
+    fill=tumviolet!15
+}}
+\pgfplotsset{one step/.style = {
+    tumgreen
+}}
+\pgfplotsset{one step fill/.style = {
+    fill=tumgreen!15
+}}
+\pgfplotsset{linearization/.style = {
+    tumblue
+}}
+\pgfplotsset{linearization fill/.style = {
+    fill=tumblue!15
+}}
+\pgfplotsset{truncation/.style = {
+    tumorange
+}}
+\pgfplotsset{truncation fill/.style = {
+    fill=tumorange!15
+}}
+
+\newcommand{\meanrewardline}[4]{
+    \addplot[
+        thick, #1,
+        mark=#4, mark size=1.25pt,
+        only marks,
+        with error,
+        ] table[
+        ignore chars={\#}, col sep=comma,
+        x=M, y=#2_reward, y error=#2_reward_sem
+    ] {\datapath/data/results_mean_mean_rewards.dat};
+    \addplot[forget plot, thin, opacity=0, name path=#1a] table[ignore chars={\#}, col sep=comma, x=M,
+        y expr={\thisrow{#2_reward} + \thisrow{#2_reward_sem}}
+    ] {\datapath/data/results_mean_mean_rewards.dat};
+    \addplot[forget plot, thin, opacity=0, name path=#1b] table[ignore chars={\#}, col sep=comma, x=M,
+        y expr={\thisrow{#2_reward} - \thisrow{#2_reward_sem}}
+    ] {\datapath/data/results_mean_mean_rewards.dat};
+    \addplot[forget plot, #1, opacity=0.15] fill between[of=#1a and #1b, on layer={axis background}];
+    \addlegendentry{#3}
+}
+
+\newcommand{\goalpercentageline}[4]{
+    \addplot[
+        thick, #1,
+        mark=#4, mark size=1.25pt,
+        only marks,
+        with error,
+        ] table[
+        ignore chars={\#}, col sep=comma,
+        x=M, y=#2_percentage, y error=#2_percentage_sem
+    ] {\datapath/data/results_goal_percentage.dat};
+    \addplot[forget plot, thin, opacity=0, name path=#1a] table[ignore chars={\#}, col sep=comma, x=M,
+        y expr={\thisrow{#2_percentage} + \thisrow{#2_percentage_sem}}
+    ] {\datapath/data/results_goal_percentage.dat};
+    \addplot[forget plot, thin, opacity=0, name path=#1b] table[ignore chars={\#}, col sep=comma, x=M,
+        y expr={\thisrow{#2_percentage} - \thisrow{#2_percentage_sem}}
+    ] {\datapath/data/results_goal_percentage.dat};
+    \addplot[forget plot, #1, opacity=0.15] fill between[of=#1a and #1b, on layer={axis background}];
+    \addlegendentry{#3}
+}
+
 % See
 % https://tex.stackexchange.com/a/21759/34265
 \tikzset{
