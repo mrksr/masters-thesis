@@ -1,0 +1,19 @@
+\documentclass[border=1cm]{standalone}
+\input{tikz_common.tex}
+\input{tikz_standalone.tex}
+
+\begin{document}
+\begin{tikzpicture}
+    \begin{axis} [
+            spgp plot,
+            clip mode=individual, % markers behind lines
+        ]
+        \addplot[mark=x, only marks] table[x=X, y=y] {\datapath/data/spgp_data.dat};
+
+        \addplot[thin, tumblue, name path=c, restrict x to domain=-5:5] table[x=X, y expr=\thisrow{y} + 2 * \thisrow{y_std}] {\datapath/data/spgp_full.dat};
+        \addplot[thin, tumblue, name path=d, restrict x to domain=-5:5] table[x=X, y expr=\thisrow{y} - 2 * \thisrow{y_std}] {\datapath/data/spgp_full.dat};
+        \addplot[tumblue!15] fill between[of=c and d, on layer={axis background}];
+        \addplot[very thick, tumblue] table[x=X, y=y] {\datapath/data/spgp_full.dat};
+    \end{axis}
+\end{tikzpicture}
+\end{document}

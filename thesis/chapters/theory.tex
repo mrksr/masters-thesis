@@ -647,17 +647,23 @@ This observation directly yields the SPGP predictive posterior using \cref{lem:g
     \centering
     \begin{subfigure}{\subfigurewidth}
         \centering
-        \missingfigure[figheight=.3\textheight]{GP on some Data}
-        \caption{GP on some Data}
+        \includestandalonewithpath{figures/theory_spgp_full}
+        \caption{Full GP}
         \label{fig:spgp_example:gp}
     \end{subfigure}
     \begin{subfigure}{\subfigurewidth}
         \centering
-        \missingfigure[figheight=.3\textheight]{SPGP on some Data}
-        \caption{SPGP on some Data}
+        \includestandalonewithpath{figures/theory_spgp_sparse}
+        \caption{SPGP}
         \label{fig:spgp_example:spgp}
     \end{subfigure}
-    \caption{MISSING: GP vs. SPGP}
+    \caption{
+        The black crosses signify data sample from a noise sine function.
+        \Cref{fig:spgp_example:gp} shows a full GP trained on the complete data.
+        \Cref{fig:spgp_example:spgp} shows an SPGP with pseudo inputs located at the dart positions.
+        Since the pseudo function values are marginalized, only their $x$-coordinate is meaningful.
+        Three pseudo inputs are enough to approximate the full GP with reasonable accuracy.
+    }
     \label{fig:spgp_example}
 \end{figure}
 
