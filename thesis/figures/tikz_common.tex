@@ -11,6 +11,7 @@
 \usetikzlibrary{shapes.multipart}
 
 \usepgfplotslibrary{fillbetween}
+\usepgfplotslibrary{units}
 
 \tikzstyle{very small node} = [draw, circle, fill=tumblue!15, thick, minimum size=3pt, inner sep=0pt]
 \tikzstyle{data point} = [very small node]
@@ -25,42 +26,87 @@
 \tikzstyle{marked node} = [very thick, draw=tumred, fill=tumred!15]
 \tikzstyle{every text node part} = [align=center, execute at begin node=\setlength{\baselineskip}{2ex}]
 
+\pgfplotsset{unit code/.code 2 args={\si{#1#2}}}
 \pgfplotsset{every plot/.append style={smooth}}
 \pgfplotsset{default plot/.style = {
     grid=major,
     minor y tick num=1,
     minor x tick num=1,
 }}
-\pgfplotsset{prior plot/.style = {
+\pgfplotsset{narrow plot/.style = {
     default plot,
+    width=220pt,
+    height=207pt,
+}}
+\pgfplotsset{very narrow plot/.style = {
+    default plot,
+    width=200pt,
+    height=207pt,
+}}
+\pgfplotsset{prior plot/.style = {
+    narrow plot,
     ymin=-2.5,
     ymax=2.5,
     xmin=-2.5,
     xmax=2.5,
-    width=220pt,
-    height=207pt,
 }}
 \pgfplotsset{prior sample/.style = {
     semithick,
     densely dashed
 }}
 \pgfplotsset{posterior plot/.style = {
-    default plot,
+    narrow plot,
     ymin=-6.5,
     ymax=6.5,
     xmin=-5,
     xmax=5,
-    width=220pt,
-    height=207pt,
 }}
 \pgfplotsset{spgp plot/.style = {
-    default plot,
+    narrow plot,
     ymin=-1.5,
     ymax=1.5,
     xmin=-4.5,
     xmax=4.5,
-    width=220pt,
-    height=207pt,
+}}
+
+\pgfplotsset{bicycle/.style = {
+    thick,
+    tumblue,
+    smooth,
+}}
+\pgfplotsset{omega plot/.style = {
+    ymin=-0.24,
+    ymax=0.24,
+    ytick={-0.20943, 0, 0.20943},
+    yticklabels={-$\frac{\pi}{15}$, $0$, $\frac{\pi}{15}$},
+    xlabel={Timestep},
+    ylabel={$\omega$},
+    y unit={\radian},
+}}
+\pgfplotsset{omega dot plot/.style = {
+    ymin=-0.24,
+    ymax=0.24,
+    ytick={-10, 0, 10},
+    xlabel={Timestep},
+    ylabel={$\dot{\omega}$},
+    y unit={\radian\per\second},
+}}
+\pgfplotsset{theta plot/.style = {
+    ymin=-0.24,
+    ymax=0.24,
+    ytick={-1.5708, 0, 1.5708},
+    yticklabels={-$\frac{\pi}{2}$, $0$, $\frac{\pi}{2}$},
+    xlabel={Timestep},
+    ylabel={$\theta$},
+    y unit={\radian},
+}}
+\pgfplotsset{theta dot plot/.style = {
+    ymin=-0.24,
+    ymax=0.24,
+    ytick={-10, 0, 10},
+    xlabel={Timestep},
+    ylabel={$\dot{\theta}$},
+    y unit={\radian\per\second},
 }}
 
 % See

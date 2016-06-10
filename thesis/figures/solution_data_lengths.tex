@@ -1,0 +1,19 @@
+\documentclass[border=1cm]{standalone}
+\input{tikz_common.tex}
+\input{tikz_standalone.tex}
+
+\begin{document}
+\begin{tikzpicture}
+    \begin{axis} [
+            very narrow plot,
+            xmin=0,
+            xmax=25,
+            ymin=0,
+            bar width=5pt,
+            xlabel={Episode length},
+            ylabel={Number of Episodes},
+        ]
+        \addplot[tumblue, fill=tumblue!15, ybar] table[ignore chars={\#}, col sep=comma, x index=0, y index=1] {\datapath/data/solution_data_lengths.dat};
+    \end{axis}
+\end{tikzpicture}
+\end{document}

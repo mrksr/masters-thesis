@@ -132,17 +132,23 @@ Instead, this thesis chooses an uninformed controller which applies random actio
     \centering
     \begin{subfigure}{\subfigurewidth}
         \centering
-        \includegraphics[height=.35\textheight]{data_set_length_histogram.png}
-        \caption{Length of Episodes}
+        \includestandalonewithpath{figures/solution_data_lengths}
+        \caption{Histogram of episode lengths}
         \label{fig:data_set_properties:episode_length}
     \end{subfigure}
     \begin{subfigure}{\subfigurewidth}
         \centering
-        \includegraphics[height=.35\textheight]{data_set_omega_plot.png}
-        \caption{Omega-Plot for one episode}
+        \includestandalonewithpath{figures/solution_data_omega}
+        \caption{The variable $\omega$ for one episode}
         \label{fig:data_set_properties:omega_example}
     \end{subfigure}
-    \caption{MISSING: Data Set properties}
+    \caption{
+        \Cref{fig:data_set_properties:episode_length} shows the distribution of episode lengths in a typical training set.
+        Most trajectories are between five and ten time steps long, with a clear peak at six steps.
+        \Cref{fig:data_set_properties:omega_example} shows the development of the angle $\omega$ for an exceptionally long episode.
+        Even for long episodes, the bicycle quickly starts leaning towards one side and does not recover.
+        The last value of $\omega$ is in the valid range of values, since the last transition which results in a terminal state is not par of the training set.
+    }
     \label{fig:data_set_properties}
 \end{figure}
 \Cref{alg:bicycle_transitions,alg:bicycle_trajectories,alg:bicycle_data_set} describe how data sets were created for the experiments.
