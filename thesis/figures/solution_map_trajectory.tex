@@ -1,0 +1,72 @@
+\documentclass[border=1cm]{standalone}
+\input{tikz_common.tex}
+\input{tikz_standalone.tex}
+
+\begin{document}
+\begin{tikzpicture}
+    \begin{axis} [
+            very narrow plot,
+            theta plot,
+            shift={(-16cm, 0)},
+        ]
+        \addplot[bicycle, means only] table[ignore chars={\#}, col sep=space, x expr=\coordindex, y=theta]
+            {\datapath/data/solution_trajectory_means_only.xa};
+    \end{axis}
+    \begin{axis} [
+            very narrow plot,
+            theta dot plot,
+            shift={(-8cm, 0)},
+        ]
+        \addplot[bicycle, means only] table[ignore chars={\#}, col sep=space, x expr=\coordindex, y=theta_dot]
+            {\datapath/data/solution_trajectory_means_only.xa};
+    \end{axis}
+    \begin{axis} [
+            very narrow plot,
+            omega plot,
+        ]
+        \addplot[bicycle, means only] table[ignore chars={\#}, col sep=space, x expr=\coordindex, y=omega]
+            {\datapath/data/solution_trajectory_means_only.xa};
+    \end{axis}
+    \begin{axis} [
+            very narrow plot,
+            omega dot plot,
+            shift={(8cm, 0)},
+        ]
+        \addplot[bicycle, means only] table[ignore chars={\#}, col sep=space, x expr=\coordindex, y=omega_dot]
+            {\datapath/data/solution_trajectory_means_only.xa};
+    \end{axis}
+
+    \begin{axis} [
+            very narrow plot,
+            theta plot,
+            shift={(-16cm, 8cm)},
+        ]
+        \addplot[bicycle, linearization] table[ignore chars={\#}, col sep=space, x expr=\coordindex, y=theta]
+            {\datapath/data/solution_trajectory_linearization.xa};
+    \end{axis}
+    \begin{axis} [
+            very narrow plot,
+            theta dot plot,
+            shift={(-8cm, 8cm)},
+        ]
+        \addplot[bicycle, linearization] table[ignore chars={\#}, col sep=space, x expr=\coordindex, y=theta_dot]
+            {\datapath/data/solution_trajectory_linearization.xa};
+    \end{axis}
+    \begin{axis} [
+            very narrow plot,
+            omega plot,
+            shift={(0, 8cm)},
+        ]
+        \addplot[bicycle, linearization] table[ignore chars={\#}, col sep=space, x expr=\coordindex, y=omega]
+            {\datapath/data/solution_trajectory_linearization.xa};
+    \end{axis}
+    \begin{axis} [
+            very narrow plot,
+            omega dot plot,
+            shift={(8cm, 8cm)},
+        ]
+        \addplot[bicycle, linearization] table[ignore chars={\#}, col sep=space, x expr=\coordindex, y=omega_dot]
+            {\datapath/data/solution_trajectory_linearization.xa};
+    \end{axis}
+\end{tikzpicture}
+\end{document}

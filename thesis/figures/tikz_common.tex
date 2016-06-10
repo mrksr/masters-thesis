@@ -74,39 +74,62 @@
     tumblue,
     smooth,
 }}
+\pgfplotsset{xy trajectory/.style = {
+    very thick,
+    smooth,
+}}
+\pgfplotsset{success/.style = {
+    tumgreen
+}}
+\pgfplotsset{fail/.style = {
+    tumred
+}}
+
 \pgfplotsset{omega plot/.style = {
     ymin=-0.24,
     ymax=0.24,
-    ytick={-0.20943, 0, 0.20943},
-    yticklabels={-$\frac{\pi}{15}$, $0$, $\frac{\pi}{15}$},
+    ytick={-0.20943, -0.1047, 0, 0.1047, 0.20943},
+    yticklabels={-$\frac{\pi}{15}$, -$\frac{\pi}{30}$, $0$, $\frac{\pi}{30}$, $\frac{\pi}{15}$},
     xlabel={Timestep},
     ylabel={$\omega$},
     y unit={\radian},
 }}
 \pgfplotsset{omega dot plot/.style = {
-    ymin=-0.24,
-    ymax=0.24,
-    ytick={-10, 0, 10},
+    ymin=-4.5,
+    ymax=4.5,
     xlabel={Timestep},
     ylabel={$\dot{\omega}$},
     y unit={\radian\per\second},
 }}
 \pgfplotsset{theta plot/.style = {
-    ymin=-0.24,
-    ymax=0.24,
-    ytick={-1.5708, 0, 1.5708},
-    yticklabels={-$\frac{\pi}{2}$, $0$, $\frac{\pi}{2}$},
+    ymin=-0.6,
+    ymax=0.6,
+    ytick={-0.5236, -0.2618, 0, 0.2618, 0.5236},
+    yticklabels={-$\frac{\pi}{6}$, -$\frac{\pi}{12}$, $0$, $\frac{\pi}{12}$, $\frac{\pi}{6}$},
     xlabel={Timestep},
     ylabel={$\theta$},
     y unit={\radian},
 }}
 \pgfplotsset{theta dot plot/.style = {
-    ymin=-0.24,
-    ymax=0.24,
-    ytick={-10, 0, 10},
+    ymin=-6.5,
+    ymax=6.5,
     xlabel={Timestep},
     ylabel={$\dot{\theta}$},
     y unit={\radian\per\second},
+}}
+
+\pgfplotsset{xy plot/.style = {
+    default plot,
+    width=360pt,
+    height=360pt,
+    xmin=-26,
+    xmax=26,
+    ymin=-26,
+    ymax=26,
+    xlabel={$x$ Position},
+    x unit={\meter},
+    ylabel={$y$ Position},
+    y unit={\meter},
 }}
 
 \pgfplotsset{reward plot/.style = {
@@ -199,6 +222,22 @@
     ] {\datapath/data/results_goal_percentage.dat};
     \addplot[forget plot, #1, opacity=0.15] fill between[of=#1a and #1b, on layer={axis background}];
     \addlegendentry{#3}
+}
+
+\newcommand{\xytrajectory}[2]{
+    \addplot[xy trajectory, #2] table[
+        ignore chars={\#}, col sep=space,
+        x expr={(\thisrow{next_r_zero}) * cos(\thisrow{next_psi_zero} r)},
+        y expr={(\thisrow{next_r_zero}) * sin(\thisrow{next_psi_zero} r)},
+    ] {\datapath/data/solution_xy_trajectories_#1.xa};
+}
+\newcommand{\goalarea}{
+    \draw[draw=tumblue, fill=tumblue!15] \pgfextra{
+        \pgfpathellipse{\pgfplotspointaxisxy{0}{0}}
+        {\pgfplotspointaxisdirectionxy{5}{0}}
+        {\pgfplotspointaxisdirectionxy{0}{5}}
+    };
+    \node[tumblue, font=\footnotesize] at (0, 0) {Goal};
 }
 
 % See
