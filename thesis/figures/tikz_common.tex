@@ -80,15 +80,13 @@
     smooth,
 }}
 \pgfplotsset{xy trajectory/.style = {
-    very thick,
+    ultra thick,
     smooth,
 }}
-\pgfplotsset{success/.style = {
-    tumgreen
-}}
-\pgfplotsset{fail/.style = {
-    tumred
-}}
+\tikzstyle{success} = [tumgreen]
+\tikzstyle{success node} = [fill=tumgreen!15]
+\tikzstyle{fail} = [tumred]
+\tikzstyle{fail node} = [fill=tumred!15, rectangle]
 
 \pgfplotsset{omega plot/.style = {
     ymin=-0.24,
@@ -304,7 +302,11 @@
         ignore chars={\#}, col sep=space,
         x expr={(\thisrow{next_r_zero}) * cos(\thisrow{next_psi_zero} r)},
         y expr={(\thisrow{next_r_zero}) * sin(\thisrow{next_psi_zero} r)},
-    ] {\datapath/data/solution_xy_trajectories_#1.xa};
+    ] {\datapath/data/solution_xy_trajectories_#1.xa}
+    % Starting state
+    node[pos=0, very small node, #2 node] {}
+    % Hacky way to make every trajectory just a little bit longer
+    node[pos=1, sloped, fill, inner sep=0, minimum width=1.6pt, minimum height=1.6pt] {};
 }
 \newcommand{\goalarea}{
     \draw[draw=tumblue, fill=tumblue!15] \pgfextra{

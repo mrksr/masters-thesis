@@ -1,0 +1,29 @@
+\documentclass[border=1cm]{standalone}
+\input{tikz_common.tex}
+\input{tikz_standalone.tex}
+
+\begin{document}
+\begin{tikzpicture}
+    \begin{axis} [
+            xy plot,
+        ]
+
+        \xytrajectory{one_step_0}{fail};
+        \xytrajectory{one_step_1}{fail};
+        \xytrajectory{one_step_2}{fail};
+        \xytrajectory{one_step_3}{success};
+        \xytrajectory{one_step_4}{fail};
+        \xytrajectory{one_step_5}{success};
+        \xytrajectory{one_step_6}{success};
+        \xytrajectory{one_step_7}{fail};
+        \xytrajectory{one_step_8}{success};
+        \xytrajectory{one_step_9}{success};
+        \xytrajectory{one_step_10}{fail};
+        \xytrajectory{one_step_11}{success};
+        \xytrajectory{one_step_12}{success};
+        \xytrajectory{one_step_13}{success};
+        \xytrajectory{one_step_14}{success};
+        \goalarea
+    \end{axis}
+\end{tikzpicture}
+\end{document}

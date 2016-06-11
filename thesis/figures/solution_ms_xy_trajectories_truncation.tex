@@ -1,0 +1,29 @@
+\documentclass[border=1cm]{standalone}
+\input{tikz_common.tex}
+\input{tikz_standalone.tex}
+
+\begin{document}
+\begin{tikzpicture}
+    \begin{axis} [
+            xy plot,
+        ]
+
+        \xytrajectory{truncation_0}{fail};
+        \xytrajectory{truncation_1}{success};
+        \xytrajectory{truncation_2}{success};
+        \xytrajectory{truncation_3}{fail};
+        \xytrajectory{truncation_4}{success};
+        \xytrajectory{truncation_5}{success};
+        \xytrajectory{truncation_6}{fail};
+        \xytrajectory{truncation_7}{success};
+        \xytrajectory{truncation_8}{success};
+        \xytrajectory{truncation_9}{fail};
+        \xytrajectory{truncation_10}{success};
+        \xytrajectory{truncation_11}{success};
+        \xytrajectory{truncation_12}{fail};
+        \xytrajectory{truncation_13}{success};
+        \xytrajectory{truncation_14}{success};
+        \goalarea
+    \end{axis}
+\end{tikzpicture}
+\end{document}
