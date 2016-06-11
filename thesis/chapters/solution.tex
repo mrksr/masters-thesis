@@ -733,8 +733,14 @@ Using the one-step uncertainties, the action value function can therefore be cal
 \end{figure}
 \begin{figure}[tp]
     \centering
-    \missingfigure[figheight=.35\textheight]{OS uncertainties}
-    \caption{MISSING: Some visualization of the OS uncertainties}
+    \includestandalonewithpath{figures/solution_os_uncertainties}
+    \caption[One step uncertainties]{
+        A visualization of the one step uncertainties.
+        Long term predictions using one step uncertainties do not accumulate uncertainties.
+        Instead, they are given by the predictive variance of the transition model for one specific step.
+        Since the transition models are very accurate for single steps, these uncertainties can only be seen in a plot when zoomed in.
+        The security margin induced by these uncertainties is therefore also very small.
+    }
     \label{fig:os_uncertainties}
 \end{figure}
 \begin{figure}[p]
