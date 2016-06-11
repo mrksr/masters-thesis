@@ -521,8 +521,13 @@ In order to compare different implementations of the action value function $\AVl
 \end{figure}
 \begin{figure}[tp]
     \centering
-    \includegraphics[height=.35\textheight]{map_single_trajectory.png}
-    \caption{MISSING: Single successful MAP trajectory, all variables}
+    \includestandalonewithpath{figures/solution_map_trajectory}
+    \caption[Successful MAP trajectory]{
+        A single successful MAP trajectory.
+        The bicycle starts at about 18 meters distance from the goal with an angle of about 90 degrees.
+        PSO-P starts by increasing both the distance and angle towards the goal in the first five time steps.
+        This allows the agent to make a more aggressive turn until time step 30, after which the bicycle is heading towards the goal in a mostly straight line.
+    }
     \label{fig:map_successful_trajectory}
 \end{figure}
 \begin{figure}[p]
@@ -995,7 +1000,7 @@ In contrast, the probabilities $\Prob{\ms{\rv{s_{t+1}}} \in \Goal}$ and $\Prob{\
 The multi-step uncertainties without the truncation of Gaussians therefore overestimate the terminal probabilities $\Prob{\PGoal_t}$ and $\Prob{\PFallen_t}$.
 
 \subsection{Results}
-\begin{figure}[p]
+\begin{figure}[tp]
     \centering
     \includestandalonewithpath{figures/solution_ms_goal_percentage}
     \caption[Results using multi step uncertainties]{
@@ -1007,8 +1012,13 @@ The multi-step uncertainties without the truncation of Gaussians therefore overe
 \end{figure}
 \begin{figure}[p]
     \centering
-    \includegraphics[height=.35\textheight]{ms_single_trajectory.png}
-    \caption{MISSING: Single successful Multi-Step trajectory, all variables}
+    \includestandalonewithpath{figures/solution_ms_trajectory_linearization}
+    \caption[Successful trajectory using multi step uncertainties]{
+        A single successful trajectory using multi step uncertainties.
+        Equivalently to the successful MAP trajectory in \cref{fig:map_successful_trajectory}, the bicycle starts at about 18 meters distance from the goal with an angle of about 90 degrees.
+        Similar to the first trajectory, PSO-P is first concerned with reducing the angle towards the goal in the first thirty time steps and then keeps driving towards the goal.
+        Using multi step uncertainties, instead of driving straight, the bicycle's trajectory describes a wave, with the controller always keeping the bicycle leaning towards one side.
+    }
     \label{fig:ms_successful_trajectory}
 \end{figure}
 \begin{figure}[p]
