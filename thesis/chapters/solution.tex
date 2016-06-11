@@ -107,8 +107,11 @@ These data sets are then used to train the Gaussian processes used by PSO-P.
 \end{algorithm}
 \begin{figure}[p]
     \centering
-    \includegraphics{data_set_positions.png}
-    \caption{MISSING: Positional Plot of a few Episodes}
+    \includestandalonewithpath{figures/solution_data_xy_trajectories}
+    \caption[Episodes in the training set]{
+        The $x$ and $y$ coordinates of the front tyre in representative episodes in the training set with marks at the starting states.
+        Since random actions cannot successfully balance the bicycle, episodes are fairly short and end with the bicycle falling over.
+    }
     \label{fig:data_set_plot}
 \end{figure}
 The bicycle benchmark's dynamics are introduced in \cref{cha:the_bicycle_benchmark} by defining the derivatives of the state variables and choosing values for the relevant constants in \cref{tab:bicycle_constants}.
@@ -532,8 +535,14 @@ In order to compare different implementations of the action value function $\AVl
 \end{figure}
 \begin{figure}[p]
     \centering
-    \includegraphics{positions_2.png}
-    \caption{MISSING: Multiple MAP trajectories, X-Y-Plot}
+    \includestandalonewithpath{figures/solution_map_xy_trajectories}
+    \caption[Episodes using MAP predictions]{
+        The $x$ and $y$ coordinates of the front tyre in representative episodes when using MAP predictions with marks at the starting states.
+        Successful episodes are colored in green and failed episodes are colored in red.
+        PSO-P tends to be successful for starting states which do not require a curve to reach the goal.
+        For other episodes, the policy usually fails during curved driving.
+        If successful, trajectories usually consist of one curve to orient the bicycle followed by a straight line towards the goal.
+    }
     \label{fig:map_trajectories}
 \end{figure}
 \Cref{fig:map_successful_trajectory} shows an example of a successful trajectory generated using PSO-P on the maximum-a-posteriori action value function $\map{\AVlu}$ derived in \cref{eq:map_action_value_function}.
@@ -727,8 +736,13 @@ Using the one-step uncertainties, the action value function can therefore be cal
 \end{figure}
 \begin{figure}[p]
     \centering
-    \includegraphics{positions_3.png}
-    \caption{MISSING: Multiple OS trajectories, X-Y-Plot}
+    \includestandalonewithpath{figures/solution_os_xy_trajectories}
+    \caption[Episodes using one step uncertainties]{
+        The $x$ and $y$ coordinates of the front tyre in representative episodes when using one step uncertainties with marks at the starting states.
+        Successful episodes are colored in green and failed episodes are colored in red.
+        When compared to MAP trajectories in \cref{fig:map_trajectories}, PSO-P generates very similar results.
+        However, considering one step uncertainties has a higher success rate when curved driving is needed.
+    }
     \label{fig:os_trajectories}
 \end{figure}
 \Cref{fig:os_trajectories} shows a number of trajectories generated with PSO-P applied to the one-step action value function $\os{\AVlu}$.
@@ -1023,14 +1037,23 @@ The multi-step uncertainties without the truncation of Gaussians therefore overe
 \end{figure}
 \begin{figure}[p]
     \centering
-    \includegraphics{positions_0.png}
-    \caption{MISSING: Multiple Multi-Step trajectories, X-Y-Plot}
+    \includestandalonewithpath{figures/solution_ms_xy_trajectories_linearization}
+    \caption[Episodes using multi step uncertainties without truncation]{
+        The $x$ and $y$ coordinates of the front tyre in representative episodes when using multi step uncertainties without truncation with marks at the starting states.
+        Successful episodes are colored in green and failed episodes are colored in red.
+        Considering multi step uncertainties can increase the success rate considerably.
+        However, instead of driving in relatively straight lines as in \cref{fig:map_trajectories,fig:os_trajectories}, the PSO-Policy favours wavy trajectories when considering multi step uncertainties.
+    }
     \label{fig:ms_trajectories}
 \end{figure}
 \begin{figure}[p]
     \centering
-    \includegraphics{positions_1.png}
-    \caption{MISSING: Multiple Multi-Step trajectories with truncation, X-Y-Plot}
+    \includestandalonewithpath{figures/solution_ms_xy_trajectories_truncation}
+    \caption[Episodes using multi step uncertainties with truncation]{
+        The $x$ and $y$ coordinates of the front tyre in representative episodes when using multi step uncertainties with truncation with marks at the starting states.
+        Successful episodes are colored in green and failed episodes are colored in red.
+        Trajectories generated when using the truncation of Gaussians look similar to the trajectories without truncation as showed in \cref{fig:ms_trajectories}, also describing waves.
+    }
     \label{fig:ms_truncation_trajectories}
 \end{figure}
 \Cref{fig:ms_trajectories,fig:ms_truncation_trajectories} show trajectories generated by applying PSO-P to the one-step value functions $\ms{\AVlu}_{\mat{s_0}}$ and $\tg{\AVlu}_{\mat{s_0}}$ respectively.
