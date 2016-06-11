@@ -405,8 +405,11 @@ A Gaussian distribution's density function has a unique maximum at the mean.
 
 \begin{figure}[t]
     \centering
-    \includegraphics[height=.55\textheight]{map_predictions.png}
-    \caption{MISSING: MAP predictions}
+    \includestandalonewithpath{figures/solution_map_predictions}
+    \caption[MAP long-term predictions]{
+        Colored long-term predictions for one time horizon using MAP estimates and starting from a deterministic state compared to the dashed simulation.
+        After about half the time horizon, iterating MAP-prediction produces considerable errors.
+    }
     \label{fig:map_predictions}
 \end{figure}
 The transition model is trained using observations in $\Es$ and is unaware of terminal states.
@@ -424,7 +427,7 @@ Since states at all time steps are deterministic, terminal states can easily be 
 \end{align}
 where the expected value of $f(\mat{s_t}, \mat{a_t})$ can directly be computed using \cref{lem:gp_posterior}.
 Given a time horizon $T$, a starting state $\mat{s_0}$ and a vector of actions $(\mat{a_0}, \dots, \mat{a_{T-1}})$, this function can be used to calculate the intermediate states $\map{\mat{s_1}}$ to $\map{\mat{s_T}}$ using dynamic programming.
-\Cref{fig:map_predictions} compares these iterated MAP-predictions with the correct evolution of the bicycle system in an example.
+\Cref{fig:map_predictions} \todo{mention that we only show internal variables} compares these iterated MAP-predictions with the correct evolution of the bicycle system in an example.
 
 With these intermediate states and the reward function $\RwdBicycle$ from \cref{sub:reward_function}, it is possible to evaluate the action value function $\AVlu$ defined in \cref{eq:action_value_function} and therefore apply PSO-P to the bicycle system.
 Using the MAP-estimates for intermediate states, the action value function can be calculated as
@@ -516,9 +519,9 @@ In order to compare different implementations of the action value function $\AVl
 \begin{figure}[tp]
     \centering
     \includestandalonewithpath{figures/solution_map_goal_percentage}
-    \caption[Results using MAP predictions]{
+    \caption[Results using MAP-predictions]{
         The success rate for different numbers of pseudo inputs with the standard error of the mean.
-        The performance of MAP predictions increases slightly with the number of pseudo inputs but always remains below 60 percent.
+        The performance of MAP-predictions increases slightly with the number of pseudo inputs but always remains below 60 percent.
     }
     \label{fig:map_results}
 \end{figure}
@@ -536,8 +539,8 @@ In order to compare different implementations of the action value function $\AVl
 \begin{figure}[p]
     \centering
     \includestandalonewithpath{figures/solution_map_xy_trajectories}
-    \caption[Episodes using MAP predictions]{
-        The $x$ and $y$ coordinates of the front tyre in representative episodes when using MAP predictions with marks at the starting states.
+    \caption[Episodes using MAP-predictions]{
+        The $x$ and $y$ coordinates of the front tyre in representative episodes when using MAP-predictions with marks at the starting states.
         Successful episodes are colored in green and failed episodes are colored in red.
         PSO-P tends to be successful for starting states which do not require a curve to reach the goal.
         For other episodes, the policy usually fails during curved driving.
@@ -561,12 +564,12 @@ Minimal errors in the predictions of the models when the cyclist is leaning clos
 Therefore, most trajectories fail while driving a curve.
 If a trajectory starts at a state which does not require a tight curve, PSO-P can often reach the goal, since it can very effectively solve the balancing problem in non-extreme states and drive straight.
 
-While \cref{fig:map_successful_trajectory,fig:map_trajectories} are based on a single transition model and give an idea about the performance of PSO-P using MAP predictions, statistically significant results can be obtained using the multiple iterations of the evaluation algorithm with different data sets and transition models.
+While \cref{fig:map_successful_trajectory,fig:map_trajectories} are based on a single transition model and give an idea about the performance of PSO-P using MAP-predictions, statistically significant results can be obtained using the multiple iterations of the evaluation algorithm with different data sets and transition models.
 \Cref{fig:map_results} shows the percentage of trajectories which reach the goal plotted against the number of pseudo inputs.
 The more expressive the model, the more successful PSO-P with MAP-predictions becomes, but overall, about half of the trajectories trajectories end in failure.
 
 In order to reduce the aggressiveness with which PSO-P exploits the model, the uncertainty measure provided by the Gaussian processes are going to be integrated into the action value function.
-If the model predicts that with a large probability, the true system dynamics lead to failure, even if the MAP prediction might still be a valid state, PSO-P should choose a less extreme action.
+If the model predicts that with a large probability, the true system dynamics lead to failure, even if the MAP-prediction might still be a valid state, PSO-P should choose a less extreme action.
 The following section introduces how the reward function can be extended to beliefs about states and uses the uncertainty predicted by the transition model during planning without propagating it through multiple time steps.
 
 \section{Predictions with One-Step Uncertainties}
@@ -584,7 +587,7 @@ After defining how to calculate the intermediate state distributions using one-s
 
 \subsection{Long-Term predictions}
 \label{sub:os_predictions}
-Similar to the MAP predictions defined in \cref{sub:map_predictions}, long-term predictions with one-step uncertainties are based on iterating the transition model using the means of the predicted Gaussian distributions.
+Similar to the MAP-predictions defined in \cref{sub:map_predictions}, long-term predictions with one-step uncertainties are based on iterating the transition model using the means of the predicted Gaussian distributions.
 The intermediate states are no longer assumed to be deterministic however.
 They are random variables with the distribution returned by the transition model.
 The function mapping a pair of a state distribution $\mat{s_t}$ and an action $\mat{a_t}$ to the successive state distribution $\mat{s_{t+1}}$ is given by
@@ -937,15 +940,18 @@ With multi-step uncertainties it is no longer necessary to fall back to determin
 
 \begin{figure}[t]
     \centering
-    \includegraphics[height=.55\textheight]{ms_predictions.png}
-    \caption{MISSING: Multi-Step predictions}
+    \includestandalonewithpath{figures/solution_ms_predictions_linearization}
+    \caption[Long-term predictions using multi step uncertainties]{
+        Colored long-term predictions for one time horizon using multi step uncertainties and starting from a deterministic state compared to the dashed simulation.
+        Considering multi-step uncertainties yields the shaded measure of confidence, which in this case correctly identifies that the predictive error increases after about half the time horizon.
+    }
     \label{fig:ms_predictions}
 \end{figure}
 \Cref{fig:ms_predictions} shows an example for long-term predictions using multi-step uncertainties.
 As with the other approaches presented in this thesis, all intermediate states $\ms{\rv{s_1}}$ to $\ms{\rv{s_T}}$ can be calculated using dynamic programming.
 In contrast to the one-step uncertainties presented in \cref{fig:os_uncertainties}, the state distributions obtained using linearization quite accurately estimate the predictive error.
 The uncertainties reach the same order of magnitude as the dynamic range of their variable and become visible in the plot after a few time steps.
-After about \todo{Fix this number} ten time steps, the uncertainties about $\omega$ grow and two standard deviations cover most of the value range.
+After about seven time steps, the uncertainties about $\omega$ grow and two standard deviations cover most of the value range.
 At this point, the model's predictions can be interpreted as almost complete uncertainty about the correct state.
 At the same time however, the predictive mean is no longer close to the correct trajectory.
 The model correctly identifies the decline in accuracy of its predictions.
@@ -976,8 +982,12 @@ For any state $\mat{s_t}$ in the set of terminal states $\Tee$, the successive s
 
 \begin{figure}[t]
     \centering
-    \includegraphics[height=.55\textheight]{tg_predictions.png}
-    \caption{MISSING: Multi-Step predictions with truncation}
+    \includestandalonewithpath{figures/solution_ms_predictions_truncation}
+    \caption[Long-term predictions using multi step uncertainties with truncation]{
+        Colored long-term predictions for one time horizon using multi step uncertainties with truncation and starting from a deterministic state compared to the dashed simulation.
+        While the amount of probability mass spread over terminal states is negligible, the predictions using the truncation of Gaussians is almost equal to using only linearization as shown in \cref{fig:ms_predictions}.
+        However, for the last time steps, truncating the terminal regions of $\omega$ yields more correct predictions.
+    }
     \label{fig:ms_truncation_predictions}
 \end{figure}
 In the action value function, this is reflected by the accumulative probabilities $\Prob{\PGoal}$ and $\Prob{\PFallen}$.
@@ -1019,8 +1029,8 @@ The multi-step uncertainties without the truncation of Gaussians therefore overe
     \includestandalonewithpath{figures/solution_ms_goal_percentage}
     \caption[Results using multi step uncertainties]{
         The success rate for different numbers of pseudo inputs with the standard error of the mean.
-        Using multi step uncertainties without truncation considerably improves the performance for the less expressive models and always yields an increase of the success rate of at least 10 percent when compared to MAP predictions.
-        The performance of multi step uncertainties with truncation is comparable to MAP predictions.
+        Using multi step uncertainties without truncation considerably improves the performance for the less expressive models and always yields an increase of the success rate of at least 10 percent when compared to MAP-predictions.
+        The performance of multi step uncertainties with truncation is comparable to MAP-predictions.
     }
     \label{fig:ms_results}
 \end{figure}
@@ -1041,7 +1051,7 @@ The multi-step uncertainties without the truncation of Gaussians therefore overe
     \caption[Episodes using multi step uncertainties without truncation]{
         The $x$ and $y$ coordinates of the front tyre in representative episodes when using multi step uncertainties without truncation with marks at the starting states.
         Successful episodes are colored in green and failed episodes are colored in red.
-        Considering multi step uncertainties can increase the success rate considerably.
+        Incorporating multi step uncertainties can increase the success rate considerably.
         However, instead of driving in relatively straight lines as in \cref{fig:map_trajectories,fig:os_trajectories}, the PSO-Policy favours wavy trajectories when considering multi step uncertainties.
     }
     \label{fig:ms_trajectories}
@@ -1124,7 +1134,7 @@ In this setting, even small mistakes of the models cause the bicycle to fall dow
         The success rate for different numbers of pseudo inputs with the standard error of the mean.
         Considering uncertainties during long-term planning can be beneficial.
         Multi step uncertainties without truncation perform much better with less expressive models when compared to one step uncertainties.
-        For a larger number of pseudo inputs, the two approaches both perform about 10 percent better than MAP predictions.
+        For a larger number of pseudo inputs, the two approaches both perform about 10 percent better than MAP-predictions.
     }
     \label{fig:results_goal_percentage}
 \end{figure}
@@ -1134,7 +1144,7 @@ In this setting, even small mistakes of the models cause the bicycle to fall dow
     \caption[Mean mean rewards of all approaches]{
         The mean mean reward for different numbers of pseudo inputs with the standard error of the prediction.
         The results of the mean mean reward metric are comparable to the success rate.
-        While multi step uncertainties with truncation performs about as good as MAP predictions, both one step and multi step uncertainties without truncation perform considerably better.
+        While multi step uncertainties with truncation performs about as good as MAP-predictions, both one step and multi step uncertainties without truncation perform considerably better.
         Considering uncertainties is more beneficial for less expressive models.
     }
     \label{fig:results_mean_mean_reward}

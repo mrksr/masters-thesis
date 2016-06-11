@@ -47,6 +47,11 @@
     width=200pt,
     height=172pt,
 }}
+\pgfplotsset{prediction plot/.style = {
+    default plot,
+    width=200pt,
+    height=140pt,
+}}
 \pgfplotsset{prior plot/.style = {
     narrow plot,
     ymin=-2.5,
@@ -301,7 +306,7 @@
 
 \newcommand{\predictionvariable}[6][1]{
     \begin{axis} [
-            trajectory plot,
+            prediction plot,
             #3 plot,
             shift={#5},
         ]
@@ -341,8 +346,8 @@
 \newcommand{\predictions}[3][1]{
     \predictionvariable[#1]{#2}{theta}{theta}{(0, 0)}{#3}
     \predictionvariable[#1]{#2}{theta dot}{theta_dot}{(210pt, 0)}{#3}
-    \predictionvariable[#1]{#2}{omega}{omega}{(0, -160pt)}{#3}
-    \predictionvariable[#1]{#2}{omega dot}{omega_dot}{(210pt, -160pt)}{#3}
+    \predictionvariable[#1]{#2}{omega}{omega}{(0, -130pt)}{#3}
+    \predictionvariable[#1]{#2}{omega dot}{omega_dot}{(210pt, -130pt)}{#3}
 }
 
 \newcommand{\xytrajectory}[2]{
