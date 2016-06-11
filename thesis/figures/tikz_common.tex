@@ -27,7 +27,6 @@
 \tikzstyle{every text node part} = [align=center, execute at begin node=\setlength{\baselineskip}{2ex}]
 
 \pgfplotsset{unit code/.code 2 args={\si{#1#2}}}
-\pgfplotsset{every plot/.append style={smooth}}
 \pgfplotsset{default plot/.style = {
     grid=major,
     minor y tick num=1,
@@ -114,8 +113,8 @@
     y unit={\radian},
 }}
 \pgfplotsset{theta dot plot/.style = {
-    ymin=-6.5,
-    ymax=6.5,
+    ymin=-10.5,
+    ymax=10.5,
     xlabel={Time step},
     ylabel={$\dot{\theta}$},
     y unit={\radian\per\second},
@@ -178,6 +177,9 @@
     error bars/.cd, y dir=both, y explicit,
 }}
 
+\pgfplotsset{simulation/.style = {
+    black, dashed, thick
+}}
 \pgfplotsset{means only/.style = {
     tumviolet
 }}
@@ -295,6 +297,52 @@
         \addplot[bicycle, #2] table[ignore chars={\#}, col sep=space, x expr=\coordindex, y=r_zero]
             {\datapath/data/solution_trajectory_#1.xa};
     \end{axis}
+}
+
+\newcommand{\predictionvariable}[6][1]{
+    \begin{axis} [
+            trajectory plot,
+            #3 plot,
+            shift={#5},
+        ]
+        \addplot[bicycle, sharp plot, simulation] table[ignore chars={\#}, col sep=space, x expr=\coordindex, y=#4]
+        {\datapath/data/solution_predictions_#2_simulation.xa};
+        \ifnum#1=1
+            % Since fill between behaves strangly when you draw on the background,
+            % we explicitly clip with the min and max y values.
+            \addplot[bicycle, #6, sharp plot, thin, name path=#3c] table[
+                ignore chars={\#}, col sep=space,
+                x expr=\coordindex,
+                y expr={
+                    min(
+                    \pgfkeysvalueof{/pgfplots/ymax} + 0.002 * (\pgfkeysvalueof{/pgfplots/ymax} - \pgfkeysvalueof{/pgfplots/ymin}]),
+                    \thisrow{#4} + sqrt(\thisrow{#4_variance})
+                )}
+            ] {\datapath/data/solution_predictions_#2_model.xa};
+            \addplot[bicycle, #6, sharp plot, thin, name path=#3d] table[
+                ignore chars={\#}, col sep=space,
+                x expr=\coordindex,
+                y expr={
+                    max(
+                    \pgfkeysvalueof{/pgfplots/ymin} - 0.002 * (\pgfkeysvalueof{/pgfplots/ymax} - \pgfkeysvalueof{/pgfplots/ymin}]),
+                    \thisrow{#4} - sqrt(\thisrow{#4_variance})
+                )}
+            ] {\datapath/data/solution_predictions_#2_model.xa};
+            \addplot[#6 fill] fill between[of=#3c and #3d, on layer={axis background}];
+        \fi
+        \addplot[bicycle, sharp plot, #6] table[
+            ignore chars={\#}, col sep=space,
+            x expr=\coordindex,
+            y=#4
+        ] {\datapath/data/solution_predictions_#2_model.xa};
+    \end{axis}
+}
+
+\newcommand{\predictions}[3][1]{
+    \predictionvariable[#1]{#2}{theta}{theta}{(0, 0)}{#3}
+    \predictionvariable[#1]{#2}{theta dot}{theta_dot}{(210pt, 0)}{#3}
+    \predictionvariable[#1]{#2}{omega}{omega}{(0, -160pt)}{#3}
+    \predictionvariable[#1]{#2}{omega dot}{omega_dot}{(210pt, -160pt)}{#3}
 }
 
 \newcommand{\xytrajectory}[2]{
