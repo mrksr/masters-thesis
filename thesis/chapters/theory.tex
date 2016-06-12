@@ -157,8 +157,10 @@ The objective of the reinforcement learning problem stated here is to find the m
 The optimal policy $\pi^*$ maximizes the expected value for all start states, that is it solves the optimization problem
 \begin{align}
     \label{eq:optimal_policy}
-    \pi^* &\in \argmax_{\pi} \Moment*{\E_{\rv{s_0}}}{V^\pi(\rv{s_0})} \\
-    &= \argmax_{\pi} \int V^\pi(\rv{s_0}) \Prob{\rv{s_0}} \diff \rv{s_0}.
+    \begin{split}
+        \pi^* &\in \argmax_{\pi} \Moment*{\E_{\rv{s_0}}}{V^\pi(\rv{s_0})} \\
+        &= \argmax_{\pi} \int V^\pi(\rv{s_0}) \Prob{\rv{s_0}} \diff \rv{s_0}.
+    \end{split}
 \end{align}
 
 There is a multitude of different approaches of arriving at good policies.
@@ -264,9 +266,11 @@ Sampling a trajectory from $\rv{X}$ corresponds to sampling one possible functio
 Similar to the finite case, the random variables have a dependency structure.
 Instead of a mean vector $\mat{\mu}$ and a covariance matrix $\mat{\Sigma}$, a Gaussian process is completely determined by a \emph{mean function} $\mu_f(a) = \Moment{\E}{f(a)}$ and a \emph{covariance function}
 \begin{align}
-    \K(a, a^\prime) &\coloneqq \Moment{\E}{(f(a) - \mu_f(a))(f(a^\prime) - \mu_f(a^\prime))} \\
-    &= \Moment{\cov}{f(a), f(a^\prime)} \\
-    &= \Moment{\cov}{\rv{X_a}, \rv{X_{a^\prime}}}
+    \begin{split}
+        \K(a, a^\prime) &\coloneqq \Moment{\E}{(f(a) - \mu_f(a))(f(a^\prime) - \mu_f(a^\prime))} \\
+        &= \Moment{\cov}{f(a), f(a^\prime)} \\
+        &= \Moment{\cov}{\rv{X_a}, \rv{X_{a^\prime}}}
+    \end{split}
 \end{align}
 with $a, a^\prime \in A$.
 The mean function encodes the point wise mean over all trajectories which could be sampled from $\rv{X}$.
@@ -329,8 +333,10 @@ According to the definition of Gaussian processes, for any two input numbers $x$
 where $\K = \K_{\text{linear}}$.
 Assuming that both $x$ and $y$ are not equal to zero, the correlation coefficient $\corr$ of these two variables is given by
 \begin{align}
-    \Moment{\corr}{\rv{f_x}, \rv{f_y}} &= \frac{\Moment{\cov}{\rv{f_x}, \rv{f_y}}}{\sqrt{\Moment{\var}{\rv{f_x}\vphantom{\rv{f_y}}}}\sqrt{\Moment{\var}{\rv{f_y}}}} \\
-    &= \frac{\K(x, y)}{\sqrt{\K(x, x)} \sqrt{\K(y, y)}} = \frac{xy}{\sqrt{\vphantom{y^2}x^2}\sqrt{\vphantom{y^2}y^2}} \in \left\{ -1, 1 \right\}.
+    \begin{split}
+        \Moment{\corr}{\rv{f_x}, \rv{f_y}} &= \frac{\Moment{\cov}{\rv{f_x}, \rv{f_y}}}{\sqrt{\Moment{\var}{\rv{f_x}\vphantom{\rv{f_y}}}}\sqrt{\Moment{\var}{\rv{f_y}}}} \\
+              &= \frac{\K(x, y)}{\sqrt{\K(x, x)} \sqrt{\K(y, y)}} = \frac{xy}{\sqrt{\vphantom{y^2}x^2}\sqrt{\vphantom{y^2}y^2}} \in \left\{ -1, 1 \right\}.
+    \end{split}
 \end{align}
 A correlation coefficient of plus or minus one implies that the value of one of the random variables is a linear function of the other.
 Any function drawn from this Gaussian process, such as the ones shown in \cref{fig:gp_samples:linear}, is therefore a linear function.
@@ -412,8 +418,10 @@ The variance of this noise $\sigma_n^2$ is a hyperparameter of the Gaussian proc
 
 Assuming further that given the latent function and the input points, the observations are conditionally independent, their likelihood is given by
 \begin{align}
-    \Prob{\mat{y} \given f, \mat{X}} = \Prob{\mat{y} \given \mat{f}} &= \prod_{i = 1}^N \Prob{y_i \given f_i} \\
-    &= \prod_{i = 1}^N \Gaussian{y_i \given f_i, \sigma_n^2} = \Gaussian{\mat{y} \given \mat{f}, \sigma_n^2 \Eye}
+    \begin{split}
+        \Prob{\mat{y} \given f, \mat{X}} = \Prob{\mat{y} \given \mat{f}} &= \prod_{i = 1}^N \Prob{y_i \given f_i} \\
+        &= \prod_{i = 1}^N \Gaussian{y_i \given f_i, \sigma_n^2} = \Gaussian{\mat{y} \given \mat{f}, \sigma_n^2 \Eye}
+    \end{split}
 \end{align}
 because of the assumed noise model.
 Given some vector of hyperparameters $\mat{\theta}$, the definition of Gaussian processes yields a joint Gaussian distribution for the latent function values $\mat{f}$ given by
@@ -469,9 +477,11 @@ The predictive posterior for the test outputs $\mat{f_\ast}$ can be obtained by 
     Given a latent function with a Gaussian process distribution $f \sim \GP(\mat{0}, \K)$ and $N$ training points $\mat{X}$ with noisy observations of the form $\mat{y} = f(\mat{X}) + \Gaussian{\mat{0}, \sigma_n^2 \Eye}$.
     The predictive posterior $\mat{f_\ast}$ of the test points $\mat{X_\ast}$ is then given by
     \begin{align}
-        \Prob{\mat{f_\ast} \given \mat{X}, \mat{y}, \mat{X_\ast}} &= \Gaussian*{\mat{f_\ast} \given \mat{\mu_\ast}, \mat{\Sigma_\ast}} \text{, where} \\
-        \mat{\mu_\ast} &= \mat{K_{\ast N}} \left( \mat{K_N} + \sigma_n^2 \Eye \right)^{-1} \mat{y} \\
-        \mat{\Sigma_\ast} &= \mat{K_\ast} - \mat{K_{\ast N}} \left( \mat{K_N} + \sigma_n^2 \Eye \right)^{-1} \mat{K_{N\ast}}.
+        \begin{split}
+            \Prob{\mat{f_\ast} \given \mat{X}, \mat{y}, \mat{X_\ast}} &= \Gaussian*{\mat{f_\ast} \given \mat{\mu_\ast}, \mat{\Sigma_\ast}} \text{, where} \\
+            \mat{\mu_\ast} &= \mat{K_{\ast N}} \left( \mat{K_N} + \sigma_n^2 \Eye \right)^{-1} \mat{y} \\
+            \mat{\Sigma_\ast} &= \mat{K_\ast} - \mat{K_{\ast N}} \left( \mat{K_N} + \sigma_n^2 \Eye \right)^{-1} \mat{K_{N\ast}}.
+        \end{split}
     \end{align}
 \end{lemma}
 \begin{figure}[tb]
@@ -501,8 +511,10 @@ This predictive posterior makes it possible to evaluate the function approximati
 Since any set of these points always has a joint Gaussian distribution, the predictive posterior defines a new Gaussian process, which is the posterior Gaussian process given the observations.
 This posterior process $\GP(\mu_\text{post}, \K_\text{post})$ has new mean and covariance functions given by
 \begin{align}
-    \mu_\text{post}(\mat{a}) &= \K(\mat{a}, \mat{X}) \left(\mat{K_N} + \sigma_n^2 \Eye \right)^{-1} \mat{y} \\
-    \K_\text{post}(\mat{a}, \mat{b}) &= \K(\mat{a}, \mat{b}) - \K(\mat{a}, \mat{X}) \left( \mat{K_N} + \sigma_n^2 \Eye \right)^{-1} \K(\mat{X}, \mat{b}).
+    \begin{split}
+        \mu_\text{post}(\mat{a}) &= \K(\mat{a}, \mat{X}) \left(\mat{K_N} + \sigma_n^2 \Eye \right)^{-1} \mat{y} \\
+        \K_\text{post}(\mat{a}, \mat{b}) &= \K(\mat{a}, \mat{b}) - \K(\mat{a}, \mat{X}) \left( \mat{K_N} + \sigma_n^2 \Eye \right)^{-1} \K(\mat{X}, \mat{b}).
+    \end{split}
 \end{align}
 Note that the posterior mean function is not necessarily the constant zero function.
 \Cref{fig:gp_posterior} shows samples from a pair of prior and posterior Gaussian processes.
@@ -529,7 +541,10 @@ In a fully Bayesian setup, the correct way to model uncertainty about hyperparam
 Updating the belief about the distribution of the hyperparameters then becomes part of the process of obtaining a posterior model.
 A new distribution is obtained by combining the prior with the likelihood of the training data observed using Bayes' theorem:
 \begin{align}
-    \Prob{\mat{\theta} \given \mat{X}, \mat{y}} &= \frac{\Prob{\mat{y} \given \mat{X}, \mat{\theta}} \Prob{\mat{\theta}}}{\Prob{\mat{y} \given \mat{X}}} \\ &= \frac{\Prob{\mat{y} \given \mat{X}, \mat{\theta}} \Prob{\mat{\theta}}}{\int \Prob{\mat{y} \given \mat{X}, \mat{\theta}} \Prob{\mat{\theta}} \diff \theta}
+    \begin{split}
+        \Prob{\mat{\theta} \given \mat{X}, \mat{y}} &= \frac{\Prob{\mat{y} \given \mat{X}, \mat{\theta}} \Prob{\mat{\theta}}}{\Prob{\mat{y} \given \mat{X}}} \\
+        &= \frac{\Prob{\mat{y} \given \mat{X}, \mat{\theta}} \Prob{\mat{\theta}}}{\int \Prob{\mat{y} \given \mat{X}, \mat{\theta}} \Prob{\mat{\theta}} \diff \theta}
+    \end{split}
 \end{align}
 The integration required in \cref{eq:theta_posterior_integration} is very hard in practice \todo{Is there an easy argument for this which does not rely on the likelihood?}\cite[109]{rasmussen_gaussian_2006}, since $\mat{y}$ is a complicated function of $\mat{\theta}$.
 Instead, a common approximation is to use a \emph{maximum-a-postiori (MAP)} estimate of the correct hyperparameters.
@@ -538,8 +553,10 @@ This estimate is obtained by maximizing $\Prob{\mat{\theta} \given \mat{X}, \mat
 For many choices of priors $\Prob{\mat{\theta}}$ this is still a hard problem.
 But assuming a flat prior which assigns almost equal probability to all choices of hyperparameters, it holds that
 \begin{align}
-    \Prob{\mat{\theta} \mid \mat{X}, \mat{y}} &\propto \Prob{\mat{y} \given \mat{X}, \mat{\theta}} \\
-    &= \int \Prob{\mat{y} \given \mat{f}, \mat{\theta}} \Prob{\mat{f} \given \mat{X}, \mat{\theta}} \diff \mat{f},
+    \begin{split}
+        \Prob{\mat{\theta} \mid \mat{X}, \mat{y}} &\propto \Prob{\mat{y} \given \mat{X}, \mat{\theta}} \\
+        &= \int \Prob{\mat{y} \given \mat{f}, \mat{\theta}} \Prob{\mat{f} \given \mat{X}, \mat{\theta}} \diff \mat{f},
+    \end{split}
 \end{align}
 that is, the posterior distribution is proportional to the likelihood term and can be obtained using a maximum likelihood estimate on the \emph{marginal likelihood} after integrating out the function values $\mat{f}$.
 Optimizing this term is called a \emph{type II maximum likelihood estimate (ML-II)}.
@@ -557,10 +574,12 @@ It is given by
 The solution of this integral is a Gaussian density function \cite{petersen_matrix_2008}.
 For practical reasons, it is convenient to minimize the negative logarithm of the likelihood which is given by
 \begin{align}
-    \Ell(\mat{\theta}) = -\log\Prob{\mat{y} \given \mat{X}, \mat{\theta}} =
-    \frac{1}{2} \mat{y\tran} \left( \mat{K_N} + \sigma_n^2 \Eye \right)^{-1} \mat{y} +
-    \frac{1}{2} \log \abs{\mat{K_N} + \sigma_n^2 \Eye} +
-    \frac{N}{2} \log(2\pi).
+    \begin{split}
+        \Ell(\mat{\theta}) &= -\log\Prob{\mat{y} \given \mat{X}, \mat{\theta}} \\
+        &= \frac{1}{2} \mat{y}\tran \left( \mat{K_N} + \sigma_n^2 \Eye \right)^{-1} \mat{y} +
+        \frac{1}{2} \log \abs{\mat{K_N} + \sigma_n^2 \Eye} +
+        \frac{N}{2} \log(2\pi).
+    \end{split}
 \end{align}
 The estimation of hyperparameters is the solution of the optimization problem
 \begin{align}
@@ -599,10 +618,12 @@ according to \cref{lem:gp_posterior} with the notation $\mat{K_M} = \K(\ps{\mat{
 The true data set is independent given the latent function and can therefore be assumed independent given the pseudo data set which should be a good representation of it.
 The likelihood of the original data under the Gaussian process trained on the pseudo data set is given by
 \begin{align}
-    \Prob{\mat{y} \given \mat{X}, \ps{\mat{X}}, \ps{\mat{f}}, \mat{\theta}} &= \prod_{i=1}^N \Prob{y_n \given \mat{x_n}, \ps{\mat{X}}, \ps{\mat{f}}, \mat{\theta}} \\
-    &= \prod_{i=1}^N \Gaussian*{y_n \given \mat{K_{n M}}\mat{K_M}^{-1} \ps{\mat{f}}, \mat{K_n} - \mat{K_{n M}} \mat{K_M}^{-1} \mat{K_{M n}} + \sigma_n^2} \\
-    &= \Gaussian*{\mat{y} \given \mat{K_{N M}}\mat{K_M}^{-1} \ps{\mat{f}}, \diag\left( \mat{K_N} - \mat{K_{N M}} \mat{K_M}^{-1} \mat{K_{M N}} \right) + \sigma_n^2 \Eye} \\
-    &= \Gaussian*{\mat{y} \given \mat{K_{N M}}\mat{K_M}^{-1} \ps{\mat{f}}, \diag\left( \mat{K_N} - \mat{Q_N} \right) + \sigma_n^2 \Eye}
+    \begin{split}
+        \Prob{\mat{y} \given \mat{X}, \ps{\mat{X}}, \ps{\mat{f}}, \mat{\theta}} &= \prod_{i=1}^N \Prob{y_n \given \mat{x_n}, \ps{\mat{X}}, \ps{\mat{f}}, \mat{\theta}} \\
+        &= \prod_{i=1}^N \Gaussian*{y_n \given \mat{K_{n M}}\mat{K_M}^{-1} \ps{\mat{f}}, \mat{K_n} - \mat{K_{n M}} \mat{K_M}^{-1} \mat{K_{M n}} + \sigma_n^2} \\
+        &= \Gaussian*{\mat{y} \given \mat{K_{N M}}\mat{K_M}^{-1} \ps{\mat{f}}, \diag\left( \mat{K_N} - \mat{K_{N M}} \mat{K_M}^{-1} \mat{K_{M N}} \right) + \sigma_n^2 \Eye} \\
+        &= \Gaussian*{\mat{y} \given \mat{K_{N M}}\mat{K_M}^{-1} \ps{\mat{f}}, \diag\left( \mat{K_N} - \mat{Q_N} \right) + \sigma_n^2 \Eye}
+    \end{split}
 \end{align}
 with $\mat{Q_N} \coloneqq \mat{K_{N M}} \mat{K_M}^{-1} \mat{K_{M N}}$.
 The additive term $\sigma_n^2$ comes from the noise model assumed about the observations $\mat{y}$ in the original data set.
@@ -615,17 +636,21 @@ Assuming the pseudo targets to be distributed very similarly to the real data, a
 
 The marginalization is stated as the integral of a product of two Gaussian distributions which has a closed form solution and is given by
 \begin{align}
-    \Prob{\mat{y} \given \mat{X}, \ps{\mat{X}}, \mat{\theta}} &= \int \Prob{\mat{y} \given \mat{X}, \ps{\mat{X}}, \ps{\mat{f}}, \mat{\theta}} \Prob{\ps{\mat{f}} \given \ps{\mat{X}}} \diff \ps{\mat{f}} \\
-    &= \int \Prob{\mat{y} \given \mat{X}, \ps{\mat{X}}, \ps{\mat{f}}, \mat{\theta}} \Gaussian{\ps{\mat{f}} \given \mat{0}, \mat{K_M}} \diff \ps{\mat{f}} \\
-    &= \Gaussian*{\mat{y} \given \mat{0}, \mat{K_{NM}} \mat{K_M}^{-1} \mat{K_M} \left( \mat{K_{NM}} \mat{K_M}^{-1} \right)\tran + \diag\left( \mat{K_N} - \mat{Q_N} \right) + \sigma_n^2 \Eye} \\
-    &= \Gaussian*{\vphantom{\left( \mat{K_M}^{-1} \right)\tran} \mat{y} \given \mat{0}, \mat{Q_N} + \diag\left( \mat{K_N} - \mat{Q_N} \right) + \sigma_n^2 \Eye}.
+    \begin{split}
+        \Prob{\mat{y} \given \mat{X}, \ps{\mat{X}}, \mat{\theta}} &= \int \Prob{\mat{y} \given \mat{X}, \ps{\mat{X}}, \ps{\mat{f}}, \mat{\theta}} \Prob{\ps{\mat{f}} \given \ps{\mat{X}}} \diff \ps{\mat{f}} \\
+        &= \int \Prob{\mat{y} \given \mat{X}, \ps{\mat{X}}, \ps{\mat{f}}, \mat{\theta}} \Gaussian{\ps{\mat{f}} \given \mat{0}, \mat{K_M}} \diff \ps{\mat{f}} \\
+        &= \Gaussian*{\mat{y} \given \mat{0}, \mat{K_{NM}} \mat{K_M}^{-1} \mat{K_M} \left( \mat{K_{NM}} \mat{K_M}^{-1} \right)\tran + \diag\left( \mat{K_N} - \mat{Q_N} \right) + \sigma_n^2 \Eye} \\
+        &= \Gaussian*{\vphantom{\left( \mat{K_M}^{-1} \right)\tran} \mat{y} \given \mat{0}, \mat{Q_N} + \diag\left( \mat{K_N} - \mat{Q_N} \right) + \sigma_n^2 \Eye}.
+    \end{split}
 \end{align}
 This \emph{SPGP marginal likelihood} can be interpreted as the marginal likelihood of a Gaussian process given the original data set $(\mat{X}, \mat{y})$ in \cref{eq:gp_marginal_likelihood}.
 In this Gaussian process, the original kernel $\K$ is replaced by the kernel $\K_{\text{SPGP}}$.
 With $\Ind$ denoting the indicator function it is defined as
 \begin{align}
-    \Q(\mat{a}, \mat{b}) &\coloneqq \mat{K_{aM}} \mat{K_M}^{-1} \mat{K_{Mb}} \\
-    \K_{\text{SPGP}}(\mat{a}, \mat{b}) &\coloneqq \Q(\mat{a}, \mat{b}) + \Indicator{\mat{a} = \mat{b}} \left( \K(\mat{a}, \mat{b}) - \Q(\mat{a}, \mat{b}) \right).
+    \begin{split}
+        \Q(\mat{a}, \mat{b}) &\coloneqq \mat{K_{aM}} \mat{K_M}^{-1} \mat{K_{Mb}} \\
+        \K_{\text{SPGP}}(\mat{a}, \mat{b}) &\coloneqq \Q(\mat{a}, \mat{b}) + \Indicator{\mat{a} = \mat{b}} \left( \K(\mat{a}, \mat{b}) - \Q(\mat{a}, \mat{b}) \right).
+    \end{split}
 \end{align}
 This kernel is equal to $\K$ when both arguments are identical and equal to $\Q$ everywhere else.
 For well-chosen pseudo inputs, $\mat{Q_N}$ is a low-rank approximation of $\mat{K_N}$ \cite{snelson_flexible_2007}.
@@ -637,9 +662,11 @@ This observation directly yields the SPGP predictive posterior using \cref{lem:g
     Given a latent function with a sparse pseudo-input Gaussian process distribution $f \sim \GP(\mat{0}, \K_{\text{SPGP}})$, $N$ training points $\mat{X}$ with noisy observations of the form $\mat{y} = f(\mat{X}) + \Gaussian{\mat{0}, \sigma_n^2 \Eye}$ and $M$ positions of pseudo-inputs $\ps{\mat{X}}$.
     The predictive posterior $\mat{f_\ast}$ of the test points $\mat{X_\ast}$ is then given by
     \begin{align}
-        \Prob{\mat{f_\ast} \given \mat{X_\ast}, \mat{X}, \mat{y}, \ps{\mat{X}}} &= \Gaussian*{\mat{f_\ast} \given \mat{\mu_\ast}, \mat{\Sigma_\ast}} \text{, where} \\
-        \mat{\mu_\ast} &= \mat{Q_{\ast N}} \left( \mat{Q_N} + \diag(\mat{K_N} - \mat{Q_N}) + \sigma_n^2 \Eye \right)^{-1} \mat{y} \\
-        \mat{\Sigma_\ast} &= \mat{K_\ast} - \mat{Q_{\ast N}} \left( \mat{Q_N} + \diag(\mat{K_N} - \mat{Q_N}) + \sigma_n^2 \Eye \right)^{-1} \mat{Q_{N \ast}}.
+        \begin{split}
+            \Prob{\mat{f_\ast} \given \mat{X_\ast}, \mat{X}, \mat{y}, \ps{\mat{X}}} &= \Gaussian*{\mat{f_\ast} \given \mat{\mu_\ast}, \mat{\Sigma_\ast}} \text{, where} \\
+            \mat{\mu_\ast} &= \mat{Q_{\ast N}} \left( \mat{Q_N} + \diag(\mat{K_N} - \mat{Q_N}) + \sigma_n^2 \Eye \right)^{-1} \mat{y} \\
+            \mat{\Sigma_\ast} &= \mat{K_\ast} - \mat{Q_{\ast N}} \left( \mat{Q_N} + \diag(\mat{K_N} - \mat{Q_N}) + \sigma_n^2 \Eye \right)^{-1} \mat{Q_{N \ast}}.
+        \end{split}
     \end{align}
     and $\mat{Q_N} \coloneqq \mat{K_{N M}} \mat{K_M}^{-1} \mat{K_{M N}}$.
 \end{lemma}
@@ -671,9 +698,11 @@ The predictive distribution as written in the previous equations can easily be c
 They do however still involve the inversion of matrices of size $N \times N$ and therefore do not offer computational improvements.
 Using the matrix inversion lemma \cite{petersen_matrix_2008}, they can be rewritten to the form\todo{fix line spacing in equation}
 \begin{align}
-    \mat{\mu_\ast} &= \mat{K_{\ast M}} \mat{B}^{-1} \mat{K_{MN}} \left( \diag(\mat{K_N} - \mat{Q_N}) + \sigma_n^2 \Eye \right)^{-1} \mat{y} \\
-    \mat{\Sigma_\ast} &= \mat{K_\ast} - \mat{K_{\ast M}} \left( \mat{K_M}^{-1} - \mat{B}^{-1} \right) \mat{K_{M \ast}} \\
-    \mat{B} &= \mat{K_M} + \mat{K_{MN}} \left( \diag(\mat{K_N} - \mat{Q_N}) + \sigma_n^2 \Eye \right)^{-1} \mat{K_{NM}},
+    \begin{split}
+        \mat{\mu_\ast} &= \mat{K_{\ast M}} \mat{B}^{-1} \mat{K_{MN}} \left( \diag(\mat{K_N} - \mat{Q_N}) + \sigma_n^2 \Eye \right)^{-1} \mat{y} \\
+        \mat{\Sigma_\ast} &= \mat{K_\ast} - \mat{K_{\ast M}} \left( \mat{K_M}^{-1} - \mat{B}^{-1} \right) \mat{K_{M \ast}} \\
+        \mat{B} &= \mat{K_M} + \mat{K_{MN}} \left( \diag(\mat{K_N} - \mat{Q_N}) + \sigma_n^2 \Eye \right)^{-1} \mat{K_{NM}},
+    \end{split}
 \end{align}
 which only involves the inversion of $M \times M$ matrices and one diagonal $N \times N$ matrix.
 Implemented this way, the calculation of all terms independent of the test points has a complexity of $\Oh(NM^2)$ and predicting means and variances takes $\Oh(M)$ and $\Oh(M^2)$ time respectively.
@@ -822,8 +851,10 @@ Since the particles are initialized randomly in the search space, most of these 
 Particles at bad parts of the search space should communicate with their neighbours and be pulled towards the most successful.
 For every particle, the best position seen by any of its neighbours $\Soc$ is defined as
 \begin{align}
-    \Soc_i(t) &\coloneqq \Cog_{n^\ast}(t) \text{, where} \\
-    n^\ast &\in \argmin_{n \in \Neigh(i)} f(\Cog_n(t)).
+    \begin{split}
+        \Soc_i(t) &\coloneqq \Cog_{n^\ast}(t) \text{, where} \\
+        n^\ast &\in \argmin_{n \in \Neigh(i)} f(\Cog_n(t)).
+    \end{split}
 \end{align}
 
 The update of the velocity of a particle is a linear combination of these two components and the previous velocity in order to simulate inertia.

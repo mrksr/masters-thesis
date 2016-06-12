@@ -222,8 +222,10 @@ This can be advantageous since differences tend to vary less than the original f
 Learning differences can also introduce independences in the data, since predicting the change in position of the bicycle only depends on the direction of movement but not on the previous position.
 Having learned models for the differences, the mean and the variance of the Gaussian posterior for the partial model for the $d$-th dimension $\Prob{f_d(\mat{s_\ast}, \mat{a_\ast})}$ is given by
 \begin{align}
-    \Moment*{\E}{f_d(\mat{s_\ast}, \mat{a_\ast}) \given \mat{s_\ast}, \mat{a_\ast}} &= s_{\ast,d} + \Moment*{\E}{\Delta s_{\ast,d} \given \mat{s_\ast}, \mat{a_\ast}}, \\
-    \Moment*{\var}{f_d(\mat{s_\ast}, \mat{a_\ast}) \given \mat{s_\ast}, \mat{a_\ast}} &= \Moment*{\var}{\Delta s_{\ast,d} \given \mat{s_\ast}, \mat{a_\ast}},
+    \begin{split}
+        \Moment*{\E}{f_d(\mat{s_\ast}, \mat{a_\ast}) \given \mat{s_\ast}, \mat{a_\ast}} &= s_{\ast,d} + \Moment*{\E}{\Delta s_{\ast,d} \given \mat{s_\ast}, \mat{a_\ast}}, \\
+        \Moment*{\var}{f_d(\mat{s_\ast}, \mat{a_\ast}) \given \mat{s_\ast}, \mat{a_\ast}} &= \Moment*{\var}{\Delta s_{\ast,d} \given \mat{s_\ast}, \mat{a_\ast}},
+    \end{split}
 \end{align}
 respectively, since the prior state is for now considered constant and non-probabilistic.
 Uncertainties in the predictions only originate from the amount of confidence expressed by the models for the differences.
@@ -232,18 +234,20 @@ The values of the expected value and variances are calculated according to \cref
 Since the different Gaussian processes are trained independently of each other and their training sets only contain their respective output dimension, their predictions are conditionally independent given the input.
 With the predictive distribution for the single dimension being Gaussian, the joint predictive state distribution is also Gaussian with a diagonal covariance matrix and is given by
 \begin{align}
-    \Prob*{f(\mat{s_\ast}, \mat{a_\ast}) \given \mat{s_\ast}, \mat{a_\ast}} &=
-    \Gaussian*{f(\mat{s_\ast}, \mat{a_\ast}) \given \mat{\mu_f}, \mat{\Sigma_f}}\text{, where} \\
-    \mat{\mu_f} &= \begin{pmatrix}
-    \Moment*{\E}{f_1(\mat{s_\ast}, \mat{a_\ast}) \given \mat{s_\ast}, \mat{a_\ast}} \\
-    \vdots \\
-    \Moment*{\E}{f_D(\mat{s_\ast}, \mat{a_\ast}) \given \mat{s_\ast}, \mat{a_\ast}} \\
-    \end{pmatrix} \\
-    \mat{\Sigma_f} &= \diag\left(
-        \Moment*{\var}{f_1(\mat{s_\ast}, \mat{a_\ast}) \given \mat{s_\ast}, \mat{a_\ast}},
-        \ldots,
-        \Moment*{\var}{f_D(\mat{s_\ast}, \mat{a_\ast}) \given \mat{s_\ast}, \mat{a_\ast}}
-    \right).
+    \begin{split}
+        \Prob*{f(\mat{s_\ast}, \mat{a_\ast}) \given \mat{s_\ast}, \mat{a_\ast}} &=
+        \Gaussian*{f(\mat{s_\ast}, \mat{a_\ast}) \given \mat{\mu_f}, \mat{\Sigma_f}}\text{, where} \\
+        \mat{\mu_f} &= \begin{pmatrix}
+        \Moment*{\E}{f_1(\mat{s_\ast}, \mat{a_\ast}) \given \mat{s_\ast}, \mat{a_\ast}} \\
+        \vdots \\
+        \Moment*{\E}{f_D(\mat{s_\ast}, \mat{a_\ast}) \given \mat{s_\ast}, \mat{a_\ast}} \\
+        \end{pmatrix} \\
+        \mat{\Sigma_f} &= \diag\left(
+            \Moment*{\var}{f_1(\mat{s_\ast}, \mat{a_\ast}) \given \mat{s_\ast}, \mat{a_\ast}},
+            \ldots,
+            \Moment*{\var}{f_D(\mat{s_\ast}, \mat{a_\ast}) \given \mat{s_\ast}, \mat{a_\ast}}
+        \right).
+    \end{split}
 \end{align}
 This diagonal covariance matrix illustrates the implicit independence assumption of the different output dimensions introduced by training one model per output dimension.
 While this assumption is not true in most cases, it can be used as an approximation and generally yields good results.
@@ -251,8 +255,10 @@ While this assumption is not true in most cases, it can be used as an approximat
 The state of the bicycle system is given by a vector $\Bicycle{\theta, \dot{\theta}, \omega, \dot{\omega}, x, y, \psi}$ composed of the internal dynamics of the bicycle and its position and orientation in euclidean space.
 During simulation with the transition model, the coordinates were transformed to polar coordinates given by
 \begin{align}
-    \varphi(x, y) &\coloneqq \atanTwo(y, x), \\
-    r(x, y) &\coloneqq \sqrt{x^2 + y^2},
+    \begin{split}
+        \varphi(x, y) &\coloneqq \atanTwo(y, x), \\
+        r(x, y) &\coloneqq \sqrt{x^2 + y^2},
+    \end{split}
 \end{align}
 where $\atanTwo$ is the arctangent function with two arguments.
 Polar coordinates uniquely represent a two-dimensional point by its angle to the x-axis and its distance to the origin.
@@ -397,9 +403,11 @@ In order to simulate a deterministic transition model, this first approach for l
 The most plausible choice for this single successive state is the maximum-a-posteriori estimation given by the maximum of the posterior density function.
 With a deterministic state $\mat{s_t}$ and an action $\mat{a_t}$, this MAP estimate of the transition model $f$ is given by
 \begin{align}
-    \argmax_{\mat{s_{t+1}} \in \R^7} \Prob{\mat{s_{t+1}} \given \mat{s_t}, \mat{a_t}} &= \argmax_{\mat{s_{t+1}} \in \R^7} f\Cond{\mat{s_{t+1}} \given \mat{s_t}, \mat{a_t}} \\
-    &= \argmax_{\mat{s_{t+1}} \in \R^7} \Gaussian{\mat{s_{t+1}} \given \mat{\mu_{t+1}}, \mat{\Sigma_{t+1}}} \\
-    &= \Set{\mat{\mu_{t+1}}}.
+    \begin{split}
+        \argmax_{\mat{s_{t+1}} \in \R^7} \Prob{\mat{s_{t+1}} \given \mat{s_t}, \mat{a_t}} &= \argmax_{\mat{s_{t+1}} \in \R^7} f\Cond{\mat{s_{t+1}} \given \mat{s_t}, \mat{a_t}} \\
+        &= \argmax_{\mat{s_{t+1}} \in \R^7} \Gaussian{\mat{s_{t+1}} \given \mat{\mu_{t+1}}, \mat{\Sigma_{t+1}}} \\
+        &= \Set{\mat{\mu_{t+1}}}.
+    \end{split}
 \end{align}
 A Gaussian distribution's density function has a unique maximum at the mean.
 
@@ -638,16 +646,20 @@ The probability $\Prob{\os{\mat{s_{t+1}}} \in \Fallen}$ then looses its signific
 In order to correctly calculate the probability that the trajectory has already ended before or at time step $t+1$, the probabilities of falling down or reaching the goal at any of the previous time steps have to be considered.
 Let
 \begin{align}
-    \Prob*{\PGoal_t} &\coloneqq \Prob*{\exists i \leq t \colon \mat{s_i} \in \Goal}, \\
-    \Prob*{\PFallen_t} &\coloneqq \Prob*{\exists i \leq t \colon \mat{s_i} \in \Fallen}
+    \begin{split}
+        \Prob*{\PGoal_t} &\coloneqq \Prob*{\exists i \leq t \colon \mat{s_i} \in \Goal}, \\
+        \Prob*{\PFallen_t} &\coloneqq \Prob*{\exists i \leq t \colon \mat{s_i} \in \Fallen}
+    \end{split}
 \end{align}
 denote the probabilities that at any point before or at $t$, the trajectory has already ended because of reaching the goal or falling down respectively.
 In other words, they denote the accumulated belief of the transition model that the trajectory has at some point hit a terminal state.
 These probabilities can be calculated using dynamic programming.
 They are given by
 \begin{align}
-    \Prob*{\PGoal_{t+1}} &= \Prob*{\PGoal_{t}} + \left( 1 - \Prob*{\PGoal_{t}}  \right) \cdot \Prob*{\mat{s_{t+1}} \in \Goal}, \\
-    \Prob*{\PFallen_{t+1}} &= \Prob*{\PFallen_{t}} + \left( 1 - \Prob*{\PFallen_{t}}  \right) \cdot \Prob*{\mat{s_{t+1}} \in \Fallen},
+    \begin{split}
+        \Prob*{\PGoal_{t+1}} &= \Prob*{\PGoal_{t}} + \left( 1 - \Prob*{\PGoal_{t}}  \right) \cdot \Prob*{\mat{s_{t+1}} \in \Goal}, \\
+        \Prob*{\PFallen_{t+1}} &= \Prob*{\PFallen_{t}} + \left( 1 - \Prob*{\PFallen_{t}}  \right) \cdot \Prob*{\mat{s_{t+1}} \in \Fallen},
+    \end{split}
 \end{align}
 respectively, where the probabilities $\Prob*{\PGoal_{0}}$ and $\Prob*{\PFallen_{0}}$ can be calculated directly.
 
@@ -655,8 +667,10 @@ With these probabilities describing the overall belief that the predictive traje
 Consider the state $\mat{s_t}$ with the Gaussian distribution $\Gaussian{\mat{\mu_t}, \mat{\Sigma_t}}$.
 Its expected reward is given by
 \begin{align}
-    \Moment*{\E}{\RwdBicycle(\rv{s_t})} &= \int \RwdBicycle(\rv{s_t}) \Prob{\rv{s_t}} \diff \rv{s_t} \\
-    &= \int \RwdBicycle(\rv{s_t}) \Gaussian{\rv{s_t} \given \mat{\mu_t}, \mat{\Sigma_t}} \diff \rv{s_t}.
+    \begin{split}
+        \Moment*{\E}{\RwdBicycle(\rv{s_t})} &= \int \RwdBicycle(\rv{s_t}) \Prob{\rv{s_t}} \diff \rv{s_t} \\
+        &= \int \RwdBicycle(\rv{s_t}) \Gaussian{\rv{s_t} \given \mat{\mu_t}, \mat{\Sigma_t}} \diff \rv{s_t}.
+    \end{split}
 \end{align}
 In \cref{sub:reward_function}, $\RwdBicycle$ was specified using a definition by cases, separating the terminal states.
 To simplify the integration, it can be rewritten as a single sum using the indicator function $\Ind$ in
@@ -671,9 +685,13 @@ To simplify the integration, it can be rewritten as a single sum using the indic
 In the integration required for the expected reward, the indicator functions are replaced by their corresponding probabilities according to the law of total probability.
 The integral is then given by
 \begin{align}
-    \int \RwdBicycle(\rv{s_t}) \Prob{\rv{s_t}} \diff \rv{s_t} &= 2 \cdot \Prob{\PGoal_t} + 0 \cdot (1 - \Prob{\PGoal_t}) \Prob{\PFallen_t} \\
-    &\qquad + (1 - \Prob{\PGoal_t})(1 - \Prob{\PFallen_t}) \int \RwdBicycleHat(\rv{s_t}) \Prob{\rv{s_t}} \diff \rv{s_t} \\
-    &= 2 \cdot \Prob{\PGoal_t} + (1 - \Prob{\PGoal_t})(1 - \Prob{\PFallen_t}) \int \RwdBicycleHat(\rv{s_t}) \Prob{\rv{s_t}} \diff \rv{s_t} \\
+    \begin{split}
+        \int \RwdBicycle(\rv{s_t}) \Prob{\rv{s_t}} \diff \rv{s_t} &= 2 \cdot \Prob{\PGoal_t} + 0 \cdot (1 - \Prob{\PGoal_t}) \Prob{\PFallen_t} \\
+        &\qquad + (1 - \Prob{\PGoal_t})(1 - \Prob{\PFallen_t}) \\
+        &\qquad\phantom{{}+{}} \cdot \int \RwdBicycleHat(\rv{s_t}) \Prob{\rv{s_t}} \diff \rv{s_t} \\
+        &= 2 \cdot \Prob{\PGoal_t} + (1 - \Prob{\PGoal_t})(1 - \Prob{\PFallen_t}) \\
+        &\qquad\phantom{{}+{}} \cdot \int \RwdBicycleHat(\rv{s_t}) \Prob{\rv{s_t}} \diff \rv{s_t}
+    \end{split}
     \intertext{where $\RwdBicycleHat$ denotes the reward term for states which are not terminal and is defined as}
     \RwdBicycleHat(\rv{s}) &\coloneqq \sqrt{2\pi\sigma_{\text{angle}}^2} \Gaussian{\Delta_\psi(\rv{s}) \given 0, \sigma_{\text{angle}}^2}.
 \end{align}
@@ -681,8 +699,10 @@ The angle between the bicycle's heading and the goal $\Delta_\psi$ can be calcul
 Equivalently, it is the result of applying a linear transformation to the Gaussian state distribution.
 Since $\Delta_\psi = \psi - \varphi$ and the variables in the state vector are organized as presented in \cref{sub:gp_models}, this linear transformation has the form
 \begin{align}
-    \pi &= \left( 0, 0, 0, 0, -1, 0, 1 \right)\tran, \\
-    \rv{\Delta_\psi} &= \pi\tran \rv{s_t}.
+    \begin{split}
+        \pi &= \left( 0, 0, 0, 0, -1, 0, 1 \right)\tran, \\
+        \rv{\Delta_\psi} &= \pi\tran \rv{s_t}.
+    \end{split}
 \end{align}
 Linear transformations of Gaussians are also Gaussian \cite{petersen_matrix_2008}.
 The distribution of $\rv{\Delta_\psi}$ is given by
@@ -693,20 +713,24 @@ The distribution of $\rv{\Delta_\psi}$ is given by
 The expected reward for non-terminal states can then be rewritten as the integral of a product of univariate Gaussian distributions.
 With $c \coloneqq \sqrt{2\pi\sigma_{\text{angle}}^2}$ it is given by
 \begin{align}
-    \int \RwdBicycleHat(\rv{s_t}) \Prob{\rv{s_t}} \diff \rv{s_t} &=  \int c \Gaussian{\Delta_\psi(\rv{s_t}) \given 0, \sigma_{\text{angle}}^2} \Prob{\rv{s_t}} \diff \rv{s_t} \\
-    &= c \int \Gaussian{\Delta_\psi(\rv{s_t}) \given 0, \sigma_{\text{angle}}^2} \Prob{\rv{s_t}} \diff \rv{s_t} \\
-    &= c \int \Gaussian{\rv{\Delta_\psi} \given 0, \sigma_{\text{angle}}^2} \Prob{\rv{\Delta_\psi}} \diff \rv{\Delta_\psi} \\
-    &= c \int \Gaussian{\rv{\Delta_\psi} \given 0, \sigma_{\text{angle}}^2} \Gaussian{\rv{\Delta_\psi} \given \pi\tran \mat{\mu_t}, \pi\tran \mat{\Sigma_t} \pi} \diff \rv{\Delta_\psi} \\
-    &= c \Gaussian{\pi\tran \mat{\mu_t} \given 0, \sigma_{\text{angle}}^2 + \pi\tran \mat{\Sigma_t} \pi}.
+    \begin{split}
+        \int \RwdBicycleHat(\rv{s_t}) \Prob{\rv{s_t}} \diff \rv{s_t} &=  \int c \Gaussian{\Delta_\psi(\rv{s_t}) \given 0, \sigma_{\text{angle}}^2} \Prob{\rv{s_t}} \diff \rv{s_t} \\
+        &= c \int \Gaussian{\Delta_\psi(\rv{s_t}) \given 0, \sigma_{\text{angle}}^2} \Prob{\rv{s_t}} \diff \rv{s_t} \\
+        &= c \int \Gaussian{\rv{\Delta_\psi} \given 0, \sigma_{\text{angle}}^2} \Prob{\rv{\Delta_\psi}} \diff \rv{\Delta_\psi} \\
+        &= c \int \Gaussian{\rv{\Delta_\psi} \given 0, \sigma_{\text{angle}}^2} \Gaussian{\rv{\Delta_\psi} \given \pi\tran \mat{\mu_t}, \pi\tran \mat{\Sigma_t} \pi} \diff \rv{\Delta_\psi} \\
+        &= c \Gaussian{\pi\tran \mat{\mu_t} \given 0, \sigma_{\text{angle}}^2 + \pi\tran \mat{\Sigma_t} \pi}.
+    \end{split}
 \end{align}
 The product of two Gaussian density functions is another unnormalized Gaussian density function.
 The normalization constant can in turn be written in terms of Gaussian densities and is the result of the integration \cite{petersen_matrix_2008}.
 
 Together these results give a closed form solution for the expected reward for the state $\rv{s_t}$ which is given by
 \begin{align}
-    \Moment*{\E}{\RwdBicycle(\rv{s_t})} &= 2 \cdot \Prob{\PGoal_t} + (1 - \Prob{\PGoal_t})(1 - \Prob{\PFallen_t}) \int \RwdBicycleHat(\rv{s_t}) \Prob{\rv{s_t}} \diff \rv{s_t} \\
-    &= 2 \cdot \Prob{\PGoal_t} + (1 - \Prob{\PGoal_t})(1 - \Prob{\PFallen_t}) \\
-    &\qquad\qquad\qquad\qquad\cdot\sqrt{2\pi\sigma_{\text{angle}}^2} \Gaussian{\pi\tran \mat{\mu_t} \given 0, \sigma_{\text{angle}}^2 + \pi\tran \mat{\Sigma_t}\pi}.
+    \begin{split}
+        \Moment*{\E}{\RwdBicycle(\rv{s_t})} &= 2 \cdot \Prob{\PGoal_t} + (1 - \Prob{\PGoal_t})(1 - \Prob{\PFallen_t}) \int \RwdBicycleHat(\rv{s_t}) \Prob{\rv{s_t}} \diff \rv{s_t} \\
+        &= 2 \cdot \Prob{\PGoal_t} + (1 - \Prob{\PGoal_t})(1 - \Prob{\PFallen_t}) \\
+        &\qquad\qquad\qquad\qquad\cdot\sqrt{2\pi\sigma_{\text{angle}}^2} \Gaussian{\pi\tran \mat{\mu_t} \given 0, \sigma_{\text{angle}}^2 + \pi\tran \mat{\Sigma_t}\pi}.
+    \end{split}
 \end{align}
 Note that for states with very low uncertainty, that is states for which $\pi\tran \mat{\Sigma_t} \pi$ goes to zero, the expected value converges towards the original reward function.
 Similarly, both $\Prob{\PGoal_t}$ and $\Prob{\PFallen_t}$ are close zero or one for all time steps, converging to the binary behaviour of deterministic states.
@@ -796,8 +820,10 @@ The model $f_d$ is used to predict the $d$-th entry of this vector.
 Using MAP-predictions, $\mat{\Delta_t}$ is assumed to be one deterministic value and using the one-step uncertainties, the complete Gaussian distribution $\rv{\Delta_t} \sim \Gaussian{\mat{\mu_\Delta}, \mat{\Sigma_\Delta}}$ is the basis the distribution of the successive state.
 Since $\mat{s_t}$ is assumed deterministic in these cases, the distribution of $\os{\rv{s_{t+1}}}$ is given by
 \begin{align}
-    \os{\rv{s_{t+1}}} &= \mat{s_t} + \rv{\Delta_t}, \\
-    \os{\rv{s_{t+1}}} &\sim \Gaussian{\mat{s_t} + \mat{\mu_\Delta}, \mat{\Sigma_\Delta}}.
+    \begin{split}
+        \os{\rv{s_{t+1}}} &= \mat{s_t} + \rv{\Delta_t}, \\
+        \os{\rv{s_{t+1}}} &\sim \Gaussian{\mat{s_t} + \mat{\mu_\Delta}, \mat{\Sigma_\Delta}}.
+    \end{split}
 \end{align}
 In both cases, the state was again assumed to be deterministic for the timestep $t+1$ and located at $\Moment{\E}{\rv{s_{t+1}}}$ in order to derive the distribution of the next state $\rv{s_{t+2}}$, preventing the accumulation of uncertainties.
 
@@ -834,9 +860,11 @@ Instead, the distribution is approximated by a Gaussian.
 Assume that the distribution $\rv{\Delta_t} \sim \Gaussian{\mat{\mu_\Delta}, \mat{\Sigma_\Delta}}$ is known.
 Since $\rv{s_{t+1}}$ is the sum of $\rv{s_t}$ and $\rv{\Delta_t}$, a Gaussian approximation of the posterior distribution is given by
 \begin{align}
-    \rv{s_{t+1}} &\sim \Gaussian{\mat{\mu_{t+1}}, \mat{\Sigma_{t+1}}} \text{, where} \\
-    \mat{\mu_{t+1}} &= \mat{\mu_t} + \mat{\mu_\Delta} \\
-    \mat{\Sigma_{t+1}} &= \mat{\Sigma_t} + \mat{\Sigma_\Delta} + \Moment{\cov}{\rv{s_t}, \rv{\Delta_t}} + \Moment{\cov}{\rv{\Delta_t}, \rv{s_t}},
+    \begin{split}
+        \rv{s_{t+1}} &\sim \Gaussian{\mat{\mu_{t+1}}, \mat{\Sigma_{t+1}}} \text{, where} \\
+        \mat{\mu_{t+1}} &= \mat{\mu_t} + \mat{\mu_\Delta} \\
+        \mat{\Sigma_{t+1}} &= \mat{\Sigma_t} + \mat{\Sigma_\Delta} + \Moment{\cov}{\rv{s_t}, \rv{\Delta_t}} + \Moment{\cov}{\rv{\Delta_t}, \rv{s_t}},
+    \end{split}
 \end{align}
 where $\Moment{\cov}{\rv{s_t}, \rv{\Delta_t}}$ denotes the covariance between the prior state and the state change.
 \Cref{alg:linearization} shows the different steps necessary to compute this predictive distribution.
@@ -849,14 +877,18 @@ Equivalently, the angles have to be replaced in the joint distribution of the st
 Let $\rv{\alpha} \sim \Gaussian{\mu, \sigma^2}$ denote an angle with a Gaussian distribution.
 Using Euler's identity, it can be shown that the expected values of its sine and cosine are given by
 \begin{align}
-    \Moment{\E}{\sin \rv{\alpha}} &= \exp\!\left( -\frac{\sigma^2}{2} \right)\sin\mu, \\
-    \Moment{\E}{\cos \rv{\alpha}} &= \exp\!\left( -\frac{\sigma^2}{2} \right)\cos\mu,
+    \begin{split}
+        \Moment{\E}{\sin \rv{\alpha}} &= \exp\!\left( -\frac{\sigma^2}{2} \right)\sin\mu, \\
+        \Moment{\E}{\cos \rv{\alpha}} &= \exp\!\left( -\frac{\sigma^2}{2} \right)\cos\mu,
+    \end{split}
 \end{align}
 respectively \cite{deisenroth_efficient_2010}.
 The variances of the two random variables can be calculated as
 \begin{align}
-    \Moment{\var}{\sin \rv{\alpha}} &= \frac{1}{2} - \frac{1}{2} \exp\!\left( -2 \sigma^2 \right) \cos(2\mu) - \exp(- \sigma^2) \sin^2\mu, \\
-    \Moment{\var}{\cos \rv{\alpha}} &= \frac{1}{2} + \frac{1}{2} \exp\!\left( -2 \sigma^2 \right) \cos(2\mu) - \exp(- \sigma^2) \cos^2\mu.
+    \begin{split}
+        \Moment{\var}{\sin \rv{\alpha}} &= \frac{1}{2} - \frac{1}{2} \exp\!\left( -2 \sigma^2 \right) \cos(2\mu) - \exp(- \sigma^2) \sin^2\mu, \\
+        \Moment{\var}{\cos \rv{\alpha}} &= \frac{1}{2} + \frac{1}{2} \exp\!\left( -2 \sigma^2 \right) \cos(2\mu) - \exp(- \sigma^2) \cos^2\mu.
+    \end{split}
 \end{align}
 The mean $\mat{\hat{\mu}_t}$ and covariance matrix $\mat{\hat{\Sigma}_t}$ of the augmented are calculated by inserting these values into the original mean $\rv{\mu_t}$ and covariance matrix $\rv{\Sigma_t}$ instead of the respective angles.
 Since the sine and cosine functions are nonlinear, the covariances of the transformed angles with all other variables is assumed to be zero.
@@ -896,9 +928,11 @@ and depends on the derivative of the kernel function with respect to the augment
 The Gaussian processes used in this thesis only make the prior assumption that the transition dynamics of the bicycle benchmark are a smooth function and are trained using a squared exponential kernel.
 For the squared exponential kernel as shown in \cref{def:rbf_kernel}, this derivation can be calculated as
 \begin{align}
-    \frac{\partial}{\partial \mat{\mu}}\K_{\text{SE}}(\mat{\mu}, \mat{x}) &= \frac{\partial}{\partial \mat{\mu}} \sigma_f^2 \exp\!\left( -\frac{1}{2} (\mat{\mu} - \mat{x})\tran \mat{\Lambda}^{-1} (\mat{\mu} - \mat{x}) \right) \\
-    &= \K_{\text{SE}}(\mat{\mu}, \mat{x}) \frac{\partial}{\partial \mat{\mu}}\!\left( -\frac{1}{2} (\mat{\mu} - \mat{x})\tran \mat{\Lambda}^{-1} (\mat{\mu} - \mat{x}) \right) \\
-    &= -\K_{\text{SE}}(\mat{\mu}, \mat{x}) \mat{\Lambda}^{-1} (\mat{\mu} - \mat{x}).
+    \begin{split}
+        \frac{\partial}{\partial \mat{\mu}}\K_{\text{SE}}(\mat{\mu}, \mat{x}) &= \frac{\partial}{\partial \mat{\mu}} \sigma_f^2 \exp\!\left( -\frac{1}{2} (\mat{\mu} - \mat{x})\tran \mat{\Lambda}^{-1} (\mat{\mu} - \mat{x}) \right) \\
+        &= \K_{\text{SE}}(\mat{\mu}, \mat{x}) \frac{\partial}{\partial \mat{\mu}}\!\left( -\frac{1}{2} (\mat{\mu} - \mat{x})\tran \mat{\Lambda}^{-1} (\mat{\mu} - \mat{x}) \right) \\
+        &= -\K_{\text{SE}}(\mat{\mu}, \mat{x}) \mat{\Lambda}^{-1} (\mat{\mu} - \mat{x}).
+    \end{split}
 \end{align}
 
 The predictive variance $\mat{\Sigma_\Delta}$ consists of two components, the propagated uncertainty about the prior state and the newly added model uncertainties for this transition.
@@ -906,14 +940,16 @@ Since the transition model is linearized, the propagation of the prior uncertain
 Since the transition model is only evaluated for the prior mean $\mat{\hat{\mu}_t}$ and not for all other possible states, the true model uncertainty is unknown.
 Instead, it is assumed to be constant and equal to the uncertainty for the prior mean.
 The two components are independent given the prior distribution and therefore, the predictive variance is given by
-\begin{alignat}{2}
-    \mat{\Sigma_\Delta} &= \Moment{\var}{V \rv{\hat{s}_t}} &&+ \Moment{\var}{f(\rv{\hat{\mu}_t}, \mat{a_t})} \\
-    &= V \mat{\hat{\Sigma}_t} V\tran &&+ \diag\left(
+\begin{align}
+    \begin{alignedat}{2}
+        \mat{\Sigma_\Delta} &= \Moment{\var}{V \rv{\hat{s}_t}} &&+ \Moment{\var}{f(\rv{\hat{\mu}_t}, \mat{a_t})} \\
+        &= V \mat{\hat{\Sigma}_t} V\tran &&+ \diag\left(
         \Moment*{\var}{f_1(\rv{\hat{\mu}_t}, \mat{a_t})},
         \ldots,
         \Moment*{\var}{f_D(\rv{\hat{\mu}_t}, \mat{a_t})}
     \right),
-\end{alignat}
+    \end{alignedat}
+\end{align}
 since $\mat{\hat{s}_t}$ is Gaussian \cite{petersen_matrix_2008}.
 The covariance of the augmented state and the state change is given by
 \begin{align}
@@ -924,11 +960,13 @@ using the linearity of expectations. Equivalently, it holds that $\Moment{\cov}{
 Using the linearization of the predictive mean function, all components necessary to approximate the posterior distribution $\Prob{\rv{s_{t+1}}}$ can be calculated.
 The belief about the successive state is a Gaussian distribution characterized by
 \begin{align}
-    \rv{s_{t+1}} &\sim \Gaussian{\mat{\mu_{t+1}}, \mat{\Sigma_{t+1}}} \text{, where} \\
-    \mat{\mu_{t+1}} &= \mat{\mu_t} + \mat{\mu_\Delta} \\
-    &= \mat{\mu_t} + \Moment{\E}{f(\rv{\hat{\mu}_t}, \mat{a_t})} \\
-    \mat{\Sigma_{t+1}} &= \mat{\Sigma_t} + \mat{\Sigma_\Delta} + \Moment{\cov}{\rv{s_t}, \rv{\Delta_t}} + \Moment{\cov}{\rv{\Delta_t}, \rv{s_t}} \\
-    &= \mat{\Sigma_t} + V\mat{\hat{\Sigma}_t}V\tran + \Moment{\var}{f(\rv{\hat{\mu}_t}, \mat{a_t})} + \mat{\hat{\Sigma}_t}V\tran + V\mat{\hat{\Sigma}_t}.
+    \begin{split}
+        \rv{s_{t+1}} &\sim \Gaussian{\mat{\mu_{t+1}}, \mat{\Sigma_{t+1}}} \text{, where} \\
+        \mat{\mu_{t+1}} &= \mat{\mu_t} + \mat{\mu_\Delta} \\
+        &= \mat{\mu_t} + \Moment{\E}{f(\rv{\hat{\mu}_t}, \mat{a_t})} \\
+        \mat{\Sigma_{t+1}} &= \mat{\Sigma_t} + \mat{\Sigma_\Delta} + \Moment{\cov}{\rv{s_t}, \rv{\Delta_t}} + \Moment{\cov}{\rv{\Delta_t}, \rv{s_t}} \\
+        &= \mat{\Sigma_t} + V\mat{\hat{\Sigma}_t}V\tran + \Moment{\var}{f(\rv{\hat{\mu}_t}, \mat{a_t})} + \mat{\hat{\Sigma}_t}V\tran + V\mat{\hat{\Sigma}_t}.
+    \end{split}
 \end{align}
 
 \subsection{Long-Term predictions}

@@ -136,14 +136,17 @@ The combination $\varphi$ of this displacement and the lean angle of the bicycle
 \end{align}
 With this, the angular acceleration $\ddot{\omega}$ can be calculated as
 \begin{align}
-    \ddot{\omega} \coloneqq \frac{1}{I_{\text{BC}}} \left(
-        \sin \varphi \cdot Mgh - \cos \varphi \cdot \left(
-            I_{\text{dc}}\dot{\sigma}\cdot\dot{\theta} +
-            \sgn(\theta) \cdot v^2 \left(
-                \frac{M_dr}{r_f} + \frac{M_d r}{r_b} + \frac{Mh}{r_\CM}
+    \begin{split}
+        \ddot{\omega} &\coloneqq \frac{1}{I_{\text{BC}}} \Bigg(
+            \sin \varphi \cdot Mgh \\
+            &\qquad- \cos \varphi \cdot \left(
+                I_{\text{dc}}\dot{\sigma}\cdot\dot{\theta} +
+                \sgn(\theta) \cdot v^2 \left(
+                    \frac{M_dr}{r_f} + \frac{M_d r}{r_b} + \frac{Mh}{r_\CM}
+                \right)
             \right)
-        \right)
-    \right).
+        \Bigg).
+    \end{split}
 \end{align}
 
 The angular acceleration $\ddot{\theta}$ of the orientation of the front tyre is equal to that of the handlebars because the front fork is assumed to vertical.
