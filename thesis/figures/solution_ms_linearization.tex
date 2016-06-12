@@ -1,0 +1,78 @@
+\documentclass{standalone}
+\input{tikz_common.tex}
+\input{tikz_standalone.tex}
+
+\begin{document}
+\begin{tikzpicture}
+    \begin{axis} [
+            default plot,
+            ymin=-6.5,
+            ymax=6.5,
+            xmin=-5,
+            xmax=5,
+            yticklabel pos=right,
+            xticklabel pos=right,
+            ylabel={$\bm{\Delta_t}$},
+            xlabel={$(\bm{s}, \bm{a})$},
+        ]
+        \addplot[thin, tumblue, name path=c, restrict x to domain=-5:5] table[x=X, y expr=\thisrow{y} + \thisrow{y_2std}] {\datapath/data/posterior_gp.dat};
+        \addplot[thin, tumblue, name path=d, restrict x to domain=-5:5] table[x=X, y expr=\thisrow{y} - \thisrow{y_2std}] {\datapath/data/posterior_gp.dat};
+        \addplot[tumblue!15] fill between[of=c and d, on layer={axis background}];
+        \addplot[very thick, tumblue] table[x=X, y=y] {\datapath/data/posterior_gp.dat};
+
+        \addplot[only marks, mark size=1.5pt] table[x=X, y=y] {\datapath/data/posterior_data.dat};
+
+        \addplot[tumgreen, thick] {x + 3.5};
+
+        \coordinate (gp intersection) at (-0.5, 3);
+    \end{axis}
+
+    \begin{axis} [
+            default plot,
+            xmin=-5,
+            xmax=5,
+            shift=({0, -10pt}),
+            anchor=north west,
+            height=120pt,
+            width=240pt,
+            yticklabel pos=right,
+            xlabel={$(\bm{s}, \bm{a})$},
+            ylabel={$p(\bm{s}, \bm{a})$},
+            extra x ticks={-0.5},
+            extra x tick labels={$\mu_{\text{prior}}$},
+            extra x tick style={
+                x tick label style={yshift=-1.2ex},
+            },
+        ]
+        \addplot[very thick, tumblue, smooth, samples=300] {
+                exp(-(x + 0.5)^2 / (2 * 0.25)) / (sqrt(2 * pi * 0.25))
+        };
+
+        \coordinate (prior mean) at (-0.5, -0.1);
+    \end{axis}
+
+    \begin{axis} [
+            default plot,
+            ymin=-6.5,
+            ymax=6.5,
+            shift=({-10pt, 0}),
+            anchor=south east,
+            width=120pt,
+            height=207pt,
+            x dir=reverse,
+            ylabel={$\bm{\Delta_t}$},
+            xlabel={$p(\bm{\Delta_t})$},
+            extra y ticks={3},
+            extra y tick labels={$\mu_{\text{lin}}$},
+        ]
+        \addplot[very thick, tumblue, smooth, samples=300, domain=-6:6] (
+                exp(-(x - 3)^2 / (2 * 0.25)) / (sqrt(2 * pi * 0.25)),
+                x
+        );
+
+        \coordinate (posterior mean) at (0.9, 3);
+    \end{axis}
+
+    \draw[thick, tumgreen, dashed] (prior mean) -- (gp intersection) -- (posterior mean);
+\end{tikzpicture}
+\end{document}
