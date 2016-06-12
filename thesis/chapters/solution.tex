@@ -30,8 +30,8 @@ The transition dynamics are derived from a physical approximation of the system 
 
 This thesis assumes that the actor is not allowed to interact with the system in order to evaluate or improve its policy.
 In contrast, the agent is presented with a predefined data set of observations of the system obtained with a simple and sub-optimal controller.
-This constraint is meant to mimic industrial systems where it is comparatively cheap to obtain measurements of running systems but allowing an agent to explore is either very expensive or a security concern.
-It is therefore not possible to apply an on-line learning scheme on the system or to explore in specific directions in order to improve the dynamics model.
+This constraint is meant to mimic industrial systems where it is comparatively cheap to obtain measurements of running systems but allowing an agent to explore is either very expensive or a safety concern.
+It is therefore not possible to apply an on-line learning scheme to the system or to explore in specific directions in order to improve the dynamics model.
 
 This section first describes how data sets are sampled from the bicycle benchmark in order to simulate this constraint.
 These data sets are then used to train the Gaussian processes used by PSO-P.
@@ -118,17 +118,16 @@ The bicycle benchmark's dynamics are introduced in \cref{cha:the_bicycle_benchma
 Given a starting state and an appropriate number of actions, these derivatives can be used to approximate the future behaviour of the system using iterative numerical methods for approximating ordinary differential equations.
 For this thesis, the bicycle benchmark was implemented in Python \cite{van_rossum_python_1995} with NumPy \cite{walt_numpy_2011} and using the classical Runge-Kutta scheme \cite{kutta_beitrag_1901}.
 
-In their experiments, \citeauthor{randlov_learning_1998} chose a time discretization of 0.01 seconds.
+In their experiments, \citeauthor{randlov_learning_1998} \cite{randlov_learning_1998} chose a time discretization of 0.01 seconds.
 During this time, the action applied by the agent remains constant and after one such time step, the agent can choose a new action.
 This results in a controller frequency of \SI[mode=text]{100}{\Hz}.
-A high frequency gives the agent a high degree of control which is often not possible to achieve in real systems.
-The experiments in this thesis are based on the same time discretization of 0.01 seconds but only allow the actor to choose an action every ten time steps, keeping it constant for the time steps in between.
+The experiments in this thesis are based on the same time discretization of 0.01 seconds but for computational reasons only allow the actor to choose an action every ten time steps, keeping it constant for the time steps in between.
 This yields a controller frequency of \SI[mode=text]{10}{\Hz}.
 The choice of time discretization is the only free parameter in the transition dynamics for the bicycle system described in \cref{cha:the_bicycle_benchmark}.
 The resulting transition dynamics used for the interaction of the controller and the system are called $\DynBicycle$ below.
 
 Applying a controller to the bicycle benchmark produces time series beginning at some starting state and ending when the cyclist either falls down or reaches the goal.
-It is assumed that no expert knowledge is available, so the data sets available for learning transition dynamics should not be based a controller which can successfully balance the bicycle.
+It is assumed that no expert knowledge is available, so the data sets available for learning transition dynamics should not be based on a controller which can successfully balance the bicycle.
 Instead, this thesis chooses an uninformed controller which applies random actions to the system.
 
 \begin{figure}[t]
@@ -166,7 +165,7 @@ While the bicycle starts in an upright position, it quickly starts leaning heavi
 The sampled trajectories do not contain many state transitions where the bicycle drives straight or the actions counteract falling.
 
 In order to reduce this bias, the data set also contains random samples from the complete state space as shown in \cref{alg:bicycle_data_set}.
-While those random samples add more balanced observations of the system, they also increase the difficulty of the learning problem.
+While those random samples add more coverage of the state space of the system, they also increase the difficulty of the learning problem.
 Not every combination of angles in the state space is sensible and can be reached from an upright starting state by applying actions.
 The transition models therefore also have to learn irrelevant information about the dynamics.
 A heuristic to reduce the amount of improbable states is to not sample the angles uniformly but rather to sample them from a broad normal distribution around zero, resampling values which fall outside of the range of allowed values.
@@ -211,7 +210,8 @@ Similar to the absence of terminal states, the transition models are also not aw
 
 All models are trained using the squared exponential kernel presented in \cref{def:rbf_kernel}.
 The bicycle benchmark represents a physical system, which makes smoothness of the transition function a natural assumption.
-The RBF kernel is the standard choice in Gaussian process regression when no special knowledge about the shape of the transition function is available\todo{maybe mention other kernels? Is there anything to say about them?}.
+The RBF kernel is a common choice in Gaussian process regression when no special knowledge about the shape of the transition function is available.
+Experiments with other kernels and combinations of kernels showed no difference in terms of mean squared error on a test set.
 
 Opposed to learning successive states directly, the training targets for the $d$th dimension are the differences to the current state given by
 \begin{align}
@@ -308,7 +308,7 @@ If any action applied to the system leads to the danger of falling over however,
 
 Without expert knowledge available, the controller must learn this distinction autonomously, given the reward function.
 The most basic and uninformed reward function possible assigns positive reward for reaching the goal, a punishment (in the form of negative reward) for falling over and weighs all other states equally somewhere between the two extremes.
-While this can be enough to teach the short-term task of avoiding to fall down, the agent has no initiative of driving towards the goal besides actually hitting it.
+While this can be enough to teach the short-term task of avoiding to fall down, the agent has no incentive of driving towards the goal.
 For most situations, the goal cannot be reached within the time-horizon of one PSO-P instance.
 In this setting, PSO-P would optimize towards a trajectory for which the chance of falling down is minimal.
 This trajectory is a circle with large radius~\cite{randlov_learning_1998}.
@@ -322,7 +322,7 @@ The hint towards the goal encoded in the reward function should be a term which 
 The most simple term to consider is a punishment based on the current distance to the goal.
 This formulation is problematic however, since the agent should not care about the actual distance rather than the change of distance with respect to the previous state, which cannot be expressed in the reward.
 Using the distance itself, an increase in reward would express movement in the correct direction.
-However, for any non-linear punishment, the amount of increase is dependent on the current position in the input space and can lead to numerical problems if it gets to small.
+However, for any non-linear punishment, the amount of increase is dependent on the current position in the input space and can lead to numerical problems if it gets too small.
 If it were linear, the punishment might at some point be larger than the punishment for falling.
 At this point, the agent's correct choice would be to fall down as quickly as possible.
 
@@ -345,9 +345,9 @@ The quadratic saturating reward function is a Gaussian density function normaliz
 It behaves locally quadratic around this maximum and shows exponential drop off towards zero for large deviations from the mean.
 \Cref{fig:saturating_reward} compares the saturating reward function to a linear one.
 The Gaussian reward is more forgiving for small errors around zero but punishes large deviations more, which is a good behaviour for the bicycle benchmark since it is often good enough for the bicycle to only approximately head towards the goal.
-If the bicycle has reached the goal, the agent receives a constant award of two.
+If the bicycle has reached the goal, the agent receives a constant reward of two.
 This is double the reward which can be obtained for any state which is not in the goal.
-Similarly, the reward for any state where the bicycle has fallen over is zero, which is less then for any non-terminal state in the benchmark.
+Similarly, the reward for any state where the bicycle has fallen over is zero, which is less than for any non-terminal state in the benchmark.
 
 \begin{definition}[Bicycle Reward Function]
     Given the set $\Es^+$ of possible states of the bicycle benchmark and the sets $\Goal$ and $\Fallen$ of all terminal states where the bicycle has reached the goal or fallen respectively, the \emph{bicycle reward function} is defined as
@@ -370,6 +370,7 @@ Similarly, the reward for any state where the bicycle has fallen over is zero, w
 The agent does not receive negative reward for falling down.
 Instead, the reward is zero.
 The agent is still punished when falling down though, since the episode has to end and the agent is not able to collect additional reward by driving towards the goal at later time steps.
+The width $\sigma_{\text{angle}}^2$ of the saturating reward was chosen to be $(\sfrac{\pi}{2})^2$, a compromise between an emphasized peak at zero and sufficiently large derivatives at the extreme values $-\pi$ and $\pi$.
 
 \subsection{Long-Term predictions}
 \label{sub:map_predictions}
@@ -396,7 +397,6 @@ A state where $\psi$ is greater than $\pi$ or where $\theta$ is greater than $\s
 This is unknown to the transition models and it is possible for them to predict impossible states.
 Since these extreme states are rare, this thesis considers all physically impossible predictions to be predictions of the closest possible value.
 A prediction of $\sfrac{\pi}{6} + \epsilon$ for $\theta$ is interpreted as a prediction of $\sfrac{\pi}{6}$.
-Notationally, this thesis uses a projection function $\squeeze \colon \R^7 \to \Es^+$ to indicate the correction of impossible states.
 
 Gaussian processes are Bayesian models which predict values by averaging over all plausible latent functions, resulting in a Gaussian belief about the prediction.
 In order to simulate a deterministic transition model, this first approach for long-term predictions discards this belief and only predicts a single successive state.
@@ -428,14 +428,16 @@ Since states at all time steps are deterministic, terminal states can easily be 
             \Es^+ \times \Ah &\to \Es^+ \\
             (\mat{s_t}, \mat{a_t}) &\mapsto \begin{cases}
             \mat{s_t} & \text{if $\mat{s_t} \in \Tee$} \\
-            \squeeze(\Moment{\E}{f(\mat{s_t}, \mat{a_t})}) & \text{otherwise,}
+            \Moment{\E}{f(\mat{s_t}, \mat{a_t})} & \text{otherwise,}
         \end{cases}
     \end{aligned}
     \right.
 \end{align}
 where the expected value of $f(\mat{s_t}, \mat{a_t})$ can directly be computed using \cref{lem:gp_posterior}.
 Given a time horizon $T$, a starting state $\mat{s_0}$ and a vector of actions $(\mat{a_0}, \dots, \mat{a_{T-1}})$, this function can be used to calculate the intermediate states $\map{\mat{s_1}}$ to $\map{\mat{s_T}}$ using dynamic programming.
-\Cref{fig:map_predictions} \todo{mention that we only show internal variables} compares these iterated MAP-predictions with the correct evolution of the bicycle system in an example.
+\Cref{fig:map_predictions} compares these iterated MAP-predictions with the correct evolution of the bicycle system in an example.
+Only the angles $\theta$ and $\omega$ and their derivatives are shown in the picture, since they define the dynamics of the bicycle.
+The position and orientation of the bicycle are derived from those variables and do not play a role in long-term predictions.
 
 With these intermediate states and the reward function $\RwdBicycle$ from \cref{sub:reward_function}, it is possible to evaluate the action value function $\AVlu$ defined in \cref{eq:action_value_function} and therefore apply PSO-P to the bicycle system.
 Using the MAP-estimates for intermediate states, the action value function can be calculated as
@@ -478,7 +480,7 @@ Since all states are deterministic, all expected values collapse to applications
 \begin{algorithm}[tp]
     \caption{Bicycle evaluation setup}
     \label{alg:evaluation_setup}
-    Let $\AVlu$ denote an implementation of the action value function to be evaluated.
+    Let $\AVlu$ denote an implementation of the action value function to be evaluated and $\mat{s}^{\text{max}}$ the vector of maximum values for all state variables.
     All other constants are described in \cref{tab:evaluation_parameters} and \cref{alg:bicycle_data_set}.
     \begin{algorithmic}[1]
         \For{$i \gets 1, I$}
@@ -502,9 +504,9 @@ In order to reduce this bias in the evaluations, the performance is measured bas
 The behaviour of the transition models depends on the quality of the underlying data set, the number of input points used for training and the prior choices of the hyperparameters.
 The evaluation samples multiple data sets and then considers a number of combinations of training points $N$ and pseudo inputs $M$ as shown in \cref{tab:evaluation_parameters}.
 The number of pseudo inputs determines the expressiveness of the model.
-Many pseudo inputs allow the transition models to describe the data with more detail while few pseudo inputs force the model to generalize.
+Many pseudo inputs allow the transition models to describe the data with more detail while few pseudo inputs may force the model to generalize more.
 
-Standard choices for the number of pseudo inputs is in the range from a few ten to several hundred inputs \cite{snelson_flexible_2007}, but the correct choice depends on the function to be learned and cannot easily be determined.
+Standard choices for the number of pseudo inputs are in the range from a few ten to several hundred inputs \cite{snelson_flexible_2007}, but the correct choice depends on the function to be learned and cannot easily be determined.
 The models in this thesis range from very simple models with 20 pseudo inputs to more powerful models with 150 pseudo inputs.
 The boundaries were chosen based on empirical studies.
 At some point below 20 pseudo inputs, the models collapse since they loose their expressive power.
@@ -521,18 +523,9 @@ The time horizon $T$ used in PSO-P is chosen to be long enough to contain about 
 This proofed to be a long enough horizon to solve the benchmark while still remaining computationally feasible.
 
 The application of \cref{alg:evaluation_setup} leads to a large set of trajectories based on different data and different models.
-In order to compare different implementations of the action value function $\AVlu$, PSO-P is applied to the same starting states using the same models using the respective functions.
+In order to compare different implementations of the action value function $\AVlu$, PSO-P is applied to the same starting states using the same models with the respective functions.
 
-\subsection{Results}
-\begin{figure}[tp]
-    \centering
-    \includestandalonewithpath{figures/solution_map_goal_percentage}
-    \caption[Results using MAP-predictions]{
-        The success rate for different numbers of pseudo inputs with the standard error of the mean.
-        The performance of MAP-predictions increases slightly with the number of pseudo inputs but always remains below 60 percent.
-    }
-    \label{fig:map_results}
-\end{figure}
+\subsection{Results using MAP Predictions}
 \begin{figure}[tp]
     \centering
     \includestandalonewithpath{figures/solution_map_trajectory}
@@ -543,6 +536,15 @@ In order to compare different implementations of the action value function $\AVl
         This allows the agent to make a more aggressive turn until time step 30, after which the bicycle is heading towards the goal in a mostly straight line.
     }
     \label{fig:map_successful_trajectory}
+\end{figure}
+\begin{figure}[tp]
+    \centering
+    \includestandalonewithpath{figures/solution_map_goal_percentage}
+    \caption[Results using MAP-predictions]{
+        The success rate for different numbers of pseudo inputs with the standard error of the mean.
+        The performance of MAP-predictions increases slightly with the number of pseudo inputs but always remains below 60 percent.
+    }
+    \label{fig:map_results}
 \end{figure}
 \begin{figure}[p]
     \centering
@@ -604,11 +606,10 @@ The function mapping a pair of a state distribution $\mat{s_t}$ and an action $\
     \os{\mat{s_{t+1}}} \colon \left\{
         \begin{aligned}
             \Dists(\Es^+) \times \Ah &\to \Dists(\Es^+) \\
-            (\rv{s_t}, \mat{a_t}) &\mapsto \squeeze(f(\Moment{\E}{\rv{s_t}}, \mat{a_t})),
+            (\rv{s_t}, \mat{a_t}) &\mapsto f(\Moment{\E}{\rv{s_t}}, \mat{a_t}),
     \end{aligned}
     \right.
 \end{align}
-where $\squeeze(f(\mat{\mu_t}, \mat{a_t})) = \squeeze(\Gaussian{\mat{\mu_{t+1}}, \mat{\Sigma_{t+1}}}) = \Gaussian{\squeeze(\mat{\mu_{t+1}}), \mat{\Sigma_{t+1}}}$ denotes the elimination of physically impossible states by correcting the posterior mean.
 Note that there can still be probability mass assigned to impossible states since the Gaussian is symmetric around the mean.
 Since only the mean is used for predictions, this does not cause a problem in this setting however.
 
@@ -695,7 +696,7 @@ The integral is then given by
     \intertext{where $\RwdBicycleHat$ denotes the reward term for states which are not terminal and is defined as}
     \RwdBicycleHat(\rv{s}) &\coloneqq \sqrt{2\pi\sigma_{\text{angle}}^2} \Gaussian{\Delta_\psi(\rv{s}) \given 0, \sigma_{\text{angle}}^2}.
 \end{align}
-The angle between the bicycle's heading and the goal $\Delta_\psi$ can be calculated as the difference of two entries of the state vector.
+The angle $\Delta_\psi$ between the bicycle's heading and the goal can be calculated as the difference of two entries of the state vector.
 Equivalently, it is the result of applying a linear transformation to the Gaussian state distribution.
 Since $\Delta_\psi = \psi - \varphi$ and the variables in the state vector are organized as presented in \cref{sub:gp_models}, this linear transformation has the form
 \begin{align}
@@ -745,7 +746,7 @@ Using the one-step uncertainties, the action value function can therefore be cal
     \end{split}
 \end{align}
 
-\subsection{Results}
+\subsection{Results using One-Step Uncertainties}
 \begin{figure}[tp]
     \centering
     \includestandalonewithpath{figures/solution_os_goal_percentage}
@@ -808,7 +809,7 @@ Over the course of multiple time steps, small errors nevertheless accumulate and
 
 In order to arrive at more reliable estimates of the true uncertainty about predictions several steps into the future, the uncertainty about the state $\rv{s_t}$ has to be taken into account when predicting the distribution of the state $\rv{s_{t+1}}$.
 Since the transition dynamics $\DynBicycle$ are nonlinear, calculating the propagation of the prior uncertainty through the Gaussian process directly is not analytically tractable and the resulting distribution usually is not a Gaussian.
-This section introduces an approximation of this propagation via linearization of the transition model around the predictive mean as presented in \cite{ko_gp-bayesfilters:_2009} and \cite{ deisenroth_gaussian_2015}.
+This section introduces an approximation of this propagation via linearization of the transition model around the predictive mean as presented in \cite{ko_gp-bayesfilters:_2009} and \cite{deisenroth_gaussian_2015}.
 This approximation can be used to create long-term predictions with accumulated uncertainties.
 
 \subsection{Propagation of Uncertainties using Linearization}
@@ -817,7 +818,7 @@ A transition model $f$ described in \cref{sub:gp_models} consists of a group of 
 Instead of predicting the successive state $\mat{s_{t+1}}$ directly given a pair of deterministic state $\mat{s_t}$ and action $\mat{a_t}$, the GPs are used to predict $\mat{\Delta_t} = \mat{s_{t+1}} - \mat{s_t}$, the difference between the two states.
 The model $f_d$ is used to predict the $d$-th entry of this vector.
 
-Using MAP-predictions, $\mat{\Delta_t}$ is assumed to be one deterministic value and using the one-step uncertainties, the complete Gaussian distribution $\rv{\Delta_t} \sim \Gaussian{\mat{\mu_\Delta}, \mat{\Sigma_\Delta}}$ is the basis the distribution of the successive state.
+Using MAP-predictions, $\mat{\Delta_t}$ is assumed to be one deterministic value and using the one-step uncertainties, the complete Gaussian distribution $\rv{\Delta_t} \sim \Gaussian{\mat{\mu_\Delta}, \mat{\Sigma_\Delta}}$ is the basis of the distribution of the successive state.
 Since $\mat{s_t}$ is assumed deterministic in these cases, the distribution of $\os{\rv{s_{t+1}}}$ is given by
 \begin{align}
     \begin{split}
@@ -838,14 +839,6 @@ In both cases, the state was again assumed to be deterministic for the timestep 
     }
     \label{fig:linearization}
 \end{figure}
-Now assume the state $\rv{s_t} \sim \Gaussian{\mat{\mu_t}, \mat{\Sigma_t}}$ is already uncertain.
-In order to propagate this uncertainty through the transition model, the distribution $\Prob{\rv{\Delta_t}}$ is computed by solving the integral
-\begin{align}
-    \Prob{\rv{\Delta_t}} = \iint \Prob{f(\rv{s_t}, \mat{a_t}) \given \rv{s_t}} \Prob{\rv{s_t}} \diff f \diff \rv{s_t},
-\end{align}
-that is, by marginalizing both the belief over the current state $\rv{s_t}$ and all plausible transition models $f$.
-\Cref{fig:linearization} illustrates that computing the exact predictive distribution is analytically intractable, since the GP models are highly nonlinear.
-
 \begin{algorithm}[p]
     \caption{Computing the successive state distribution}
     \label{alg:linearization}
@@ -856,6 +849,14 @@ that is, by marginalizing both the belief over the current state $\rv{s_t}$ and 
         \State Approximate the successive state distribution $\Prob{\rv{s_{t+1}}}$ as the sum of $\rv{s_t}$ and $\rv{\Delta_t}$
     \end{algorithmic}
 \end{algorithm}
+Now assume the state $\rv{s_t} \sim \Gaussian{\mat{\mu_t}, \mat{\Sigma_t}}$ is already uncertain.
+In order to propagate this uncertainty through the transition model, the distribution $\Prob{\rv{\Delta_t}}$ is computed by solving the integral
+\begin{align}
+    \Prob{\rv{\Delta_t}} = \iint \Prob{f(\rv{s_t}, \mat{a_t}) \given \rv{s_t}} \Prob{\rv{s_t}} \diff f \diff \rv{s_t},
+\end{align}
+that is, by marginalizing both the belief over the current state $\rv{s_t}$ and all plausible transition models $f$.
+\Cref{fig:linearization} illustrates that computing the exact predictive distribution is analytically intractable, since the GP models are highly nonlinear.
+
 Instead, the distribution is approximated by a Gaussian.
 Assume that the distribution $\rv{\Delta_t} \sim \Gaussian{\mat{\mu_\Delta}, \mat{\Sigma_\Delta}}$ is known.
 Since $\rv{s_{t+1}}$ is the sum of $\rv{s_t}$ and $\rv{\Delta_t}$, a Gaussian approximation of the posterior distribution is given by
@@ -891,7 +892,7 @@ The variances of the two random variables can be calculated as
     \end{split}
 \end{align}
 The mean $\mat{\hat{\mu}_t}$ and covariance matrix $\mat{\hat{\Sigma}_t}$ of the augmented are calculated by inserting these values into the original mean $\rv{\mu_t}$ and covariance matrix $\rv{\Sigma_t}$ instead of the respective angles.
-Since the sine and cosine functions are nonlinear, the covariances of the transformed angles with all other variables is assumed to be zero.
+Since the sine and cosine functions are nonlinear, the covariances of the transformed angles with all other variables are assumed to be zero.
 
 The second step in the algorithm is to calculate $\Prob{\rv{\Delta_t}}$ from the augmented state distribution.
 Since it cannot be calculated directly, the distribution is approximated with a Gaussian.
@@ -980,11 +981,10 @@ Given a pair of a state distribution $\rv{s_t}$ and an action $\mat{a_t}$, the d
     \ms{\mat{s_{t+1}}} \colon \left\{
         \begin{aligned}
             \Dists(\Es^+) \times \Ah &\to \Dists(\Es^+) \\
-            (\rv{s_t}, \mat{a_t}) &\mapsto \squeeze(f(\rv{s_t}, \mat{a_t})),
+            (\rv{s_t}, \mat{a_t}) &\mapsto f(\rv{s_t}, \mat{a_t}),
     \end{aligned}
     \right.
 \end{align}
-where $\squeeze$ denotes the elimination of physically impossible states by correcting the posterior mean, equivalent to \cref{eq:os_dynamic_programming}.
 With multi-step uncertainties it is no longer necessary to fall back to deterministic intermediate states for prediction.
 
 \begin{figure}[t]
@@ -1016,12 +1016,11 @@ Having calculated the terminal probabilities $\Prob{\ms{\PGoal_t}}$ and $\Prob{\
     \label{eq:ms_action_value_function}
     \begin{split}
         \ms{\AVlu}_{\mat{s_0}}(\mat{a_0}, \dots, \mat{a_{T-1}}) &= \Moment*{\E}{\sum_{t=0}^T \gamma^t \RwdBicycle(\mat{s_t}) \given f, \mat{s_0}, \mat{a_0}, \dots, \mat{a_{T-1}}} \\
-        &= \sum_{t=0}^T \gamma^t \Moment*{\E}{\RwdBicycle(\mat{s_t}) \given f, \mat{s_0}, \mat{a_0}, \dots, \mat{a_{T-1}}} \\
         &= \sum_{t=0}^T \gamma^t \bigg( 2 \cdot \Prob{\ms{\PGoal}_t} + (1 - \Prob{\ms{\PGoal}_t})(1 - \Prob{\ms{\PFallen}_t}) \\
     &\qquad \sqrt{2\pi\sigma_{\text{angle}}^2} \Gaussian{\pi\tran \ms{\mat{\mu_t}} \given 0, \sigma_{\text{angle}}^2 + \pi\tran \ms{\mat{\Sigma_t}}\pi} \bigg).
     \end{split}
 \end{align}
-Since the starting state $\mat{s_0}$ is deterministic, the reward function $\RwdBicycle$ can either be evaluated directly or the state can be approximated using a distribution $\Gaussian{\mat{s_0}, \epsilon\Eye}$ with $\epsilon \to 0$.
+Since the starting state $\mat{s_0}$ is deterministic, the reward $\RwdBicycle$ can either be evaluated directly or the state can be approximated using a distribution $\Gaussian{\mat{s_0}, \epsilon\Eye}$ with $\epsilon \to 0$.
 
 \subsection{Posterior States using the Truncation of Gaussians}
 Using the intermediate state distributions $\Prob{\ms{\rv{s_t}}}$ directly when predicting successive states is a good approximation in most cases but is not correct when the probabilities $\Prob{\rv{s_t} \in \Fallen}$ or $\Prob{\rv{s_t} \in \Goal}$ are large.
@@ -1049,7 +1048,7 @@ This condition is encoded in the successive state function $\tg{\mat{s_{t+1}}}$ 
     \tg{\mat{s_{t+1}}} \colon \left\{
         \begin{aligned}
             \Dists(\Es^+) \times \Ah &\to \Dists(\Es^+) \\
-            (\rv{s_t}, \mat{a_t}) &\mapsto \squeeze(f\Cond{\rv{s_t}, \mat{a_t} \given \rv{s_t} \not\in \Tee}).
+            (\rv{s_t}, \mat{a_t}) &\mapsto f\Cond{\rv{s_t}, \mat{a_t} \given \rv{s_t} \not\in \Tee}.
     \end{aligned}
     \right.
 \end{align}
@@ -1072,7 +1071,7 @@ The probabilities $\Prob{\tg{\rv{s_{t+1}}} \in \Goal}$ and $\Prob{\tg{\rv{s_{t+1
 In contrast, the probabilities $\Prob{\ms{\rv{s_{t+1}}} \in \Goal}$ and $\Prob{\ms{\rv{s_{t+1}}} \in \Fallen}$ also contain instances where $\ms{\rv{s_t}}$ already was in the respective sets.
 The multi-step uncertainties without the truncation of Gaussians therefore overestimate the terminal probabilities $\Prob{\PGoal_t}$ and $\Prob{\PFallen_t}$.
 
-\subsection{Results}
+\subsection{Results using Multi-Step Uncertainties}
 \begin{figure}[tp]
     \centering
     \includestandalonewithpath{figures/solution_ms_goal_percentage}
@@ -1129,7 +1128,7 @@ When using multi-step uncertainties, PSO-P must avoid action sequences which lea
 A possible explanation for the wavy movement is that driving straight is hard to predict for the transition model for two reasons.
 Firstly, the training data described in \cref{sub:data_sets} does not contain many samples of driving straight.
 The training trajectories start with a bicycle in an upright position going straight, but applying random actions cannot balance the bicycle.
-Since the bicycle quickly begins to fall, most transitions observed in the trajectories are do not show a balanced bicycle.
+Since the bicycle quickly begins to fall, most transitions observed in the trajectories do not show a balanced bicycle.
 Similarly, randomly sampled transitions do not show an upright bicycle with high probability.
 Because of this, the transition models are more confident about the parts of the system where the bicycle is leaning slightly and therefore, the long-term uncertainties are smaller in this case.
 And secondly, a balanced bicycle is unstable and if left alone, the bicycle will start to fall down.
@@ -1222,15 +1221,15 @@ The mean time to goal presented in \cref{tab:evaluation_results} are somewhat bi
 The median time to goal suggests that for similar situations, the time difference between the two approaches could be smaller.
 
 \section{Summary}
-This chapter applied the mathematical foundations presented in \cref{cha:theory} to the bicycle benchmark problem.
+This chapter applied Gaussian processes and PSO-P as presented in \cref{cha:theory} to the bicycle benchmark problem.
 It described the sampling of data sets and the design of Gaussian process models for the transition function $\DynBicycle$.
 Based on these models, it presented the classical solution of using deterministic maximum-a-posterior predictions to create long-term predictions.
 As a baseline for comparison, PSO-P was applied to the action-value-function $\AVlu$ using a reward function $\RwdBicycle$ formulated using reward shaping.
 
 A first improvement over plain MAP-predictions was given by using the one-step uncertainties yielded by the transition models to approximate the expected reward $\Moment{\E}{\RwdBicycle(\rv{s_t})}$ of the intermediate states $\rv{s_t}$ more exactly.
 If the intermediate states are no longer deterministic, it is no longer clear when a predictive trajectory ends.
-The solution proposed in this thesis is to calculate accumulative probabilities $\Prob{\PGoal_t}$ and $\Prob{\PFallen_t}$ for the different termination conditions for every time step and weigh the expected reward accordingly.
+The solution proposed in this thesis is to calculate accumulative probabilities $\Prob{\PGoal_t}$ and $\Prob{\PFallen_t}$ for the different termination conditions for every time step and to weigh the expected reward accordingly.
 
-Since one-step uncertainties cannot correctly model the iterated confidence of the transition model, the next approach is to propagate the state uncertainties through the nonlinear transition models using linearization.
+Since one-step uncertainties cannot correctly model the iterated confidence of the transition model, the next approach was to propagate the state uncertainties through the nonlinear transition models using linearization.
 These accumulated uncertainties reduce model bias since they give an accurate measure of the correctness of long-term trajectories and reduce model bias.
 Using PSO-P with multi-step uncertainties results in more defensive trajectories which are more often successful.

@@ -294,6 +294,7 @@ For any finite set of random variables, the matrix obtained by pairwise applicat
         \K(X, Y) = \mat{K_{XY}} \coloneqq \bigg( \K(x_i, y_j) \bigg)_{\substack{i \in [n], \\ j \in [m]}}
     \end{align}
     is called the \emph{Gram matrix} of $\K$ with respect to $X$ and $Y$ \cite{scholkopf_learning_2002}.
+    The notation $[n]$ describes the set $\Set{1, \dots, n}$ of integers.
 \end{definition}
 In order for the Gram matrix to be a valid covariance matrix $\mat{\Sigma}$ of a Gaussian distribution, it must be positive definite.
 \emph{Kernels} are functions which fulfill the property that for every possible subset of random variables, or more generally every set of elements in their domain, their induced Gram matrix is positive definite.
