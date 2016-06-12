@@ -696,11 +696,11 @@ This observation directly yields the SPGP predictive posterior using \cref{lem:g
 
 The predictive distribution as written in the previous equations can easily be compared to the predictive posterior of Gaussian processes in \cref{lem:gp_posterior}.
 They do however still involve the inversion of matrices of size $N \times N$ and therefore do not offer computational improvements.
-Using the matrix inversion lemma \cite{petersen_matrix_2008}, they can be rewritten to the form\todo{fix line spacing in equation}
+Using the matrix inversion lemma \cite{petersen_matrix_2008}, they can be rewritten to the form
 \begin{align}
     \begin{split}
         \mat{\mu_\ast} &= \mat{K_{\ast M}} \mat{B}^{-1} \mat{K_{MN}} \left( \diag(\mat{K_N} - \mat{Q_N}) + \sigma_n^2 \Eye \right)^{-1} \mat{y} \\
-        \mat{\Sigma_\ast} &= \mat{K_\ast} - \mat{K_{\ast M}} \left( \mat{K_M}^{-1} - \mat{B}^{-1} \right) \mat{K_{M \ast}} \\
+        \mat{\Sigma_\ast} &= \mat{K_\ast} - \mat{K_{\ast M}} \left( \mat{K_M}^{-1} - \mat{B}^{-1} \right) \mat{K_{M \ast}}\vphantom{\left(\mat{K_M}^{-1} \right)^{-1}} \\
         \mat{B} &= \mat{K_M} + \mat{K_{MN}} \left( \diag(\mat{K_N} - \mat{Q_N}) + \sigma_n^2 \Eye \right)^{-1} \mat{K_{NM}},
     \end{split}
 \end{align}
