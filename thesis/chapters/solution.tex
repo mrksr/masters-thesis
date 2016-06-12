@@ -801,10 +801,15 @@ Since $\mat{s_t}$ is assumed deterministic in these cases, the distribution of $
 \end{align}
 In both cases, the state was again assumed to be deterministic for the timestep $t+1$ and located at $\Moment{\E}{\rv{s_{t+1}}}$ in order to derive the distribution of the next state $\rv{s_{t+2}}$, preventing the accumulation of uncertainties.
 
-\begin{figure}[t]
+\begin{figure}[p]
     \centering
-    \missingfigure[figheight=.4\textheight]{Linearization Visualization}
-    \caption{MISSING: Linearization Visualization}
+    \includestandalonewithpath{figures/solution_ms_linearization}
+    \caption[Uncertainty propagation using linearization]{
+        This figure shows the propagation of uncertainties throug a Gaussian process transition model (upper right panel).
+        The belief about the prior state $\rv{s_t}$ is assumed to be Gaussian (lower right panel).
+        The orange shaded distribution of state changes $\rv{\Delta_t}$ (upper left panel) is not Gaussian in general and cannot be calculated analytically.
+        A Gaussian approximation can be obtained by linearizing the transition model around the prior mean $\rv{\mu_t}$.
+    }
     \label{fig:linearization}
 \end{figure}
 Now assume the state $\rv{s_t} \sim \Gaussian{\mat{\mu_t}, \mat{\Sigma_t}}$ is already uncertain.
@@ -815,7 +820,7 @@ In order to propagate this uncertainty through the transition model, the distrib
 that is, by marginalizing both the belief over the current state $\rv{s_t}$ and all plausible transition models $f$.
 \Cref{fig:linearization} illustrates that computing the exact predictive distribution is analytically intractable, since the GP models are highly nonlinear.
 
-\begin{algorithm}[t]
+\begin{algorithm}[p]
     \caption{Computing the successive state distribution}
     \label{alg:linearization}
     Let $\rv{s_t} \sim \Gaussian{\mat{\mu_t}, \mat{\Sigma_t}}$ denote a Gaussian state distribution and $\mat{a_t} \in \Ah$ a deterministic action.

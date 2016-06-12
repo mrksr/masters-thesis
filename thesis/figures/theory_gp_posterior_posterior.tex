@@ -10,7 +10,7 @@
         \addplot[thin, tumblue, name path=c, restrict x to domain=-5:5] table[x=X, y expr=\thisrow{y} + \thisrow{y_2std}] {\datapath/data/posterior_gp.dat};
         \addplot[thin, tumblue, name path=d, restrict x to domain=-5:5] table[x=X, y expr=\thisrow{y} - \thisrow{y_2std}] {\datapath/data/posterior_gp.dat};
         \addplot[tumblue!15] fill between[of=c and d, on layer={axis background}];
-        \addplot[very thick, tumblue] table[x=X, y=y] {\datapath/data/posterior_gp.dat};
+        \addplot[very thick, tumblue, restrict x to domain=-5:5] table[x=X, y=y] {\datapath/data/posterior_gp.dat};
 
         \addplot[prior sample, tumviolet] table[x=X, y=y] {\datapath/data/posterior_posterior_sample_0.dat};
         \addplot[prior sample, tumorange] table[x=X, y=y] {\datapath/data/posterior_posterior_sample_1.dat};
