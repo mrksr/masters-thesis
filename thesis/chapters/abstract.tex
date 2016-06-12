@@ -10,9 +10,12 @@ Thereby, multiple approaches of incorporating uncertainties are described and co
 \end{Abstract}
 
 \begin{Abstract}{ngerman}
-\todo{abstract placeholder}
-Diese Arbeit beschäftigt sich mit der Konstruktion von optimierten Flugpfaden für Kamerafahrten mit Multikoptern.
-Im Theorieteil werden geeignete Metriken definiert, mittels derer in einem Optimierungsverfahren Splines als Trajektorien erzeugt werden.
-Diese Lösung wird in eine Software überführt und um eine Flugsimulation erweitert.
-Schließlich werden Schnittstellen zu Flugsystemen der Firma Asctec geschaffen und die Flugbahnen in einem Anwendungsfall getestet.
+Im Reinforcement Learning ist es die Aufgabe eines Agenten zu lernen, welche Entscheidungen in einer unbekannten Umgebung eine numerische Belohnung maximieren.
+Im modellbasierten Reinforcement Learning wird die durch Interaktion erworbene Erfahrung in einem Transitionsmodell repräsentiert, mit dem das zukünftige Verhalten des Systems simuliert werden kann.
+Diese Arbeit beschäftigt sich damit, den systematischen Fehler zu reduzieren, der durch Entscheidungsfindung auf Basis eines imperfekten Modells entsteht.
+Anstatt eines einzelnen deterministischen Modells wird Wissen mit Hilfe von Gaußprozessen dargestellt, die eine Wahrscheinlichkeitsverteilung über alle plausiblen Transitionsmodelle darstellen.
+Unter Berücksichtigung aller dieser Modelle wird die erwartete Belohnung über mehrere Zeitschritte errechnet, wodurch Modellunsicherheiten explizit in die Planung integriert werden.
+Durch Anwendung von Partikelschwarmoptimierung auf dem erwarteten Reward wird eine Entscheidungsstrategie formuliert, die Aktionen direkt mit Hilfe der Modelle wählt.
+Neben der formalen Beschreibung dieser Werkzeuge untersucht diese Arbeit ihre Effektivität anhand eines Beispielproblems mit der Aufgabe, ein Fahrrad zu balancieren und zu navigieren.
+Dabei werden mehrere Ansätze beschrieben, wie Unsicherheiten in die Planung integriert werden können, und mit dem klassischen Ansatz deterministischer Vorhersagen verglichen.
 \end{Abstract}
