@@ -1,0 +1,159 @@
+\makeatletter
+
+\newcommand\thesisTypeText{}
+\newcommand\thesisType[1]{\renewcommand\thesisTypeText{#1}}
+
+\newcommand\matNoText{}
+\newcommand\matNo[1]{\renewcommand\matNoText{#1}}
+
+\newcommand\studiesText{}
+\newcommand\studies[1]{\renewcommand\studiesText{#1}}
+
+\newcommand\eMailText{}
+\newcommand\eMail[1]{\renewcommand\eMailText{#1}}
+
+\newcommand\FirstUniversityText{}
+\newcommand\university[1]{\renewcommand\FirstUniversityText{#1}}
+\newcommand\FirstChairText{}
+\newcommand\chair[1]{\renewcommand\FirstChairText{#1}}
+\newcommand\FirstUniversityLogo{}
+\newcommand\logo[1]{\renewcommand\FirstUniversityLogo{#1}}
+
+\newcommand\SecondUniversityText{}
+\newcommand\secondUniversity[1]{\renewcommand\SecondUniversityText{#1}}
+\newcommand\SecondChairText{}
+\newcommand\secondChair[1]{\renewcommand\SecondChairText{#1}}
+\newcommand\SecondUniversityLogo{}
+\newcommand\secondLogo[1]{\renewcommand\SecondUniversityLogo{#1}}
+
+\newcommand\CompanyText{}
+\newcommand\company[1]{\renewcommand\CompanyText{#1}}
+\newcommand\CompanyDepartmentText{}
+\newcommand\companyDepartment[1]{\renewcommand\CompanyDepartmentText{#1}}
+\newcommand\CompanyLogo{}
+\newcommand\companyLogo[1]{\renewcommand\CompanyLogo{#1}}
+
+\newcommand\advisorText{}
+\newcommand\advisor[1]{\renewcommand\advisorText{#1}}
+
+\newcommand\tutorText{}
+\newcommand\tutor[1]{\renewcommand\tutorText{#1}}
+
+\newcommand\TitleLogoHeight{2cm}
+
+\renewcommand\maketitle{
+    \begin{titlepage}%
+        \newgeometry{hmargin=3cm}
+
+        \let\footnotesize\small
+        \let\footnoterule\relax
+        \let \footnote \thanks
+
+        %\begin{center}
+        %  \includegraphics[width=0.75\linewidth,keepaspectratio]{bilder/unilogo.png}
+        %\end{center}
+
+        %  \hspace{-.1\linewidth}
+        %  \parbox{1.2\linewidth}
+        %  {
+        %    \raggedleft
+        %    \Large \textbf{\@author}
+        %
+        %    \small
+        %    \studiesText \ (\matNoText) \\
+        %    \eMailText
+        %  }
+        \hspace*{-.1\linewidth}
+        \parbox{1.2\linewidth}
+        {
+            \raggedleft
+            \small ~\phantom{\@date}
+        }
+        \vspace*{\fill}
+        %\vskip 2em%
+
+        \hspace*{-.1\linewidth}
+        \parbox{1.2\linewidth}
+        {
+            \raggedleft
+
+            %\begin{tabular*}{\linewidth}[b]{@{}p{0.5\linewidth}@{}p{0.5\linewidth}@{}}
+            % \@date  &  \raggedleft  \thesisTypeText
+            %\end{tabular*}
+            \thesisTypeText \\ %-- \@date \\
+            {\color{layoutTitle}\rule[.9em]{\linewidth}{2pt}
+                \huge {\bfseries\rmfamily\boldmath \@title}
+
+                \rule{\linewidth}{2pt}\par}
+
+            \vskip 0.7em%
+
+            \Large {\bfseries\rmfamily\@author}
+
+            %\small
+            %\studiesText \ (\matNoText) \\
+            %\eMailText
+
+        }%
+
+        \vspace*{\fill}
+
+        %\hspace*{-.1\linewidth}
+        %\parbox{1.2\linewidth}
+        %{
+                    %\raggedleft
+                    %\Large
+                    %\textrm{\rmfamily\advisorText} \\
+                    %\small
+                    %Gutachter
+
+                    %\vskip 1.5em
+
+                    %\raggedleft
+                    %\Large
+                    %\textrm{\rmfamily\tutorText} \\
+                    %\small
+                    %Betreuer
+        %}
+
+        %\vfil\null
+        %\vspace*{\fill}
+
+        \hspace*{-.1\linewidth}
+        \parbox{1.2\linewidth}{
+            \begin{tabular}[c]{@{}l@{}r@{}}
+                \parbox[b][][b]{0.35\linewidth}
+                {
+                    \includegraphics[height=\TitleLogoHeight,keepaspectratio]{\FirstUniversityLogo}
+                }
+                &
+                \parbox[b][][b]{0.65\linewidth}
+                {
+                    \raggedleft
+                    \textbf{\rmfamily\FirstChairText}\\
+                    \small\FirstUniversityText\\
+                }
+            \end{tabular}
+        }
+
+        %\vskip 2.5em%
+
+        %{\large \@date \par}%       % Set date in \large size.
+
+        %\vfil\null
+
+        \restoregeometry
+    \end{titlepage}%
+    \setcounter{footnote}{0}%
+    %\global\let\thanks\relax
+    %\global\let\maketitle\relax
+    %\global\let\@thanks\@empty
+    %\global\let\@author\@empty
+    %\global\let\@date\@empty
+    %\global\let\@title\@empty
+    %\global\let\title\relax
+    %\global\let\author\relax
+    %\global\let\date\relax
+    %\global\let\and\relax
+}
+\makeatother

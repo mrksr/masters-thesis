@@ -1,0 +1,75 @@
+\makeatletter
+
+\newcommand\thesisTypeText{}
+\newcommand\thesisType[1]{\renewcommand\thesisTypeText{#1}}
+
+\newcommand\matNoText{}
+\newcommand\matNo[1]{\renewcommand\matNoText{#1}}
+
+\newcommand\studiesText{}
+\newcommand\studies[1]{\renewcommand\studiesText{#1}}
+
+\newcommand\eMailText{}
+\newcommand\eMail[1]{\renewcommand\eMailText{#1}}
+
+\newcommand\FirstUniversityText{}
+\newcommand\university[1]{\renewcommand\FirstUniversityText{#1}}
+\newcommand\FirstChairText{}
+\newcommand\chair[1]{\renewcommand\FirstChairText{#1}}
+\newcommand\FirstUniversityLogo{}
+\newcommand\logo[1]{\renewcommand\FirstUniversityLogo{#1}}
+
+\newcommand\SecondUniversityText{}
+\newcommand\secondUniversity[1]{\renewcommand\SecondUniversityText{#1}}
+\newcommand\SecondChairText{}
+\newcommand\secondChair[1]{\renewcommand\SecondChairText{#1}}
+\newcommand\SecondUniversityLogo{}
+\newcommand\secondLogo[1]{\renewcommand\SecondUniversityLogo{#1}}
+
+\newcommand\CompanyText{}
+\newcommand\company[1]{\renewcommand\CompanyText{#1}}
+\newcommand\CompanyDepartmentText{}
+\newcommand\companyDepartment[1]{\renewcommand\CompanyDepartmentText{#1}}
+\newcommand\CompanyLogo{}
+\newcommand\companyLogo[1]{\renewcommand\CompanyLogo{#1}}
+
+\newcommand\advisorText{}
+\newcommand\advisor[1]{\renewcommand\advisorText{#1}}
+
+\newcommand\tutorText{}
+\newcommand\tutor[1]{\renewcommand\tutorText{#1}}
+
+\newcommand\TitleLogoHeight{2cm}
+
+\renewcommand\maketitle{
+    \begin{titlepage}
+        \newgeometry{hmargin=3cm}
+        \vspace{10mm}
+        \begin{center}
+            \includegraphics[height=3cm,keepaspectratio]{figures/tum.eps}
+            \bigskip
+
+            {\huge DEPARTMENT OF INFORMATICS}
+
+            {\Large TECHNISCHE UNIVERSITÄT MÜNCHEN}
+        \end{center}
+        \vfill
+        \begin{center}
+            {\Large \thesisTypeText}
+        \end{center}
+        \vfill
+        \begin{center}
+            {\LARGE \textbf{\@title}}
+        \end{center}
+        \vfill
+        \begin{center}
+            {\Large \@author}
+        \end{center}
+        \vfill
+        \begin{center}
+            \includegraphics[height=2cm]{figures/tum_info.eps}
+        \end{center}
+        \restoregeometry
+    \end{titlepage}
+}
+\makeatother
