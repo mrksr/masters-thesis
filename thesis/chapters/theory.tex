@@ -124,11 +124,11 @@ Given a distribution of the state $\rv{s_t}$, the distribution for the next stat
     \intertext{where}
     \label{eq:rl_successive_state}
     \Prob{\rv{s_{t+1}} \given \rv{s_t}, \pi} &= \begin{cases}
-        \delta\left(\rv{s_t}, \rv{s_{t+1}}\right) & \text{ if $\rv{s_t} \in \Tee$} \\
+        \delta(\rv{s_{t+1}} - \rv{s_t}) & \text{ if $\rv{s_t} \in \Tee$} \\
         \Dyn\Cond{\rv{s_{t+1}} \given \rv{s_t}, \pi(\rv{s_t})} & \text{ otherwise.}
     \end{cases}
 \end{align}
-Here, $\delta$ denotes the Dirac-delta-distribution and the notation $\Dyn\Cond{\rv{s_{t+1}} \given \rv{s_t}, \pi(\rv{s_t})}$ means the probability of $\rv{s_{t+1}}$ under the distribution $\Dyn(\rv{s_t}, \pi(\rv{s_t}))$.
+Here, $\delta$ denotes the Dirac-delta-distribution as defined in \cite[39]{murphy_machine_2012} and the notation $\Dyn\Cond{\rv{s_{t+1}} \given \rv{s_t}, \pi(\rv{s_t})}$ means the probability of $\rv{s_{t+1}}$ under the distribution $\Dyn(\rv{s_t}, \pi(\rv{s_t}))$.
 Once the dynamics have reached a terminal state, all future states will be this same state.
 This extends all episodes to potentially infinite length.
 
