@@ -5,14 +5,14 @@ It was originally defined by \citeauthor{randlov_learning_1998} in 1998~\cite{ra
 The task in this benchmark is to balance and navigate a simulated bicycle which travels at a constant speed.
 
 The computer, or \emph{agent}, takes the place of the rider of the bicycle.
-After fixed time intervals, it has to decide how to influence the bicycle by applying some torque $T$ on the handle bars to steer or by displacing the center of mass of the bicycle via leaning over the bicycle by some distance $d$ or both.
+After fixed time intervals, it has to decide how to influence the bicycle by applying some torque $T$ on the handlebars to steer or by displacing the center of mass of the bicycle via leaning over the bicycle by some distance $d$ or both.
 In order to make its decision, the controller is given perfect information about the internal state of the simulation.
 Besides having to prevent the bicycle from falling over in the short-term, there is also the long-term goal of navigating to some predefined goal position.
 
 The bicycle is modelled by non-linear differential equations which describe the steering and leaning behaviour of the bicycle.
 The speed of the back tyre is considered constant and independent of the actions of the agent.
 This results in two important angles to describe the system.
-The angle $\theta$ is measured between the front tyre and the frame of the bicycle and describes the straightness of the bicycles path.
+The angle $\theta$ is measured between the front tyre and the frame of the bicycle and describes the straightness of the bicycle's path.
 The angle $\omega$ measures the amount of tilt of the bicycle's frame compared to standing upright.
 If the absolute value of $\omega$ is greater than 12 degrees, the bicycle has fallen over.
 In addition to the two angles, their time-derivatives $\dot{\theta}$ and $\dot{\omega}$ define the dynamics of the bicycle.
@@ -110,6 +110,8 @@ And secondly, the equations are not an exact analytical description, as some sec
         The angle $\omega$ describes the leaning of the bicycle.
         The center of mass is defined by the green bicycle's height $h$ and the leaning distance $d$.
         \Cref{fig:bicycle:inertia} shows the axes of the moments of inertia of the blue tyre.
+        The axis $I_{\text{dc}}$ describes the tyre's rotation due to movement of the bicycle.
+        The axes $I_{\text{dv}}$ and $I_{\text{dl}}$ describe the tyre's rotation due to leaning and steering respectively.
     }
     \label{fig:bicycle}
 \end{figure}
@@ -126,8 +128,8 @@ The moments of the tyre as displayed in \cref{fig:bicycle:inertia} and the momen
 The dynamics also depend on multiple constants which are detailed in \cref{tab:bicycle_constants}.
 
 The angular acceleration $\ddot{\omega}$ of the lean of the bicycle consists of three parts.
-The first part describes the gravitation acting on the bicycle and cyclist which pulls the bicycle in the direction it is already leaning.
-The second one are effects based on the conservation of angular momentum introduced via a cross-term dependent on \todo{interpretation?} $\dot{\theta}$.
+The first part describes the gravitation acting on the bicycle and cyclist which pulls the bicycle in the direction it is already leaning towards.
+The second one are effects based on the conservation of angular momentum introduced via a cross-term dependent on $\dot{\theta}$.
 The centrifugal force resulting from of the curved movement of the bicycle forms the last part.
 The center of mass can be displaced horizontally by the agent via the choice of $d$.
 The combination $\varphi$ of this displacement and the lean angle of the bicycle is defined as
@@ -136,6 +138,7 @@ The combination $\varphi$ of this displacement and the lean angle of the bicycle
 \end{align}
 With this, the angular acceleration $\ddot{\omega}$ can be calculated as
 \begin{align}
+    \label{eq:omega_dotdot}
     \begin{split}
         \ddot{\omega} &\coloneqq \frac{1}{I_{\text{BC}}} \Bigg(
             \sin \varphi \cdot Mgh \\
@@ -152,6 +155,7 @@ With this, the angular acceleration $\ddot{\omega}$ can be calculated as
 The angular acceleration $\ddot{\theta}$ of the orientation of the front tyre is equal to that of the handlebars because the front fork is assumed to vertical.
 It is dependent on the torque $T$ applied to the handlebars and the conservation of angular momentum introduced via a cross-term dependent on $\dot{\omega}$ and is calculated as
 \begin{align}
+    \label{eq:theta_dotdot}
     \ddot{\theta} \coloneqq \frac{T - I_{\text{dv}}\dot{\sigma}\dot{\omega}}{I_{\text{dl}}}.
 \end{align}
 
@@ -161,11 +165,11 @@ In order to successfully navigate to the goal position, these movements have to 
 The bicycle state contains three variables which locate the bicycle in space.
 The position of the bicycle is defined by the point where the front tyre touches the ground.
 This point is independent of the orientation of the handlebars given by the angle $\theta$ and identified via the two euclidean coordinates $x$ and $y$.
-The last state variable $\psi$ describes the orientation of the bicycle frame relative to this point as shown in \cref{fig:bicycle:above}.
-If $\psi$ is equal to zero, the back tyre points in $x$-direction if viewed from the point $(x, y)$ and a positive $\psi$ denotes a counter-clockwise rotation.
+The last state variable $\psi$ describes the orientation of the bicycle frame relative to the $x$-axis.
+If $\psi$ is equal to zero, the back tyre is located at a distance of $l$ looking along the positive $x$-axis from the point $(x, y)$ and a positive $\psi$ denotes a counter-clockwise rotation.
 
 The back tyre of the bicycle moves at the constant speed $v$.
-The front and back tyre follow two circular paths with different radii but the same center as can be seen in \cref{fig:bicycle:above} with the front tyre following the longer path.
+When keeping the steering angle of the handlebars constant, the front and back tyre follow two circular paths with different radii but the same center as can be seen in \cref{fig:bicycle:above} with the front tyre following the longer path.
 The radii $r_f$ and $r_b$ can be calculated as
 \begin{align}
     r_f &= \frac{l}{\abs*{\sin \theta}}, \\
@@ -177,38 +181,58 @@ If $\theta$ is equal to zero, the bicycle's orientation does not change and it m
 If it is not zero, the change of position and orientation can be calculated from the curved movement.
 
 Since the two tyres are connected with a rigid frame and the front tyre travels on a longer path, it has to do so at a higher speed.
-They do however share the same angular velocity $v_\circ$ on their respective circular paths, since if $\theta$ remains constant, the bicycle rotates around the common center point.
-This angular velocity can be derived from the constant speed of the back tyre and is given by
+They do however share the same angular velocity $v_\circ$ on their respective circular paths around the common center point.
+The bike's angular velocity can be derived from the constant speed of the back tyre and is given by
 \begin{align}
     v_\circ = \frac{v}{r_b}.
 \end{align}
 Combined with the direction of rotation on the circle defined by the sign of $\theta$, this directly yields the derivative of the world orientation $\psi$:
 \begin{align}
+    \label{eq:psi_dot}
     \dot{\psi} = \sgn(\theta) \cdot v_\circ
 \end{align}
 
 The actual speed of the front tyre can be obtained from the common angular velocity $v_\circ$ and the radius of its path $r_f$.
 Together with the orientation of the front tyre, this gives the derivatives
 \begin{align}
+    \label{eq:x_dot}
     \dot{x} &= v_\circ \cdot r_f \cdot \cos(\psi + \theta) \\
+    \label{eq:y_dot}
     \dot{y} &= v_\circ \cdot r_f \cdot \sin(\psi + \theta)
 \end{align}
 of the position of the bicycle.
 
 The original implementation of \citeauthor{randlov_learning_1998} uses an explicit Euler scheme to evolve the dynamics of the system for a time step.
 The changes of position and orientation are calculated using the exact analytical solution of moving the tyres along their circular paths.
-To improve accuracy, the implementation developed for this thesis implements a standard Runge-Kutta-Scheme as described in \citetitle{press_numerical_2007}~\cite{press_numerical_2007}.
+To improve accuracy, the implementation developed for this thesis works with a classical Runge-Kutta-Scheme as described in \citetitle{press_numerical_2007}~\cite{press_numerical_2007}.
 The assumption that for a single time step, the bicycle moves along a fixed circular path is no longer correct when evaluating the dynamics with Runge-Kutta.
 Because of this, the changes in position and orientation are integrated into the scheme.
+
+Let $\Delta$ denote the function which maps a pair state and action $(\mat{s}, \mat{a})$ of the bicycle benchmark to its derivatives given by
+\begin{align}
+    \Delta(\mat{s}, \mat{a}) = \Delta \left( \left( \theta, \dot{\theta}, \omega, \dot{\omega}, x, y, \psi \right), \mat{a} \right) \coloneqq \left( \dot{\theta}, \ddot{\theta}, \dot{\omega}, \ddot{\omega}, \dot{x}, \dot{y}, \dot{\psi} \right).
+\end{align}
+This function can be calculated using \cref{eq:theta_dotdot,eq:omega_dotdot,eq:x_dot,eq:y_dot,eq:psi_dot}.
+Given a state $\mat{s_t}$ at time $t$ and an action $\mat{a_t}$ which should be applied constantly for a time step $\tau$, an approximation to the state $\mat{s_{t+\tau}}$ can be calculated using the classical Runge-Kutta-Scheme given by
+\begin{align}
+    \mat{s_{t+\tau}} &= \mat{s_t} + \frac{\tau}{6} \left( \mat{k_1} + 2 \cdot \mat{k_2} + 2 \cdot \mat{k_3} + \mat{k_4} \right),
+    \intertext{where the intermediate constants $\mat{k_1}$ to $\mat{k_4}$ are calculated as}
+    \begin{split}
+        \mat{k_1} &= \Delta(\mat{s_t}, \mat{a_t}) \vphantom{\frac{\tau}{2}}\\
+        \mat{k_2} &= \Delta(\mat{s_t} + \frac{\tau}{2} \cdot \mat{k_1}, \mat{a_t}) \\
+        \mat{k_3} &= \Delta(\mat{s_t} + \frac{\tau}{2} \cdot \mat{k_2}, \mat{a_t}) \\
+        \mat{k_4} &= \Delta(\mat{s_t} + \tau \cdot \mat{k_3}, \mat{a_t}) \vphantom{\frac{\tau}{2}}.
+    \end{split}
+\end{align}
 
 The goal of the bicycle benchmark is to drive the bicycle to a specific position which is assumed to be a circle at the origin of the coordinate system with a radius of 5.
 The bicycle starts in a position which is almost upright, with the state variables $\theta$, $\dot{\theta}$, $\omega$, $\dot{\omega}$ being sampled from Gaussian noise with a standard deviation of one percent of their value range.
 
 The agent has to choose the two continuous actions $d$ and $T$ described in \cref{tab:bicycle_actions} every 0.01 seconds, after which they are assumed constant for this time interval.
-After this time, the controller is once again presented with the current and exact values of the state variables and has to make a new decision.
-One run of the bicycle system creates a time series of bicycle states and the actions chosen by the controller.
+After this time, the agent is once again presented with the current and exact values of the state variables and has to make a new decision.
+One run of the bicycle system creates a time series of bicycle states and the actions chosen by the agent.
 The episode ends in failure if the bicycle falls over and it ends in success if the bicycle reaches the goal.
 Since it is possible for the bicycle to drive in circles indefinitely, the episode also ends in failure after a certain amount of time has passed.
 
-The next chapter introduces reinforcement learning as a general mathematical description of the problem posed with the bicycle benchmark.
-Model based reinforcement learning is one way to solve the bicycle benchmark which tries to learn the bicycle's dynamics using general function approximators and use them to make informed guesses about the future.
+Using the bicycle benchmark as an example, the next chapter introduces reinforcement learning, a general mathematical description of the problem of learning how to control a dynamic system.
+This thesis focuses on model-based reinforcement learning, which tries to learn the bicycle's dynamics using general function approximators and use them to make informed guesses about the future.

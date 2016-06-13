@@ -3,7 +3,7 @@
 \input{tikz_standalone.tex}
 
 \begin{document}
-\begin{tikzpicture}
+\begin{tikzpicture}[x=0.9cm,y=0.9cm]
     \tikzstyle{bicycle} = [edge, ultra thick, shorten <=0pt, shorten >=0pt];
     \tikzstyle{tyre} = [bicycle, very thick];
     \tikzstyle{help} = [very thin];
@@ -17,7 +17,7 @@
     \coordinate (center) at (intersection of front--frontperp and back--backperp);
     \coordinate (thetapoint) at (-1, -0.25);
     \coordinate (thetadotpoint) at (0, 1);
-    \coordinate (psipoint1) at ($(back) + (1, 0)$);
+    \coordinate (psipoint1) at ($(back) - (1, 0)$);
     \coordinate (psipoint2) at ($(back) + (1, 0.25)$);
 
     \draw[help, dashed]
@@ -30,7 +30,7 @@
     \draw[help, shorten <=-2cm, shorten >=-2cm] (front) -- (back);
     \draw[help] ($(back) - (1.5, 0)$) -- ($(back) + (2, 0)$);
     \draw pic["$\theta$", draw, angle eccentricity=1.3, angle radius=0.75cm] {angle=thetapoint--front--tfront};
-    \draw pic["$\psi$", draw, angle eccentricity=1.3, angle radius=1.5cm] {angle=psipoint1--back--psipoint2};
+    \draw pic["$\psi$", draw] {angle=psipoint2--back--psipoint1};
     \draw pic["$\dot{\theta}$", draw, arrows={-latex}, angle eccentricity=1.3, angle radius=0.8cm] {angle=tback--front--thetadotpoint};
 
     \draw (front) -- node[right] {$r_f$} (center);
