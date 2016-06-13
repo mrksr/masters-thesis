@@ -1210,6 +1210,10 @@ Given a series of observed (and therefore deterministic) states beginning with t
 Note that $T$ is a constant defined in \cref{tab:evaluation_parameters} and can be larger than the length of the trajectory.
 In this case, the terminal state at the end of the trajectory is repeated infinitely as defined in \cref{eq:rl_successive_state}.
 \Cref{fig:results_mean_mean_reward} shows the mean mean reward of all trajectories created with the different classes of models.
+Given a set $\mat{\tau}$ of trajectories, the mean mean reward is defined as
+\begin{align}
+    \MeanMeanRwdBicycle(\mat{\tau}) \coloneqq \frac{1}{\abs{\mat{\tau}}} \sum_{i=1}^{\abs{\mat{\tau}}} \MeanRwdBicycle(\mat{\tau_i}).
+\end{align}
 Especially for less expressive models which are forced to generalize more, the techniques which consider model uncertainties perform better.
 While both OS and MS earn significantly more reward, MS-TG only slightly outperforms the baseline.
 

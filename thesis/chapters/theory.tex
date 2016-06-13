@@ -547,7 +547,7 @@ A new distribution is obtained by combining the prior with the likelihood of the
         &= \frac{\Prob{\mat{y} \given \mat{X}, \mat{\theta}} \Prob{\mat{\theta}}}{\int \Prob{\mat{y} \given \mat{X}, \mat{\theta}} \Prob{\mat{\theta}} \diff \theta}
     \end{split}
 \end{align}
-The integration required in \cref{eq:theta_posterior_integration} is very hard in practice \todo{Is there an easy argument for this which does not rely on the likelihood?}\cite[109]{rasmussen_gaussian_2006}, since $\mat{y}$ is a complicated function of $\mat{\theta}$.
+The integration required in \cref{eq:theta_posterior_integration} is very hard in practice \cite{rasmussen_gaussian_2006}, since $\mat{y}$ is a complicated function of $\mat{\theta}$.
 Instead, a common approximation is to use a \emph{maximum-a-postiori (MAP)} estimate of the correct hyperparameters.
 This estimate is obtained by maximizing $\Prob{\mat{\theta} \given \mat{X}, \mat{y}}$ and does not require evaluation of the denominator since it is constant.
 
@@ -595,10 +595,10 @@ The positions of these input points can be interpreted as hyperparameters to the
 
 \subsection{Sparse Approximations using Inducing Inputs}
 A major drawback of Gaussian processes in real-world applications is their high computational cost for large data sets.
-Assume a data set $(\mat{X}, \mat{y})$ with $\abs{\mat{y}} = N$, then the operations on a posterior Gaussian process are usually dominated by the inversion of the kernel matrix $\mat{K_N}$ which takes $\Oh(N^3)$ time.
+Assume a data set $(\mat{X}, \mat{y})$ with $N$ training samples, then the operations on a posterior Gaussian process are usually dominated by the inversion of the kernel matrix $\mat{K_N}$ which takes $\Oh(N^3)$ time.
 While this is only a preprocessing step, the cost of predicting the mean and variance of one test point remains $\Oh(N)$ and $\Oh(N^2)$ respectively.
 Additionally, these operations have a space requirement of $\Oh(N^2)$.
-The goal of sparse approximations of Gaussian processes is to find model representations which avoid these quadratic complexities or at least restrict them to the training phase of finding hyperparameters.
+The goal of sparse approximations of Gaussian processes is to find model representations which avoid the cubic complexities or at least restrict them to the training phase of finding hyperparameters.
 This section introduces one type of approximation based on representing the complete data set through a smaller set of points.
 
 The most simple approach to achieve this is to only use a small subset of $M \ll N$ \emph{inducing} points of the original training set and learn a normal Gaussian process.
@@ -717,9 +717,9 @@ The curse of dimensionality of requiring exponentially many points in a grid giv
 
 With a large number of pseudo inputs, the number of hyperparameters can grow large.
 This implies the danger of overfitting since the altered Gaussian process has no direct connection to the original Gaussian process over the complete training set.
-As an alternative to the optimization of the SPGP marginal likelihood, \citeauthor{titsias_variational_2009} proposed a variational approach \cite{titsias_variational_2009} which optimizes a lower bound of the marginal likelihood of the original Gaussian process.
-Instead of choosing a sparse model which explains the data well, this optimization chooses a sparse model which is as close as possible to the original full GP.
-Since this strategy leads to better convergence and more robust results in practice, these variational sparse approximation of full Gaussian processes is used to model transition dynamics within this thesis.
+As an alternative to selecting pseudo inputs by optimization of the SPGP marginal likelihood, \citeauthor{titsias_variational_2009} proposed a variational approach \cite{titsias_variational_2009} which optimizes a lower bound of the marginal likelihood of the original Gaussian process.
+This formulation has the property of minimizing the Kullback-Leibler divergence between the variational distribution and the exact posterior distribution of the latent function values of the full GP.
+Since this strategy of selecting hyperparameters leads to batter convergence and more robust results in practice, this variational SPGP is used to model transition dynamics within this thesis.
 
 In order to solve the control problem of the bicycle benchmark, the next step after modeling the transition dynamics using Gaussian processes is to find a policy representation.
 Instead of a closed form representation of the policy, the choice of which action to take is made by directly optimizing over the value function using particle swarm optimization.

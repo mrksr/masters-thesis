@@ -1,8 +1,8 @@
 \chapter{Conclusions}
 This thesis was concerned with incorporating information about uncertainties into reinforcement learning using ideas from Bayesian statistics.
-In model-based reinforcement learning, a model of the true system's transition dynamics extracted from limited observations is used to make approximations about the system's future behaviour.
+In model-based reinforcement learning, a model of the system's transition dynamics extracted from limited observations is used to make approximations about the system's future behaviour.
 These observations were considered to be gathered beforehand using a simple controller or random exploration instead of allowing the controller to directly interact with the system.
-This restriction is often imposed in industrial systems due to financial or security concerns.
+This restriction is often imposed in industrial systems due to financial or safety concerns.
 Instead of relying on a single deterministic model which introduces model bias, a Bayesian framework considers distributions over models obtained by combining broad and simple prior assumptions about the transition function with their likelihood given the observed data.
 Since the observed data is finite, there are multiple plausible models which have to be considered.
 Gaussian processes make predictions about successive states by marginalizing the distribution of plausible models and can give estimations about the uncertainty of their predictions in a principled manner.
@@ -32,6 +32,7 @@ While the uncertainties about the transition model are used as a basis for long-
 Instead, they only indirectly improve the policy by making the objective function more robust.
 Bayesian optimization schemes \cite{brochu_tutorial_2010} could be used on the uncertain reward function to choose actions which result in high expected reward with lower variance.
 Additionally, the computational cost of choosing actions could be reduced considerably.
+While PSO has to evaluate the objective function very often, Bayesian optimization schemes assume that this is expensive and try to find an optimum with as few evaluations as possible.
 Alternatively, policies in closed form could be learned by maximizing the expected reward of simulated trajectories as proposed by \citeauthor{deisenroth_efficient_2010} in \cite{deisenroth_efficient_2010}.
 
 The transition models operate under the assumption that the prior state is not terminal.
