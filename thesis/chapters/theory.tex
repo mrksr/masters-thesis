@@ -280,7 +280,7 @@ The covariance function is also called a \emph{kernel} and describes the interac
 A function which is distributed according to a Gaussian process is denoted as $f \sim \GP\Cond{\mu_f, \K}$.
 
 For convenience it is often assumed that the prior mean function $\mu_f$ is constant zero.
-This assumption is without loss of generality \cite{rasmussen_gaussian_2006} since in case the mean function is known to be different to zero, the observations $\left( \mat{X}, \mat{y} \right)$ can be transformed to $\mat{y^\prime} = \mat{y} - \mu(\mat{X})$.
+This assumption is without loss of generality \cite{rasmussen_gaussian_2006} since otherwise, the observations $\left( \mat{X}, \mat{y} \right)$ can be transformed to $\mat{y^\prime} = \mat{y} - \mu(\mat{X})$.
 The Gaussian process based on the observations $\left( \mat{X}, \mat{y^\prime} \right)$ then only models the differences to the mean function.
 It is the covariance functions which encode the assumptions about the underlying function.
 
