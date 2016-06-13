@@ -149,7 +149,7 @@ Instead, this thesis chooses an uninformed controller which applies random actio
         Most trajectories are between five and ten time steps long, with a clear peak at six steps.
         \Cref{fig:data_set_properties:omega_example} shows the development of the angle $\omega$ for an exceptionally long episode.
         Even for long episodes, the bicycle quickly starts leaning towards one side and does not recover.
-        The last value of $\omega$ is in the valid range of values, since the last transition which results in a terminal state is not par of the training set.
+        The last value of $\omega$ is in the valid range of values, since the last transition which results in a terminal state is not part of the training set.
     }
     \label{fig:data_set_properties}
 \end{figure}
@@ -307,7 +307,7 @@ While an agent is in control of the bicycle's balance, it can try to drive towar
 If any action applied to the system leads to the danger of falling over however, the agent has to quickly change its focus towards preventing this.
 
 Without expert knowledge available, the controller must learn this distinction autonomously, given the reward function.
-The most basic and uninformed reward function possible assigns positive reward for reaching the goal, a punishment (in the form of negative reward) for falling over and weighs all other states equally somewhere between the two extremes.
+The most basic and uninformed reward function possible assigns positive reward for reaching the goal, a punishment (in the form of negative reward) for falling over and weights all other states equally somewhere between the two extremes.
 While this can be enough to teach the short-term task of avoiding to fall down, the agent has no incentive of driving towards the goal.
 For most situations, the goal cannot be reached within the time-horizon of one PSO-P instance.
 In this setting, PSO-P would optimize towards a trajectory for which the chance of falling down is minimal.
@@ -335,7 +335,7 @@ As the bicycle moves at a constant speed, a successful trajectory which locally 
     \centering
     \includestandalone{figures/solution_saturating_reward}
     \caption[Comparison of linear and saturating reward functions]{
-        The blue quadratic saturating reward function is a Gaussian densityprobability density which has been renormalized to a maximum value of one.
+        The blue quadratic saturating reward function is a Gaussian probability density which has been renormalized to a maximum value of one.
         When compared to the dashed piecewise linear reward function, the saturating reward is more forgiving for small errors in the angle difference $\Delta^\Psi$, but punishes large deviations more.
     }
     \label{fig:saturating_reward}
@@ -764,7 +764,7 @@ Using the one-step uncertainties, the action value function can therefore be cal
         Long term predictions using one step uncertainties do not accumulate uncertainties.
         Instead, they are given by the predictive variance of the transition model for one specific step.
         Since the transition models are very accurate for single steps, these uncertainties can only be seen in a plot when zoomed in considerably.
-        The security margin induced by these uncertainties therefore is also very small.
+        The safety margin induced by these uncertainties therefore is also very small.
     }
     \label{fig:os_uncertainties}
 \end{figure}
@@ -832,7 +832,7 @@ In both cases, the state was again assumed to be deterministic for the timestep 
     \centering
     \includestandalonewithpath{figures/solution_ms_linearization}
     \caption[Uncertainty propagation using linearization]{
-        This figure shows the propagation of uncertainties throug a Gaussian process transition model (upper right panel).
+        This figure shows the propagation of uncertainties through a Gaussian process transition model (upper right panel).
         The belief about the prior state $\rv{s_t}$ is assumed to be Gaussian (lower right panel).
         The orange shaded distribution of state changes $\rv{\Delta_t}$ (upper left panel) is not Gaussian in general and cannot be calculated analytically.
         A Gaussian approximation can be obtained by linearizing the transition model around the prior mean $\rv{\mu_t}$.
@@ -1232,7 +1232,7 @@ As a baseline for comparison, PSO-P was applied to the action-value-function $\A
 
 A first improvement over plain MAP-predictions was given by using the one-step uncertainties yielded by the transition models to approximate the expected reward $\Moment{\E}{\RwdBicycle(\rv{s_t})}$ of the intermediate states $\rv{s_t}$ more exactly.
 If the intermediate states are no longer deterministic, it is no longer clear when a predictive trajectory ends.
-The solution proposed in this thesis is to calculate accumulative probabilities $\Prob{\PGoal_t}$ and $\Prob{\PFallen_t}$ for the different termination conditions for every time step and to weigh the expected reward accordingly.
+The solution proposed in this thesis is to calculate accumulative probabilities $\Prob{\PGoal_t}$ and $\Prob{\PFallen_t}$ for the different termination conditions for every time step and to weight the expected reward accordingly.
 
 Since one-step uncertainties cannot correctly model the iterated confidence of the transition model, the next approach was to propagate the state uncertainties through the nonlinear transition models using linearization.
 These accumulated uncertainties reduce model bias since they give an accurate measure of the correctness of long-term trajectories and reduce model bias.

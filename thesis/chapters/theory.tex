@@ -134,7 +134,7 @@ This extends all episodes to potentially infinite length.
 
 The time horizon $T$ can be chosen freely but does not depend on either the current policy or state.
 The larger the time horizon, the more far-sighted an agent has to be to be successful.
-For large values of $T$, it can be helpful to focus on rewards earned in the near future and to weigh potential rewards further along with a smaller factor.
+For large values of $T$, it can be helpful to focus on rewards earned in the near future and to weight potential rewards further along with a smaller factor.
 This can be achieved using the discount factor $\gamma$ which is a constant real number between zero and one.
 In the case of an infinite time horizon, $\gamma$ must be chosen smaller than one to ensure the well-definedness of the value function.
 
@@ -181,7 +181,7 @@ A closed form policy can then be found by solving the non-linear optimization pr
 This iteration allows the agent to explore promising directions in the state space using intermediate policies.
 
 In this thesis it is assumed that all interaction with the system has to happen before any learning can take place.
-This assumption is sensible in the context of industrial applications where interactions with a system can be very expensive and dangerous and where a potentially bad agent cannot be allowed to choose actions to perform.
+This assumption is sensible in the context of industrial applications where exploration of a system like a gas turbine can be very expensive and dangerous and where a potentially bad agent cannot be allowed to choose actions to perform.
 Instead of allowing interaction, the agent is presented with a data set of observations of the transition dynamics in the form of tuples $(\mat{s_t}, \mat{a_t}, \mat{s_{t+1}})$.
 These observations can be obtained via a mix of random exploration and actions chosen by a sub-optimal controller.
 
@@ -200,9 +200,9 @@ The last part of this chapter will be concerned with introducing a policy-repres
 
 \section{Gaussian Process Regression}
 \label{sec:gp_regression}
-The transition dynamics $\Dyn \colon \Es \times \Ah \to \Dists(\Es^+)$ are a function mapping states and actions to a probability distribution of following states.
+The transition dynamics $\Dyn \colon \Es \times \Ah \to \Dists(\Es^+)$ is a function mapping states and actions to a probability distribution of following states.
 In order to estimate them using Gaussian processes, some assumptions about the structure of this function are needed.
-First, it will be assumed that both the set of states $\Es$ and the set of actions $\Ah$ are euclidean real valued vector spaces and that the set of terminal states $\Tee$ is empty, that is, $\Es^+$ and $\Es$ are assumed equal, requiring that episode endings have to be modelled separately.
+First, it will be assumed that both the set of states $\Es$ and the set of actions $\Ah$ are euclidean real-valued vector spaces and that the set of terminal states $\Tee$ is empty, that is, $\Es^+$ and $\Es$ are assumed equal, requiring that episode endings have to be modelled separately.
 And secondly, the probability distribution of the following state is assumed to be unimodal.
 This unimodality can result from deterministic transition functions, such as the one of the bicycle benchmark defined in \cref{cha:the_bicycle_benchmark}, being disturbed slightly by Gaussian noise.
 
@@ -376,8 +376,8 @@ Gaussian process regression with a linear kernel is equivalent to Bayesian linea
     \end{subfigure}
     \caption[Samples from GP priors]{
         Since the mean function $\mu_f$ is assumed to be constant zero, the kernel specifies the prior assumptions about the function.
-        A dashed sample function can be drawn by sampling a multivariate gaussian with the kernel's Gram matrix using a grid of discrete sampling positions.
-        While samples from the linear kernel are always hyperplanes, the RBF kernel describs arbitrary smooth functions.
+        A dashed sample function can be drawn by sampling a multivariate Gaussian with the kernel's Gram matrix using a grid of discrete sampling positions.
+        While samples from the linear kernel are always hyperplanes, the RBF kernel describes arbitrary smooth functions.
         The hyperparameters $l$ and $\sigma_f$ of the kernel describe the assumed dynamic range in $x$ and $y$ directions respectively.
     }
     \label{fig:gp_samples}
@@ -502,7 +502,7 @@ The predictive posterior for the test outputs $\mat{f_\ast}$ can be obtained by 
         \label{fig:gp_posterior:posterior}
     \end{subfigure}
     \caption[GP posterior]{
-        \Cref{fig:gp_posterior:prior} shows a GP prior with and RBF kernel.
+        \Cref{fig:gp_posterior:prior} shows a GP prior with an RBF kernel.
         After observing the black data points, the mean function of the posterior GP in \cref{fig:gp_posterior:posterior} is no longer constant zero.
         The dashed function samples of the posterior GP interpolate the data but can be different in-between.
         The shaded area represents the point wise mean plus and minus two times the standard deviation.
@@ -688,7 +688,7 @@ This observation directly yields the SPGP predictive posterior using \cref{lem:g
         \label{fig:spgp_example:spgp}
     \end{subfigure}
     \caption[SPGP example]{
-        The black crosses signify data sample from a noise sine function.
+        The black crosses signify data sampled from a noisy sine function.
         \Cref{fig:spgp_example:gp} shows a full GP trained on the complete data.
         \Cref{fig:spgp_example:spgp} shows an SPGP with pseudo inputs located at the dart positions.
         Since the pseudo function values are marginalized, only their $x$-coordinate is meaningful.
@@ -772,7 +772,7 @@ The action value function is itself not probabilistic but is defined as an expec
 Since the transition model is Bayesian, evaluating this expected values implies iterated marginalizations of beliefs about both model hyperparameters and intermediate states.
 The dependency of the action value on the different actions is therefore very complex and finding their gradients for the optimization is analytically intractable.
 
-This section first introduces \emph{Particle Swarm Optimization}, the gradient-free heuristic used in PSO-P to tackle the non-convex optimization problem of finding the optimal action sequence.
+This section first introduces \emph{Particle Swarm Optimization}, a gradient-free heuristic used in PSO-P to tackle the non-convex optimization problem of finding the optimal action sequence.
 After the definition, different choices of parameters are discussed.
 
 \subsection{Basic Particle Swarm Optimization}
@@ -867,7 +867,7 @@ It is defined as
         + \underbracket[1pt]{\gamma_c \cdot r_c \cdot \left( \Cog_i(t) - \Pos_i(t) \right)}_{\text{cognitive component}}
         + \underbracket[1pt]{\gamma_s \cdot r_s \cdot \left( \Soc_i(t) - \Pos_i(t) \right)}_{\text{social component}}.
 \end{align}
-The real constants $\omega$, $\gamma_c$ and $\gamma_s$ weigh the relative influences of the different components and $r_c, r_s \sim \Uniform{0, 1}$ introduce a stochastic element to the algorithm which enables some random exploration after the first time step.
+The real constants $\omega$, $\gamma_c$ and $\gamma_s$ weight the relative influences of the different components and $r_c, r_s \sim \Uniform{0, 1}$ introduce a stochastic element to the algorithm which enables some random exploration after the first time step.
 Since both the cognitive and social components are proportional to the distance of the particle to either the personal or the social best position, velocities can become very large.
 A common solution to avoid this is \emph{velocity clamping} which bounds the maximum velocity of a particle to a fraction $\zeta$ of the size of the input space.
 
@@ -903,7 +903,8 @@ During the first few iterations of PSO where particles are just starting to infl
 If $\abs{\Pe}$ is increased in expense of the number of iterations, more particles mean a higher chance that some of them find good parts of the search space.
 However, fewer iterations can mean that there is less time for the swarm to collapse towards these good parts and search them more thoroughly to exploit the gained knowledge.
 In this thesis, PSO is used to optimize in the space of all future actions in the time horizon.
-To ensure good coverage of this space, which for the bicycle benchmark is about 50-dimensional, 250 particles were used during the experiments.
+Given a time horizon of 15 and two actions per time step, this space is 30-dimensional.
+To ensure good coverage, 250 particles were used during the experiments.
 
 \begin{figure}[t]
     \centering
@@ -923,7 +924,7 @@ To ensure good coverage of this space, which for the bicycle benchmark is about 
         Neighbourhood topologies define the social interaction between particles in a swarm.
         \Cref{fig:pso_topology:ring} shows a ring topology with six particles, where every particle is connected to its neighbours and itself.
         Since every particle is connected to exactly three other particles, the average degree of connectivity $\lambda_{\Neigh}$ is one half.
-        The special case of the ring topology where every particle is connected to every other particle is called the start topology and is shown in \cref{fig:pso_topology:star}.
+        The special case of the ring topology where every particle is connected to every other particle is called the star topology and is shown in \cref{fig:pso_topology:star}.
     }
     \label{fig:pso_topology}
 \end{figure}
@@ -949,7 +950,7 @@ Having established a swarm of particles with a neighbourhood $\Neigh$, the const
 The cognitive weight $\gamma_c$ and the social weight $\gamma_s$ describe the trust of a particle towards its own experiences and the experiences of its neighbours.
 If $\gamma_s$ is equal to zero, the communication of the particles is ignored and every particle performs a local optimization independent of the rest of the swarm.
 On the other hand, if $\gamma_c$ is zero in a star topology, every particle would be attracted towards the single best known position and PSO turns into a stochastic hill-climber \cite{engelbrecht_fundamentals_2006}.
-The strength of PSO comes from weighing the two aspects, so a common choice is to set both constants to similar values.
+The strength of PSO comes from weighting the two aspects, so a common choice is to set both constants to similar values.
 The inertia weight $\omega$ is meant to ensure smooth trajectories and is set to be between zero and one to allow the swarm to converge.
 \citeauthor{eberhart_comparing_2000} suggest setting $\omega$ to 0.7291 and both $\gamma_c$ and $\gamma_s$ to 1.49618 \cite{eberhart_comparing_2000,clerc_swarm_1999}.
 
@@ -958,7 +959,7 @@ A small value avoids erratic movement of the particles by jumping over huge part
 Like the weight factors, the velocity clamping factor is defined to be constant throughout a PSO run within this thesis.
 It is chosen as 0.1 which allows a particle to cross the complete space in comparatively few iterations but still limits its dynamic range.
 
-In the experiments of this thesis, the convergence of PSO did not present a problem.
+In the experiments of this thesis, the convergence behaviour of PSO was not problematic.
 For other problem instances, time dependent values of the constants can be used to influence the behaviour of the algorithm.
 It may be interesting to switch focus from exploration in the early time steps to exploitation in the later time steps and finally force convergence.
 This can be achieved by adaptively changing the different weights or the velocity clamping factor \cite{engelbrecht_fundamentals_2006}.
@@ -990,6 +991,6 @@ The different weights and the velocity clamping factor are standard choices sinc
 \end{table}
 
 \section{Summary}
-This chapter presented the mathematical framework of reinforcement learning to describe solutions to the bicycle benchmark presented in \cref{cha:the_bicycle_benchmark} with mathematical rigor.
+This chapter presented the mathematical framework of reinforcement learning to describe solutions to the bicycle benchmark presented in \cref{cha:the_bicycle_benchmark}.
 With Gaussian processes and the PSO-Policy it introduced the two main tools used in this thesis to solve it in a Bayesian way.
 The next chapter introduces a standard approach to controlling the bicycle with PSO-P and compares it to two strategies which incorporate uncertainty into their decision making process.
