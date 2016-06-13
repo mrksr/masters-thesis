@@ -444,9 +444,9 @@ Using the MAP-estimates for intermediate states, the action value function can b
 \begin{align}
     \label{eq:map_action_value_function}
     \begin{split}
-        \map{\AVlu}_{\mat{s_0}}(\mat{a_0}, \dots, \mat{a_{T-1}}) &= \Moment*{\E}{\sum_{t=0}^T \gamma^t \RwdBicycle(\mat{s_t}) \given f, \mat{s_0}, \mat{a_0}, \dots, \mat{a_{T-1}}} \\
-        &= \sum_{t=0}^T \gamma^t \Moment*{\E}{\RwdBicycle(\mat{s_t}) \given f, \mat{s_0}, \mat{a_0}, \dots, \mat{a_{T-1}}} \\
-        &= \sum_{t=0}^T \gamma^t \RwdBicycle(\map{\mat{s_t}}),
+        \map{\AVlu}_{\mat{s_0}}(\mat{a_0}, \dots, \mat{a_{T-1}}) &= \Moment*{\E}{\sum_{t=1}^T \gamma^t \RwdBicycle(\mat{s_t}) \given f, \mat{s_0}, \mat{a_0}, \dots, \mat{a_{T-1}}} \\
+        &= \sum_{t=1}^T \gamma^t \Moment*{\E}{\RwdBicycle(\mat{s_t}) \given f, \mat{s_0}, \mat{a_0}, \dots, \mat{a_{T-1}}} \\
+        &= \sum_{t=1}^T \gamma^t \RwdBicycle(\map{\mat{s_t}}),
     \end{split}
 \end{align}
 where $\map{\mat{s_0}} \coloneqq \mat{s_0}$.
@@ -739,9 +739,9 @@ Using the one-step uncertainties, the action value function can therefore be cal
 \begin{align}
     \label{eq:os_action_value_function}
     \begin{split}
-        \os{\AVlu}_{\mat{s_0}}(\mat{a_0}, \dots, \mat{a_{T-1}}) &= \Moment*{\E}{\sum_{t=0}^T \gamma^t \RwdBicycle(\mat{s_t}) \given f, \mat{s_0}, \mat{a_0}, \dots, \mat{a_{T-1}}} \\
-        &= \sum_{t=0}^T \gamma^t \Moment*{\E}{\RwdBicycle(\mat{s_t}) \given f, \mat{s_0}, \mat{a_0}, \dots, \mat{a_{T-1}}} \\
-        &= \sum_{t=0}^T \gamma^t \bigg( 2 \cdot \Prob{\os{\PGoal}_t} + (1 - \Prob{\os{\PGoal}_t})(1 - \Prob{\os{\PFallen}_t}) \\
+        \os{\AVlu}_{\mat{s_0}}(\mat{a_0}, \dots, \mat{a_{T-1}}) &= \Moment*{\E}{\sum_{t=1}^T \gamma^t \RwdBicycle(\mat{s_t}) \given f, \mat{s_0}, \mat{a_0}, \dots, \mat{a_{T-1}}} \\
+        &= \sum_{t=1}^T \gamma^t \Moment*{\E}{\RwdBicycle(\mat{s_t}) \given f, \mat{s_0}, \mat{a_0}, \dots, \mat{a_{T-1}}} \\
+        &= \sum_{t=1}^T \gamma^t \bigg( 2 \cdot \Prob{\os{\PGoal}_t} + (1 - \Prob{\os{\PGoal}_t})(1 - \Prob{\os{\PFallen}_t}) \\
         &\qquad \sqrt{2\pi\sigma_{\text{angle}}^2} \Gaussian{\pi\tran \os{\mat{\mu_t}} \given 0, \sigma_{\text{angle}}^2 + \pi\tran \os{\mat{\Sigma_t}}\pi} \bigg).
     \end{split}
 \end{align}
@@ -1015,12 +1015,11 @@ Having calculated the terminal probabilities $\Prob{\ms{\PGoal_t}}$ and $\Prob{\
 \begin{align}
     \label{eq:ms_action_value_function}
     \begin{split}
-        \ms{\AVlu}_{\mat{s_0}}(\mat{a_0}, \dots, \mat{a_{T-1}}) &= \Moment*{\E}{\sum_{t=0}^T \gamma^t \RwdBicycle(\mat{s_t}) \given f, \mat{s_0}, \mat{a_0}, \dots, \mat{a_{T-1}}} \\
-        &= \sum_{t=0}^T \gamma^t \bigg( 2 \cdot \Prob{\ms{\PGoal}_t} + (1 - \Prob{\ms{\PGoal}_t})(1 - \Prob{\ms{\PFallen}_t}) \\
+        \ms{\AVlu}_{\mat{s_0}}(\mat{a_0}, \dots, \mat{a_{T-1}}) &= \Moment*{\E}{\sum_{t=1}^T \gamma^t \RwdBicycle(\mat{s_t}) \given f, \mat{s_0}, \mat{a_0}, \dots, \mat{a_{T-1}}} \\
+        &= \sum_{t=1}^T \gamma^t \bigg( 2 \cdot \Prob{\ms{\PGoal}_t} + (1 - \Prob{\ms{\PGoal}_t})(1 - \Prob{\ms{\PFallen}_t}) \\
     &\qquad \sqrt{2\pi\sigma_{\text{angle}}^2} \Gaussian{\pi\tran \ms{\mat{\mu_t}} \given 0, \sigma_{\text{angle}}^2 + \pi\tran \ms{\mat{\Sigma_t}}\pi} \bigg).
     \end{split}
 \end{align}
-Since the starting state $\mat{s_0}$ is deterministic, the reward $\RwdBicycle$ can either be evaluated directly or the state can be approximated using a distribution $\Gaussian{\mat{s_0}, \epsilon\Eye}$ with $\epsilon \to 0$.
 
 \subsection{Posterior States using the Truncation of Gaussians}
 Using the intermediate state distributions $\Prob{\ms{\rv{s_t}}}$ directly when predicting successive states is a good approximation in most cases but is not correct when the probabilities $\Prob{\rv{s_t} \in \Fallen}$ or $\Prob{\rv{s_t} \in \Goal}$ are large.
@@ -1205,7 +1204,7 @@ While both the one-step and multi-step approaches without the truncation of Gaus
 This trend continues when comparing the mean rewards earned throughout a trajectory.
 Given a series of observed (and therefore deterministic) states beginning with the starting state $\mat{s_0}$, the mean reward earned throughout a trajectory is defined as
 \begin{align}
-    \MeanRwdBicycle(\mat{s_0}, \dots, \mat{s_T}) \coloneqq \frac{1}{T} \sum_{t=0}^T \RwdBicycle(\mat{s_t}).
+    \MeanRwdBicycle(\mat{s_0}, \dots, \mat{s_T}) \coloneqq \frac{1}{T} \sum_{t=1}^T \RwdBicycle(\mat{s_t}).
 \end{align}
 Note that $T$ is a constant defined in \cref{tab:evaluation_parameters} and can be larger than the length of the trajectory.
 In this case, the terminal state at the end of the trajectory is repeated infinitely as defined in \cref{eq:rl_successive_state}.
