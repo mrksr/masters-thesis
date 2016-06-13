@@ -730,7 +730,7 @@ This technique is presented in the next section.
 \section{Particle Swarm Optimization Policy}
 Given a starting state, the way to evaluate a policy in the general reinforcement learning setup is to evaluate its value function as defined in \cref{def:value_function}.
 Since the value is defined as the sum of expected rewards of all future states in the time horizon, calculating it correctly requires knowledge of the true transition function or, in the case of deterministic dynamics, interaction with the system.
-Model-based reinforcement learning is centered around learning a model of the transition function and use this representation to approximate the value function.
+Model-based reinforcement learning is centered around learning a model of the transition function and using this representation to approximate the value function.
 
 This allows simulated interaction with the system and can be used to choose optimal parameters for a parametric closed-form policy formulation.
 Similar to the comparison of parametric and non-parametric models in \cref{sec:gp_regression}, the performance of such policies heavily depends on the choice of function representation.
@@ -738,9 +738,9 @@ In a Bayesian setting, the uncertainties about the transition model should be pr
 In order to keep this process computationally feasible, trade-offs must be made in the flexibility of policy representations.
 \citeauthor{deisenroth_pilco:_2011} recommend the use of rather limited linear policies or non-linear representations via RBF networks \cite{deisenroth_pilco:_2011}.
 
-This thesis chooses the non-parametric approach of the \emph{Particle Swarm Optimization-Policy} described by \citeauthor{hein_reinforcement_2016} in \cite{hein_reinforcement_2016}.
-For a finite time horizon $T$, finding an optimal parametric policy using the approximated value function means finding policy parameters which result in good choices for actions at every time step.
-In contrast to this, PSO-P directly examines the \emph{action-value-function $\AVlu$} given by
+In order to avoid these complexities, this thesis chooses a non-parametric approach.
+In contrast to using the expected long-term reward to find optimal choices for parameters of a policy, the \emph{Particle Swarm Optimization-Policy} described by \citeauthor{hein_reinforcement_2016} in \cite{hein_reinforcement_2016} directly chooses optimal actions.
+When presented with a decision, PSO-P optimizes the \emph{action-value-function $\AVlu$} given by
 \begin{align}
     \label{eq:action_value_function}
     \AVlu_{\mat{s_0}} \colon \left\{
@@ -751,7 +751,9 @@ In contrast to this, PSO-P directly examines the \emph{action-value-function $\A
     \right.
 \end{align}
 where $f$ denotes a model of the transition function, $\mat{s_0}$ denotes a state and $\gamma$ is the discount factor.
-PSO-P optimizes over the vector of all possible actions in the time horizon and then applies the best action found for time step zero to the system.
+After finding an optimal vector of actions for all decisions in the time horizon, PSO-P applies the first of these actions to the system.
+Avoiding a parametric representation allows PSO-P to find actions which, according to the models, are optimal for the specific situation the agent currently is in, instead of having to find a set of parameters which is good for all possible states.
+This, however, comes with the disadvantage of having to solve an optimization problem for every decision of the controller, which increases computational cost.
 \begin{definition}[PSO-P]
     \label{def:psop}
     The \emph{Particle Swarm Optimization-Policy (PSO-P)} \cite{hein_reinforcement_2016} chooses actions via direct optimization of the action value function $\AVlu$ and is defined as
