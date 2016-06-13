@@ -1,6 +1,6 @@
 \chapter{Theoretical Background}
 \label{cha:theory}
-The bicycle benchmark is a problem in a branch of machine learning called reinforcement learning.
+The bicycle system is an established benchmark problem in a branch of machine learning called reinforcement learning.
 This chapter gives a brief introduction into reinforcement learning and defines the notation necessary to reason about the bicycle benchmark and similar problems in a mathematical way.
 The approach used in this thesis to solve it is called model-based reinforcement learning and is discussed next.
 
@@ -10,11 +10,11 @@ This is achieved by learning a distribution over possible models rather than dec
 The uncertainty about the development in a single time step can be used to reason about the uncertainty of predictions multiple steps into the future.
 
 Being able to make judgments about the future dependent on the next action to take allows the definition of a controller.
-Particle swarm optimization is introduced as a way to choose the best action to take based on a performance-measure of the predicted future states.
+Particle Swarm Optimization is introduced as a way to choose the best action to take based on accumulated predictions.
 
 \section{Reinforcement Learning}
 Consider an agent who wants to learn how to learn how to drive a bicycle to a certain position.
-In the case of a supervised learning environment, an expert who already knows how to solve the problem could tell this agent which actions lead to success.
+In the case of a supervised learning environment, an expert who already knows how to solve the problem could teach an agent which actions lead to success.
 In the absence of such a teacher however, the agent must learn from interaction with the bicycle.
 
 An agent might start by applying random actions to the system and quickly fall down, making it impossible to ever reach the goal.
@@ -30,17 +30,17 @@ Note that to gain these insights, it is not necessary for the agent to have an u
 It is enough to observe situations in which the effects play out and generalize from there.
 
 When the agent has learnt how to stabilize the bicycle by driving small corrective curves, it has not yet solved the original task of navigating the bicycle to a specific position.
-It will have to shift its focus from the short-term goal of avoiding falling over to the more high-level and long-term task of following a targeted trajectory.
+It will have to shift its focus from the short-term goal of avoiding falling over to the more high-level and long-term task of navigating to the goal position.
 Following this trajectory might require some compromises concerning the previous step of avoiding to fall down, since it is easier to drive straight than it is to drive along a specific curve.
 In the case that reaching the goal is time-critical, the optimal trajectory would be constrained by the minimum radius of a curve the agent can handle.
 In the case of a perfect controller, it is constrained by the maximum lean angle $\omega$.
 
-The requirements an agent faces when solving the bicycle benchmark can be understood in a more general sense, which is formulated in the problem statement of reinforcement learning.
-It formalizes the ideas of and agent, it's interaction with a system and the positive or negative feedback it receives.
+The learning task an agent faces when solving the bicycle benchmark can be understood in a more general sense, which is formulated in the problem statement of reinforcement learning.
+It formalizes the ideas of and agent, it's interaction with a system, and the positive or negative feedback it receives.
 
 \subsection{Problem Statement}
 Reinforcement learning is meant to describe the general problem of learning to control a system by interaction in order to achieve a predefined goal.
-In order to achieve this goal, the learning entity or \emph{agent} has to decide on specific actions to influence its \emph{environment} which is everything outside of the agent.
+The learning entity or \emph{agent} has to decide on specific actions to influence its \emph{environment} which is everything outside of the agent.
 The boundary between agent and environment is a well-defined and narrow interface illustrated in \cref{fig:agent_environment_interaction}.
 They interact via this interface at specific discrete \emph{time steps}, usually indexed with the natural numbers $\N$.
 \begin{figure}[t]
@@ -55,9 +55,9 @@ They interact via this interface at specific discrete \emph{time steps}, usually
     \label{fig:agent_environment_interaction}
 \end{figure}
 
-At every such time step $t$, the agent can observe the environment and receives some information in form of its \emph{state} $s_t \in \Es$, where $\Es$ is the continuous space of all possible states.
-Based on this information, the agent has to decide on which action $a_t \in \Ah$ to perform.
-The space of all possible actions $\Ah$ is assumed to be continuous and remains constant for all time steps and states.
+At every such time step $t$, the agent can observe the environment and receives some information in form of its \emph{state} $s_t \in \Es$, where $\Es$ is the space of all possible states.
+Based on this information, the agent has to decide which action $a_t \in \Ah$ to perform.
+The space of all possible actions $\Ah$ is remains constant for all time steps and states.
 
 The decision-process an agent employs in order to choose an action is called the agent's \emph{policy}.
 A policy is a function which maps states to actions.
@@ -71,9 +71,9 @@ Policies are often encoded in closed forms such as linear functions \cite{deisen
     which maps the current state of the system to the action the agent will perform.
 \end{definition}
 
-Once the agent has chosen an action for time step $t$, the \emph{transition dynamics} of the system determine the state $s_{t+1}$.
+Once the agent has chosen an action for time step $t$, the state $s_{t+1}$ is sampled from the \emph{transition dynamics}.
 These dynamics are unknown to the agent and can be subject to probabilistic factors such as noise.
-While the agent will always observe one single element $s_{t+1} \in \Es$ when prompted for the next decision, the transition dynamics return a probability distribution over the possible next states.
+While the agent will always observe one single element $s_{t+1}$ when prompted for the next decision, the transition dynamics return a probability distribution over the possible next states.
 
 Many problems like the bicycle benchmark have a natural notion of states which are \emph{terminal}.
 If the cyclist falls down or reaches the goal, the interaction between the agent and the environment comes to an end and there are no more decisions to make.
@@ -92,14 +92,16 @@ A task which does not have terminal states is called \emph{continuous} and has e
     \end{align}
     mapping a state and an action to a distribution over possibly terminal states stay constant over time but can be probabilistic in nature.
 \end{definition}
-An important observation following from this definition is that the transition dynamics fulfill the Markov property \cite{sutton_reinforcement_1998}.
+An important observation following from this definition is that together with the state and actions spaces, the transition dynamics fulfill the Markov property \cite{sutton_reinforcement_1998}.
 This means that the distribution of the state $s_{t+1}$ is independent of all states before $s_t$ given $s_t$.
 In other words, the transition dynamics only depend on the present state of the system and are conditionally independent of the past.
 
 At time step $t+1$, the agent observes the environment again in the form of the state $s_{t+1}$.
 Additionally, it also receives immediate feedback about this new state called the \emph{reward $r_{t+1}$}.
-The reward is a quality assigned to each state and serves as a measure of how good a state to be in it is.
+The reward is a quality assigned to the state transition from $s_t$ to $s_{t+1}$ using the action $a_t$.
+The higher the reward, the better the state transition is considered to be.
 This measure is independent of the future or past development of the system.
+In this thesis, the reward for time step $t+1$ is considered to be independent of the state $s_t$ and the action $a_t$ and only depends on $s_{t+1}$.
 It is obtained from a real-valued \emph{reward function $\Rwd$} such that $r_{t+1} = \Rwd(s_{t+1})$.
 \begin{definition}[Reward Function]
     \label{def:reward_function}
@@ -122,7 +124,7 @@ Given a distribution of the state $\rv{s_t}$, the distribution for the next stat
     \intertext{where}
     \label{eq:rl_successive_state}
     \Prob{\rv{s_{t+1}} \given \rv{s_t}, \pi} &= \begin{cases}
-        \delta_{\rv{s_t}, \rv{s_{t+1}}} & \text{ if $\rv{s_t} \in \Tee$} \\
+        \delta\left(\rv{s_t}, \rv{s_{t+1}}\right) & \text{ if $\rv{s_t} \in \Tee$} \\
         \Dyn\Cond{\rv{s_{t+1}} \given \rv{s_t}, \pi(\rv{s_t})} & \text{ otherwise.}
     \end{cases}
 \end{align}
@@ -131,14 +133,14 @@ Once the dynamics have reached a terminal state, all future states will be this 
 This extends all episodes to potentially infinite length.
 
 The time horizon $T$ can be chosen freely but does not depend on either the current policy or state.
-The larger the time horizon, the more far-sighted a agent has to be to be successful.
+The larger the time horizon, the more far-sighted an agent has to be to be successful.
 For large values of $T$, it can be helpful to focus on rewards earned in the near future and to weigh potential rewards further along with a smaller factor.
 This can be achieved using the discount factor $\gamma$ which is a constant real number between zero and one.
-In the case of an infinite time horizon, $\gamma$ must be chosen smaller than one to ensure the well-definedness of the function.
+In the case of an infinite time horizon, $\gamma$ must be chosen smaller than one to ensure the well-definedness of the value function.
 
 \begin{definition}[Value Function]
     \label{def:value_function}
-    Given transition dynamics $\Dyn$, a policy $\pi$, a time horizon $T \in \N \cup \left\{ \infty \right\}$ and a discount factor $0 \leq \gamma \leq 1$, the \emph{value function $\Vlu^\pi$} denotes the expected long-term reward of a state and is given by
+    Given transition dynamics $\Dyn$, a policy $\pi$, a time horizon $T \in \N \cup \left\{ \infty \right\}$ and a discount factor $0 \leq \gamma \leq 1$, the \emph{value function $\Vlu^\pi$} denotes the expected accumulated reward of a state and is given by
     \begin{align}
         \Vlu^\pi \colon \left\{
             \begin{aligned}
@@ -153,7 +155,7 @@ In the case of an infinite time horizon, $\gamma$ must be chosen smaller than on
 Assume now a known distribution of possible start states $\Prob{\rv{s_0}}$.
 The sets $\Es^+$ and $\Ah$ of states and actions together with the transition dynamics $\Dyn$, the reward function $\Rwd$ and this distribution $\Prob{\rv{s_0}}$ defines a fully observable Markov decision process (MDP) \cite{sutton_reinforcement_1998,murphy_machine_2012}.
 
-The objective of the reinforcement learning problem stated here is to find the most successful policy to control this decision process under the assumption that no expert knowledge about the transition dynamics is available.
+The objective of the reinforcement learning problem is to find the most successful policy to control this decision process under the assumption that no expert knowledge about the transition dynamics is available.
 The optimal policy $\pi^*$ maximizes the expected value for all start states, that is it solves the optimization problem
 \begin{align}
     \label{eq:optimal_policy}
@@ -163,8 +165,8 @@ The optimal policy $\pi^*$ maximizes the expected value for all start states, th
     \end{split}
 \end{align}
 
-There is a multitude of different approaches of arriving at good policies.
-The following will introduce the important distinction of model-based and model-free methods and give a high level view of how the former will be used within this thesis.
+There is a multitude of different approaches for learning good policies.
+The following will introduce the important distinction of model-based and model-free methods and give a high-level view of how the former will be used within this thesis.
 
 \subsection{Model-Based Reinforcement Learning}
 To find a good policy, an agent has to gain experience about its environment via interaction.
@@ -175,7 +177,7 @@ In \emph{model-based} reinforcement learning, the experience is used to learn an
 This allows the agent to make predictions about the future behaviour of the system and therefore approximatively evaluate the value function without actually interacting with the system.
 A closed form policy can then be found by solving the non-linear optimization problem proposed in \cref{eq:optimal_policy}.
 
-\citeauthor{deisenroth_efficient_2010} \cite{deisenroth_efficient_2010} describes an algorithmic scheme called PILCO in which phases of exploration on the real system to gather more data to improve the internal model alternate with phases of improvement of the current policy based on the internal simulation.
+\citeauthor{deisenroth_efficient_2010} \cite{deisenroth_efficient_2010} describes an algorithmic scheme called PILCO in which phases of exploration on the real system to gather more data to improve the internal model alternate with phases of improvement of the current policy by exploiting the model.
 This iteration allows the agent to explore promising directions in the state space using intermediate policies.
 
 In this thesis it is assumed that all interaction with the system has to happen before any learning can take place.
@@ -184,7 +186,7 @@ Instead of allowing interaction, the agent is presented with a data set of obser
 These observations can be obtained via a mix of random exploration and actions chosen by a sub-optimal controller.
 
 Using an internal representation instead of the real transition dynamics to choose actions leads to one of the major drawbacks of model-based reinforcement learning.
-If this representation does not capture the important characteristics of the original system well, a policy found to be optimal on the simulation might not lead to good results on the correct dynamics.
+If this representation does not capture the important characteristics of the original system well, a policy found to be optimal on the simulation might not lead to good results on the original dynamics.
 This effect is called the \emph{model bias} of a policy.
 
 Reducing this model bias is the main goal of explicitly representing uncertainties within this thesis.
@@ -205,19 +207,19 @@ And secondly, the probability distribution of the following state is assumed to 
 This unimodality can result from deterministic transition functions, such as the one of the bicycle benchmark defined in \cref{cha:the_bicycle_benchmark}, being disturbed slightly by Gaussian noise.
 
 Estimating a function $f$ on the basis of observations $\mat{y_i} = f(\mat{x_i}) + \epsilon_i \in \R$ with input vectors $\mat{x_i} \in \R^d$ and a noise term $\epsilon_i$ is a \emph{regression problem}.
-Since the number of observations is finite and the function $f$ is an infinite object, the estimation of $f$ is uncertain and based on prior assumptions about its structure.
+Since the number of observations is finite and the function $f$ lives in an infinite dimensional function space, the estimation of $f$ is uncertain and based on prior assumptions about its structure.
 
 In classic control scenarios, these prior assumptions often follow from physical descriptions of the system to be modelled.
-While the physics of driving a bicycle is understood quite well and can be described using differential equations, a controller for a specific bicycle depends on some parameters $\gamma$ such as the masses and measures detailed in \cref{tab:bicycle_constants}.
-In this setting, solving the regression problem corresponds to finding a choice of parameters $\gamma^\ast$ which explain the observations of the true system best.
+While the physics of driving a bicycle is understood quite well and can be described using differential equations, a controller for a specific bicycle depends on some parameters $\eta$ such as the masses and measures detailed in \cref{tab:bicycle_constants}.
+In this setting, solving the regression problem corresponds to finding a choice of parameters $\eta^\ast$ which explain the observations of the true system best.
 
-In a Bayesian context, instead of deciding on one specific vector of parameters, it might be more interesting to derive a distribution $\Prob{\gamma^*}$ of probable parameter values which then represents the uncertainty about their true value.
-When making a prediction for a new input point $\mat{x_\ast}$, this uncertainty can be used to derive a predictive distribution $\Prob{y_\ast \given \mat{x_\ast}, \mat{\gamma^\ast}}$, which propagates this uncertainty through the model to the prediction.
+In a Bayesian context, instead of deciding on one specific vector of parameters, it might be more interesting to derive a distribution $\Prob{\eta^*}$ of probable parameter values which then represents the uncertainty about their true value.
+When making a prediction for a new input point $\mat{x_\ast}$, this uncertainty can be used to derive a predictive distribution $\Prob{y_\ast \given \mat{x_\ast}, \mat{\eta^\ast}}$, which propagates this uncertainty through the model to the prediction.
 
 This approach represents uncertainty about the correct choice of parameters but assumes that the predefined structure of the function is correct, making it a \emph{parametric model}.
 Such structure has the advantage of making it easier to find the best set of parameters, since the search space is relatively limited.
-It does however limit the expressiveness of the model, which can lead to bad performance.
-A physical description of the system might be too idealized and not take account of all factors in reality, such as the assumptions of frictionless mechanics or limited turbulences in fluid mechanics.
+It does, however, limit the expressiveness of the model, which can lead to bad performance.
+A physical description of the system might be too idealized and not account for all real-world factors, such as the assumptions of frictionless mechanics or limited turbulences in fluid mechanics.
 Accounting for all possible effects can make the model very complicated.
 This means that both the number of parameters becomes large and it may be hard to interpret the model in a physical sense.
 
@@ -228,7 +230,7 @@ Instead of modeling a distribution of parameter values, a Bayesian non-parametri
 They are a way of representing a probability distribution over functions in a way which is both computationally feasible and allows for Bayesian inference.
 This section introduces Gaussian processes and describes how to encode a prior distribution over functions to represent preference in the space of all possible functions $f$.
 Based on observed data, GPs can be used make predictions about the predictive distribution $\Prob{y_\ast \given \mat{x_\ast}, f^\ast}$ taking all functions in the distribution $\Prob{f^\ast}$ into account.
-Since these predictions are not computationally cheap, an extension of Gaussian processes for large data sets, sparse Gaussian processes using pseudo-inputs \cite{snelson_sparse_2005}, is introduced last.
+Since these predictions are not computationally cheap, an extension of Gaussian processes for large data sets, sparse Gaussian processes using pseudo-inputs \cite{snelson_sparse_2005}, is reviewed last.
 
 \subsection{Definition}
 Gaussian processes are a generalization of the Gaussian distribution to function spaces.
@@ -273,12 +275,12 @@ Instead of a mean vector $\mat{\mu}$ and a covariance matrix $\mat{\Sigma}$, a G
     \end{split}
 \end{align}
 with $a, a^\prime \in A$.
-The mean function encodes the point wise mean over all trajectories which could be sampled from $\rv{X}$.
+The mean function encodes the point-wise mean over all trajectories which could be sampled from $\rv{X}$.
 The covariance function is also called a \emph{kernel} and describes the interaction between different parts of the function.
 A function which is distributed according to a Gaussian process is denoted as $f \sim \GP\Cond{\mu_f, \K}$.
 
 For convenience it is often assumed that the prior mean function $\mu_f$ is constant zero.
-This assumption is without loss of generality \cite{rasmussen_gaussian_2006} since in the case the mean function is known to be different to zero, the observations $\left( \mat{X}, \mat{y} \right)$ can be transformed to $\mat{y^\prime} = \mat{y} - \mu(\mat{X})$.
+This assumption is without loss of generality \cite{rasmussen_gaussian_2006} since in case the mean function is known to be different to zero, the observations $\left( \mat{X}, \mat{y} \right)$ can be transformed to $\mat{y^\prime} = \mat{y} - \mu(\mat{X})$.
 The Gaussian process based on the observations $\left( \mat{X}, \mat{y^\prime} \right)$ then only models the differences to the mean function.
 It is the covariance functions which encode the assumptions about the underlying function.
 
@@ -444,7 +446,7 @@ This integration is called the \emph{marginalization} of $\mat{f}$.
 The closed form solution of the integral is obtained using well-known results about Gaussian distributions which are for example detailed in \cite{petersen_matrix_2008}.
 
 Now consider a set of test points $\mat{X_\ast}$ for which the predictive posterior should be obtained.
-By definition the latent function values $\mat{f}$ of the training set and the latent function values of the test set $\mat{f_\ast} = f(\mat{X_\ast})$ have the joint Gaussian distribution
+By definition, the latent function values $\mat{f}$ of the training set and the latent function values of the test set $\mat{f_\ast} = f(\mat{X_\ast})$ have the joint Gaussian distribution
 \begin{align}
     \Prob*{\begin{pmatrix}
         \mat{f} \\
@@ -472,7 +474,7 @@ Adding the noise model to this distribution leads to the joint Gaussian of train
 \end{align}
 
 In this distribution, the training outputs $\mat{y}$ are known.
-The predictive posterior for the test outputs $\mat{f_\ast}$ can be obtained by applying the rules for marginalization of multivariate Gaussians, yielding another Gaussian distribution.
+The predictive posterior for the test outputs $\mat{f_\ast}$ can be obtained by applying the rules for marginalization of multivariate Gaussians, yielding another Gaussian distribution \cite{petersen_matrix_2008}.
 \begin{lemma}[GP predictive posterior]
     \label{lem:gp_posterior}
     Given a latent function with a Gaussian process distribution $f \sim \GP(\mat{0}, \K)$ and $N$ training points $\mat{X}$ with noisy observations of the form $\mat{y} = f(\mat{X}) + \Gaussian{\mat{0}, \sigma_n^2 \Eye}$.
@@ -521,7 +523,7 @@ Note that the posterior mean function is not necessarily the constant zero funct
 \Cref{fig:gp_posterior} shows samples from a pair of prior and posterior Gaussian processes.
 
 Computing the inverse $\left(\mat{K_N} + \sigma_n^2 \Eye \right)^{-1}$ costs $\Oh(N^3)$ but can be done as a preprocessing step since it is independent of the test points.
-Predicting the mean of a single test point is a weighted sum of $N$ basis functions $\mu_\ast = \mat{K_{\ast N}} \mat{\beta}$ where $\mat{\beta} = \left(\mat{K_N} + \sigma_n^2 \Eye \right)^{-1} \mat{y}$ which can be precomputed.
+Predicting the mean function value of a single test point is a weighted sum of $N$ basis functions $\mu_\ast = \mat{K_{\ast N}} \mat{\beta}$ where $\mat{\beta} = \left(\mat{K_N} + \sigma_n^2 \Eye \right)^{-1} \mat{y}$ which can be precomputed.
 After this precomputation, predicting the mean of a single test point costs $\Oh(N)$.
 To predict its variance, it is still necessary to perform a matrix multiplication which costs $\Oh(N^2)$.
 Since all of these operations are dependent on the number of training points, evaluating Gaussian processes on large data sets can be computationally expensive.
@@ -607,7 +609,7 @@ While choosing a random subset can be effective \cite{snelson_flexible_2007}, th
 This is a combinatorical optimization problem which can be very hard to solve in practice since the function to be optimized is very non-smooth.
 
 To overcome this problem, \emph{sparse pseudo input Gaussian processes (SPGP)} \cite{snelson_flexible_2007} lift the restriction of choosing inducing points from the training set and instead allow arbitrary positions in the input space.
-The original data set is replaced by a \emph{pseudo data set} $(\ps{\mat{X}}, \ps{\mat{f}})$ of \emph{pseudo inputs} $\ps{\mat{X}}$ and \emph{pseudo targets} $\ps{\mat{f}} = f(\ps{\mat{X}})$ which are equal true latent function $f \sim \GP(\mat{0}, \K)$.
+The original data set is replaced by a \emph{pseudo data set} $(\ps{\mat{X}}, \ps{\mat{f}})$ of \emph{pseudo inputs} $\ps{\mat{X}}$ and \emph{pseudo targets} $\ps{\mat{f}} = f(\ps{\mat{X}})$ which are equal to the true latent values of the function function $f \sim \GP(\mat{0}, \K)$.
 Since they are not true observations, they are assumed to be noise-free.
 
 With known positions of the pseudo inputs and fixed hyperparameters $\mat{\theta}$, the predictive posterior of a Gaussian process based on this pseudo data set for test points $(\mat{X_\ast}, \mat{f_\ast})$ is given by
@@ -646,7 +648,7 @@ The marginalization is stated as the integral of a product of two Gaussian distr
 \end{align}
 This \emph{SPGP marginal likelihood} can be interpreted as the marginal likelihood of a Gaussian process given the original data set $(\mat{X}, \mat{y})$ in \cref{eq:gp_marginal_likelihood}.
 In this Gaussian process, the original kernel $\K$ is replaced by the kernel $\K_{\text{SPGP}}$.
-With $\Ind$ denoting the indicator function it is defined as
+With $\Ind$ denoting the indicator function, it is defined as
 \begin{align}
     \begin{split}
         \Q(\mat{a}, \mat{b}) &\coloneqq \mat{K_{aM}} \mat{K_M}^{-1} \mat{K_{Mb}} \\
@@ -722,7 +724,7 @@ This formulation has the property of minimizing the Kullback-Leibler divergence 
 Since this strategy of selecting hyperparameters leads to batter convergence and more robust results in practice, this variational SPGP is used to model transition dynamics within this thesis.
 
 In order to solve the control problem of the bicycle benchmark, the next step after modeling the transition dynamics using Gaussian processes is to find a policy representation.
-Instead of a closed form representation of the policy, the choice of which action to take is made by directly optimizing over the value function using particle swarm optimization.
+Instead of a closed form representation of the policy, the choice of which action to take is made by directly optimizing over the value function using Particle Swarm Optimization.
 This technique is presented in the next section.
 
 \section{Particle Swarm Optimization Policy}
@@ -736,7 +738,7 @@ In a Bayesian setting, the uncertainties about the transition model should be pr
 In order to keep this process computationally feasible, trade-offs must be made in the flexibility of policy representations.
 \citeauthor{deisenroth_pilco:_2011} recommend the use of rather limited linear policies or non-linear representations via RBF networks \cite{deisenroth_pilco:_2011}.
 
-This thesis chooses the non-parametric approach of the \emph{particle swarm optimization policy} described by \citeauthor{hein_reinforcement_2016} in \cite{hein_reinforcement_2016}.
+This thesis chooses the non-parametric approach of the \emph{Particle Swarm Optimization-Policy} described by \citeauthor{hein_reinforcement_2016} in \cite{hein_reinforcement_2016}.
 For a finite time horizon $T$, finding an optimal parametric policy using the approximated value function means finding policy parameters which result in good choices for actions at every time step.
 In contrast to this, PSO-P directly examines the \emph{action-value-function $\AVlu$} given by
 \begin{align}
@@ -752,7 +754,7 @@ where $f$ denotes a model of the transition function, $\mat{s_0}$ denotes a stat
 PSO-P optimizes over the vector of all possible actions in the time horizon and then applies the best action found for time step zero to the system.
 \begin{definition}[PSO-P]
     \label{def:psop}
-    The \emph{particle swarm optimization policy (PSO-P)} \cite{hein_reinforcement_2016} chooses actions via direct optimization of the action value function $\AVlu$ and is defined as
+    The \emph{Particle Swarm Optimization-Policy (PSO-P)} \cite{hein_reinforcement_2016} chooses actions via direct optimization of the action value function $\AVlu$ and is defined as
     \begin{align}
         \pi_{\text{PSO-P}} &: \left\{
             \begin{aligned}
@@ -876,7 +878,7 @@ The result of the optimization using PSO is the best position visited by any par
 \begin{align}
     \mat{x^\ast} \in \lim_{t \to \infty} \argmax_{p \in \Pe} f(\Cog_p(t)).
 \end{align}
-If $f$ is bounded, this limit is well-defined since $f(\Cog_p(\cdot))$ is monotonically increasing for all $p \in \Pe$.
+If $f$ is bounded above, this limit is well-defined since $f(\Cog_p(\cdot))$ is monotonically increasing for all $p \in \Pe$.
 Assuming a neighbourhood which transitively connects all particles, an arbitrary amount of time and a unique global optimum which gets visited by a particle at some time, the swarm should intuitively collapse to this global optimum, since the best particle attracts all other particles.
 While the heuristic is surprisingly successful in practice, the basic PSO algorithm can be shown to not converge to a single point or to the global optimum in scenarios which are not so ideal \cite{engelbrecht_fundamentals_2006}.
 
@@ -953,7 +955,7 @@ If $\gamma_s$ is equal to zero, the communication of the particles is ignored an
 On the other hand, if $\gamma_c$ is zero in a star topology, every particle would be attracted towards the single best known position and PSO turns into a stochastic hill-climber \cite{engelbrecht_fundamentals_2006}.
 The strength of PSO comes from weighing the two aspects, so a common choice is to set both constants to similar values.
 The inertia weight $\omega$ is meant to ensure smooth trajectories and is set to be between zero and one to allow the swarm to converge.
-Based on empirical studies\todo{Alex suggested these are actually based on a proof?}, \citeauthor{eberhart_comparing_2000} suggest setting $\omega$ to 0.7291 and both $\gamma_c$ and $\gamma_s$ to 1.49618 \cite{eberhart_comparing_2000}.
+Based on empirical studies, \citeauthor{eberhart_comparing_2000} suggest setting $\omega$ to 0.7291 and both $\gamma_c$ and $\gamma_s$ to 1.49618 \cite{eberhart_comparing_2000,clerc_swarm_1999}.
 
 The velocity clamping factor $\zeta$ defines the maximum absolute value of the velocity per dimension to be given by $\mat{v^\text{max}} = \zeta \cdot ( \mat{x^\text{max}} - \mat{x^\text{min}} )$.
 A small value avoids erratic movement of the particles by jumping over huge parts of the search space in one time step.
