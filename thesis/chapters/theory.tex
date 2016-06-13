@@ -50,7 +50,7 @@ They interact via this interface at specific discrete \emph{time steps}, usually
         The interaction between an agent and its environment in reinforcement learning happens at discrete time steps.
         At every time step $t$, the agent observes the current state of the environment $s_t$ and decides on an action $a_t$ which should be performed.
         Based on this action, the environment evolves and is observed to be at the state $s_{t+1}$ at the next time step.
-        Additionally, the agent receives immediate feedback about this new state in form of the numeric reward $r_{t+1}$.
+        Additionally, the agent receives immediate feedback in form of the numeric reward $r_{t+1}$.
     }
     \label{fig:agent_environment_interaction}
 \end{figure}
@@ -97,7 +97,7 @@ This means that the distribution of the state $s_{t+1}$ is independent of all st
 In other words, the transition dynamics only depend on the present state of the system and are conditionally independent of the past.
 
 At time step $t+1$, the agent observes the environment again in the form of the state $s_{t+1}$.
-Additionally, it also receives immediate feedback about this new state called the \emph{reward $r_{t+1}$}.
+Additionally, it also receives immediate feedback called the \emph{reward $r_{t+1}$}.
 The reward is a quality assigned to the state transition from $s_t$ to $s_{t+1}$ using the action $a_t$.
 The higher the reward, the better the state transition is considered to be.
 This measure is independent of the future or past development of the system.
@@ -210,10 +210,10 @@ Estimating a function $f$ on the basis of observations $\mat{y_i} = f(\mat{x_i})
 Since the number of observations is finite and the function $f$ lives in an infinite dimensional function space, the estimation of $f$ is uncertain and based on prior assumptions about its structure.
 
 In classic control scenarios, these prior assumptions often follow from physical descriptions of the system to be modelled.
-While the physics of driving a bicycle is understood quite well and can be described using differential equations, a controller for a specific bicycle depends on some parameters $\eta$ such as the masses and measures detailed in \cref{tab:bicycle_constants}.
-In this setting, solving the regression problem corresponds to finding a choice of parameters $\eta^\ast$ which explain the observations of the true system best.
+While the physics of driving a bicycle is understood quite well and can be described using differential equations, a controller for a specific bicycle depends on some parameters $\rv{\eta}$ such as the masses and measures detailed in \cref{tab:bicycle_constants}.
+In this setting, solving the regression problem corresponds to finding a choice of parameters $\rv{\eta^\ast}$ which explain the observations of the true system best.
 
-In a Bayesian context, instead of deciding on one specific vector of parameters, it might be more interesting to derive a distribution $\Prob{\eta^*}$ of probable parameter values which then represents the uncertainty about their true value.
+In a Bayesian context, instead of deciding on one specific vector of parameters, it might be more interesting to derive a distribution $\Prob{\rv{\eta^\ast}}$ of probable parameter values which then represents the uncertainty about their true value.
 When making a prediction for a new input point $\mat{x_\ast}$, this uncertainty can be used to derive a predictive distribution $\Prob{y_\ast \given \mat{x_\ast}, \mat{\eta^\ast}}$, which propagates this uncertainty through the model to the prediction.
 
 This approach represents uncertainty about the correct choice of parameters but assumes that the predefined structure of the function is correct, making it a \emph{parametric model}.
@@ -474,7 +474,7 @@ Adding the noise model to this distribution leads to the joint Gaussian of train
 \end{align}
 
 In this distribution, the training outputs $\mat{y}$ are known.
-The predictive posterior for the test outputs $\mat{f_\ast}$ can be obtained by applying the rules for marginalization of multivariate Gaussians, yielding another Gaussian distribution \cite{petersen_matrix_2008}.
+The predictive posterior for the test outputs $\mat{f_\ast}$ can be obtained by applying the rules for marginalization of multivariate Gaussians, yielding another Gaussian distribution $\Prob{\mat{f_\ast} \given \mat{X}, \mat{y}, \mat{X_\ast}}$ \cite{petersen_matrix_2008}.
 \begin{lemma}[GP predictive posterior]
     \label{lem:gp_posterior}
     Given a latent function with a Gaussian process distribution $f \sim \GP(\mat{0}, \K)$ and $N$ training points $\mat{X}$ with noisy observations of the form $\mat{y} = f(\mat{X}) + \Gaussian{\mat{0}, \sigma_n^2 \Eye}$.

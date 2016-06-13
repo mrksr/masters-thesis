@@ -208,7 +208,7 @@ To improve accuracy, the implementation developed for this thesis works with a c
 The assumption that for a single time step, the bicycle moves along a fixed circular path is no longer correct when evaluating the dynamics with Runge-Kutta.
 Because of this, the changes in position and orientation are integrated into the scheme.
 
-Let $\Delta$ denote the function which maps a pair state and action $(\mat{s}, \mat{a})$ of the bicycle benchmark to its derivatives given by
+Let $\Delta$ denote the function which maps a pair of state $\mat{s}$ and action $\mat{a}$ to its derivatives given by
 \begin{align}
     \Delta(\mat{s}, \mat{a}) = \Delta \left( \left( \theta, \dot{\theta}, \omega, \dot{\omega}, x, y, \psi \right), \mat{a} \right) \coloneqq \left( \dot{\theta}, \ddot{\theta}, \dot{\omega}, \ddot{\omega}, \dot{x}, \dot{y}, \dot{\psi} \right).
 \end{align}
