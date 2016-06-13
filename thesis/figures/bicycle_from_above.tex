@@ -4,7 +4,8 @@
 
 \begin{document}
 \begin{tikzpicture}
-    \tikzstyle{bicycle} = [edge, very thick, shorten <=0pt, shorten >=0pt];
+    \tikzstyle{bicycle} = [edge, ultra thick, shorten <=0pt, shorten >=0pt];
+    \tikzstyle{tyre} = [bicycle, very thick];
     \tikzstyle{help} = [very thin];
 
     \coordinate (front) at (0, 0);
@@ -38,7 +39,7 @@
     \draw [right angle length=1ex, right angle symbol={tback}{tfront}{center}];
 
     \draw[bicycle, tumgreen] (front) -- node[above, black] {$l$} (back);
-    \draw[bicycle, tumblue] (tfront) -- (tback);
+    \draw[tyre, tumblue] (tfront) -- (tback);
     \node["$C$" below, very small node] at (center) {};
     \node[label={above left:$(x, y)$}, very small node] at (front) {};
     \node[very small node] at (back) {};
