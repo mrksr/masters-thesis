@@ -173,7 +173,8 @@ Since terminal states are modelled separately, both the last transition of a tra
 
 \subsection{Gaussian Process Models}
 \label{sub:gp_models}
-The Gaussian process models for the transition dynamics are trained using data sets of the form $\D = \Set{(\mat{s_i}, \mat{a_i}, \mat{s_i^\prime}) \in \Es \times \Ah \times \Es \with i \in [N]}$ of pairs of states and actions and their corresponding following state $\mat{s_i^\prime} = \DynBicycle(\mat{s_i}, \mat{a_i})$.
+The Gaussian process models for the transition dynamics are trained using data sets of the form $\D = \Set{(\mat{s_i}, \mat{a_i}, \mat{s_i^\prime}) \in \Es \times \Ah \times \Es \with i \in [N]}$ of pairs of states and actions and their corresponding following state.
+The following states $\mat{s_i^\prime} = \DynBicycle(\mat{s_i}, \mat{a_i})$ are obtained form the transition dynamics.
 Since the transition dynamics of the bicycle benchmark are deterministic, these observations have no probabilistic element and they are not noisy.
 The model $f$ of the transition dynamics is a compact statistical representation of this collected knowledge and is to be used to predict successive states of unobserved combinations of states and actions $(\mat{s_\ast}, \mat{a_\ast})$.
 
@@ -1022,11 +1023,6 @@ Having calculated the terminal probabilities $\Prob{\ms{\PGoal_t}}$ and $\Prob{\
 \end{align}
 
 \subsection{Posterior States using the Truncation of Gaussians}
-Using the intermediate state distributions $\Prob{\ms{\rv{s_t}}}$ directly when predicting successive states is a good approximation in most cases but is not correct when the probabilities $\Prob{\rv{s_t} \in \Fallen}$ or $\Prob{\rv{s_t} \in \Goal}$ are large.
-The transition model $f$ is trained using only non-terminal state transitions, that is, state transitions where neither the prior nor the posterior state is terminal.
-This implies the assumption that the transition model only operates on non-terminal states, similar to transition dynamics $\Dyn$ being defined on $\Es$, the set of non terminal states, in general in \cref{def:transition_dynamics}.
-For any state $\mat{s_t}$ in the set of terminal states $\Tee$, the successive state $\mat{s_{t+1}}$ is always defined to be equal to $\mat{s_t}$, regardless of the action performed by the agent.
-
 \begin{figure}[t]
     \centering
     \includestandalonewithpath{figures/solution_ms_predictions_truncation}
@@ -1037,6 +1033,12 @@ For any state $\mat{s_t}$ in the set of terminal states $\Tee$, the successive s
     }
     \label{fig:ms_truncation_predictions}
 \end{figure}
+Using the intermediate state distributions $\Prob{\ms{\rv{s_t}}}$ directly when predicting successive states is a good approximation in most cases but is not correct when the terminal probabilities $\Prob{\rv{s_t} \in \Fallen}$ or $\Prob{\rv{s_t} \in \Goal}$ are large.
+For any state $\mat{s_t}$ in the set of terminal states $\Tee$, the successive state $\mat{s_{t+1}}$ is always defined to be equal to $\mat{s_t}$, regardless of the action performed by the agent.
+The transition model $f$ is however trained using only non-terminal state transitions, that is, state transitions where neither the prior nor the posterior state is terminal.
+This implies the assumption that the transition model only operates on non-terminal states, similar to transition dynamics $\Dyn$ in general only being defined on $\Es$, the set of non terminal states.
+The attractor property of terminal states has to be modelled outside of the transition models.
+
 In the action value function, this is reflected by the accumulative probabilities $\Prob{\PGoal}$ and $\Prob{\PFallen}$.
 Any probability mass which falls to their respective terminal states is assumed to stay there for the remaining time steps, since their respective trajectories end at that point.
 When predicting successive states using the function $\ms{\mat{s_{t+1}}}$, this information is not considered however.
@@ -1122,6 +1124,7 @@ If PSO-P is successful using MAP-predictions or one-step uncertainties, the traj
 Using multi-step uncertainties, PSO-P avoids driving in a straight line.
 Instead, the bicycle's movement describes a wave, where the policy is always leaning slightly into one direction.
 This effect is also visible in \cref{fig:ms_successful_trajectory}, which shows all state variables over time for one successful trajectory.
+The policy alternates between steering heavily to the left or to the right which results in the wavy movement.
 
 When using multi-step uncertainties, PSO-P must avoid action sequences which lead to very uncertain predictions, since for high uncertainties, the probabilities for reaching a terminal state grow.
 A possible explanation for the wavy movement is that driving straight is hard to predict for the transition model for two reasons.
