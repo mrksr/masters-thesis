@@ -772,10 +772,8 @@ The action value function is itself not probabilistic but is defined as an expec
 Since the transition model is Bayesian, evaluating this expected values implies iterated marginalizations of beliefs about both model hyperparameters and intermediate states.
 The dependency of the action value on the different actions is therefore very complex and finding their gradients for the optimization is analytically intractable.
 
-\emph{Particle swarm optimization} is the heuristic technique which is used in {PSO-P} to solve this non-convex optimization problem and is not dependent on gradients.
-It works by creating a set of candidate solutions in the search space.
-These particles move through the search space with the direction being dependent on their own function value and the function values of the other particles in the swarm.
-This section introduces a basic version of the algorithm and discusses the different choices of parameters.
+This section first introduces \emph{Particle Swarm Optimization}, the gradient-free heuristic used in PSO-P to tackle the non-convex optimization problem of finding the optimal action sequence.
+After the definition, different choices of parameters are discussed.
 
 \subsection{Basic Particle Swarm Optimization}
 To choose an appropriate action for the current state, PSO-P needs to solve a non-convex optimization problem.
@@ -809,7 +807,7 @@ These particles each have a position and velocity which are both updated for all
 The set of all time steps $\Tee$ is usually considered to be the natural numbers.
 At every such time step, the objective function value is evaluated for every particle.
 Since PSO models social interaction and communication, every particle has a neighbourhood of particles it communicates with.
-This communication influences the particle's velocity as it is attracted by particles with good performance.
+This communication influences the particle's velocity as particles are  attracted to positions with good performance.
 \begin{definition}[PSO Instance]
     An instance of the \emph{particle swarm optimization (PSO)} scheme on the objective function $f \colon \R^d \to \R$ is defined by the set of particles $\Pe$.
     For every time step in $\Tee$, the particles' positions and velocities are given by the functions
@@ -856,7 +854,7 @@ For every particle, the best position seen by any of its neighbours $\Soc$ is de
 \begin{align}
     \begin{split}
         \Soc_i(t) &\coloneqq \Cog_{n^\ast}(t) \text{, where} \\
-        n^\ast &\in \argmin_{n \in \Neigh(i)} f(\Cog_n(t)).
+        n^\ast &\in \argmax_{n \in \Neigh(i)} f(\Cog_n(t)).
     \end{split}
 \end{align}
 
@@ -874,21 +872,20 @@ Since both the cognitive and social components are proportional to the distance 
 A common solution to avoid this is \emph{velocity clamping} which bounds the maximum velocity of a particle to a fraction $\zeta$ of the size of the input space.
 
 Using the update steps for the positions and velocities, the behaviour of the swarm $\Pe$ can be calculated for an arbitrary number of time steps.
-The result of the optimization using PSO is the best position visited by any particle at any time step and is given by
+The result of the optimization using PSO is the best position visited by any particle at any time step before the final iteration $t_{\text{final}}$ and is given by
 \begin{align}
-    \mat{x^\ast} \in \lim_{t \to \infty} \argmax_{p \in \Pe} f(\Cog_p(t)).
+    \mat{x^\ast} \in \argmax_{p \in \Pe} f(\Cog_p(t_{\text{final}})).
 \end{align}
-If $f$ is bounded above, this limit is well-defined since $f(\Cog_p(\cdot))$ is monotonically increasing for all $p \in \Pe$.
-Assuming a neighbourhood which transitively connects all particles, an arbitrary amount of time and a unique global optimum which gets visited by a particle at some time, the swarm should intuitively collapse to this global optimum, since the best particle attracts all other particles.
-While the heuristic is surprisingly successful in practice, the basic PSO algorithm can be shown to not converge to a single point or to the global optimum in scenarios which are not so ideal \cite{engelbrecht_fundamentals_2006}.
+Assuming a neighbourhood which transitively connects all particles, an arbitrary amount of time and a unique global optimum which gets visited by a particle at some time, the swarm collapses to this global optimum, since the best particle attracts all other particles.
+While the heuristic is surprisingly successful in practice, the basic PSO algorithm can be shown to not converge to a single point or to the global optimum in some scenarios which are not ideal \cite{engelbrecht_fundamentals_2006}.
 
-Since PSO cannot judge whether it has converged to the limit, standard termination criteria for optimization have to be employed.
+Since PSO cannot judge whether it has converged to the optimum, standard termination criteria for optimization have to be employed.
 Common problem-dependent choices are a minimum step size between successive best solutions, minimum improvement of the objective function between successive best solutions or a maximum number of iterations or iterations without improvement.
 Besides these criteria, there are many other variable parameters in PSO such as the number of particles or the structure of the neighbourhood function.
 
 \subsection{Choosing Parameters}
 The performance of basic PSO depends on choices for multiple parameters, namely the number of particles in the swarm, the structure of the neighbourhood, the number of iterations and the constants in the velocity update step.
-Since it is a heuristic algorithm, the correct settings of these parameters are problem-dependent and it is hard to give mathematical proofs.
+Since it is a heuristic algorithm, good of these parameters are problem-dependent and it is hard to give mathematical proofs.
 This subsection describes the empirical findings of this thesis and summarizes the recommendations given by \citeauthor{engelbrecht_fundamentals_2006} in \cite{engelbrecht_fundamentals_2006}.
 
 As with many other optimization algorithms, there are two important trade-offs when deciding on parameter values.
@@ -905,7 +902,6 @@ The more particles there are in the swarm, the more diversity is there in the in
 During the first few iterations of PSO where particles are just starting to influence each other, more unknown parts of the search space will be visited and therefore more of the search space will be explored.
 If $\abs{\Pe}$ is increased in expense of the number of iterations, more particles mean a higher chance that some of them find good parts of the search space.
 However, fewer iterations can mean that there is less time for the swarm to collapse towards these good parts and search them more thoroughly to exploit the gained knowledge.
-\citeauthor{engelbrecht_fundamentals_2006} recommends a number of about 10 to 30 particles as a good starting point for an unknown problem but suggests cross-validation to improve the results.
 In this thesis, PSO is used to optimize in the space of all future actions in the time horizon.
 To ensure good coverage of this space, which for the bicycle benchmark is about 50-dimensional, 250 particles were used during the experiments.
 
@@ -939,7 +935,7 @@ The information flow through this network is described by the average degree of 
 The average degree of connectivity $\lambda_{\Neigh}$ is the average fraction of all available particles a particle is connected to.
 It the degree of connectivity is high and the average distance between two arbitrary particles low, information about a good position in the search space propagates quickly to all particles and the swarm will tend to collapse sooner.
 For simple or unimodal objective functions, this behaviour can be very beneficial, since it lowers the number of iterations required for the swarm to collapse towards the global optimum.
-For more complex problems however, the swarm is in danger of quickly collapsing in a local optimum without good exploration of the search space.
+For more complex problems however, the swarm is in danger of prematurely collapsing in a local optimum without good exploration of the search space.
 
 \citeauthor{engelbrecht_fundamentals_2006} describes a number of different social network structures.
 This thesis uses the \emph{ring topology} where every particle communicates with itself and a number of immediate neighbours as shown in \cref{fig:pso_topology:ring}.
@@ -947,7 +943,7 @@ A higher degree of connectivity can be achieved by increasing the number of imme
 This topology guarantees transitive connections between every particle while still allowing for enough exploration since knowledge must potentially pass through several particles to reach a particle on the other side of the ring.
 Neighbourhoods move smoothly around the ring and overlap, which means that this topology does not favour the formation of clusters of particles in the search space.
 The special case of the ring topology where $\lambda_{\Neigh}$ is one is the \emph{star topology} as shown in \cref{fig:pso_topology:star}.
-In this topology, every particle is connected with every other particle, which implies that the PSO will quickly converge towards the globally best solution.
+In this topology, every particle is connected with every other particle, which implies that the PSO will quickly converge towards the best solution found by the swarm.
 
 Having established a swarm of particles with a neighbourhood $\Neigh$, the constants $\omega$, $\gamma_c$ and $\gamma_s$ in the velocity update in \cref{eq:pso_velocity} define the relative influences of the different kinds of information a particle has gathered to its trajectory.
 The cognitive weight $\gamma_c$ and the social weight $\gamma_s$ describe the trust of a particle towards its own experiences and the experiences of its neighbours.
@@ -955,7 +951,7 @@ If $\gamma_s$ is equal to zero, the communication of the particles is ignored an
 On the other hand, if $\gamma_c$ is zero in a star topology, every particle would be attracted towards the single best known position and PSO turns into a stochastic hill-climber \cite{engelbrecht_fundamentals_2006}.
 The strength of PSO comes from weighing the two aspects, so a common choice is to set both constants to similar values.
 The inertia weight $\omega$ is meant to ensure smooth trajectories and is set to be between zero and one to allow the swarm to converge.
-Based on empirical studies, \citeauthor{eberhart_comparing_2000} suggest setting $\omega$ to 0.7291 and both $\gamma_c$ and $\gamma_s$ to 1.49618 \cite{eberhart_comparing_2000,clerc_swarm_1999}.
+\citeauthor{eberhart_comparing_2000} suggest setting $\omega$ to 0.7291 and both $\gamma_c$ and $\gamma_s$ to 1.49618 \cite{eberhart_comparing_2000,clerc_swarm_1999}.
 
 The velocity clamping factor $\zeta$ defines the maximum absolute value of the velocity per dimension to be given by $\mat{v^\text{max}} = \zeta \cdot ( \mat{x^\text{max}} - \mat{x^\text{min}} )$.
 A small value avoids erratic movement of the particles by jumping over huge parts of the search space in one time step.
@@ -968,7 +964,7 @@ It may be interesting to switch focus from exploration in the early time steps t
 This can be achieved by adaptively changing the different weights or the velocity clamping factor \cite{engelbrecht_fundamentals_2006}.
 
 The choices for the parameters of the PSO used in this thesis are presented in \cref{tab:pso_parameters}.
-The problem of choosing a vector of actions in PSO-P is very high dimensional.
+The problem of optimizing a vector of actions in PSO-P is very high dimensional.
 Because of this, the ratio of number of particles to number of time steps leans towards a higher than usual number of particles.
 This is compensated for with a high average connectivity in the ring neighbourhood.
 The different weights and the velocity clamping factor are standard choices since they proved to be successful.
