@@ -474,7 +474,7 @@ Adding the noise model to this distribution leads to the joint Gaussian of train
 \end{align}
 
 In this distribution, the training outputs $\mat{y}$ are known.
-The predictive posterior for the test outputs $\mat{f_\ast}$ can be obtained by applying the rules for marginalization of multivariate Gaussians, yielding another Gaussian distribution $\Prob{\mat{f_\ast} \given \mat{X}, \mat{y}, \mat{X_\ast}}$ \cite{petersen_matrix_2008}.
+The predictive posterior for the test outputs $\mat{f_\ast}$ can be obtained by applying the rules for marginalization of multivariate Gaussians \cite{petersen_matrix_2008}, yielding another Gaussian distribution $\Prob{\mat{f_\ast} \given \mat{X}, \mat{y}, \mat{X_\ast}}$.
 \begin{lemma}[GP predictive posterior]
     \label{lem:gp_posterior}
     Given a latent function with a Gaussian process distribution $f \sim \GP(\mat{0}, \K)$ and $N$ training points $\mat{X}$ with noisy observations of the form $\mat{y} = f(\mat{X}) + \Gaussian{\mat{0}, \sigma_n^2 \Eye}$.
