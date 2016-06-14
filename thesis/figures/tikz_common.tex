@@ -45,7 +45,7 @@
 \pgfplotsset{trajectory plot/.style = {
     default plot,
     width=200pt,
-    height=140pt,
+    height=172pt,
 }}
 \pgfplotsset{prediction plot/.style = {
     default plot,
@@ -139,20 +139,6 @@
     xlabel={Time step},
     ylabel={$\vert\Delta^\psi\vert$},
     y unit={\radian},
-}}
-\pgfplotsset{action d plot/.style = {
-    ymin=-0.021,
-    ymax=0.021,
-    xlabel={Time step},
-    ylabel={$d$},
-    y unit={\meter},
-}}
-\pgfplotsset{action T plot/.style = {
-    ymin=-2.1,
-    ymax=2.1,
-    xlabel={Time step},
-    ylabel={$T$},
-    y unit={\N},
 }}
 
 \pgfplotsset{xy plot/.style = {
@@ -284,7 +270,7 @@
     \begin{axis} [
             trajectory plot,
             omega plot,
-            shift={(0, -130pt)},
+            shift={(0, -160pt)},
         ]
         \addplot[bicycle, #2] table[ignore chars={\#}, col sep=space, x expr=\coordindex, y=omega]
             {\datapath/data/solution_trajectory_#1.xa};
@@ -292,7 +278,7 @@
     \begin{axis} [
             trajectory plot,
             omega dot plot,
-            shift={(210pt, -130pt)},
+            shift={(210pt, -160pt)},
         ]
         \addplot[bicycle, #2] table[ignore chars={\#}, col sep=space, x expr=\coordindex, y=omega_dot]
             {\datapath/data/solution_trajectory_#1.xa};
@@ -300,7 +286,7 @@
     \begin{axis} [
             trajectory plot,
             psi goal plot,
-            shift={(0, -260pt)},
+            shift={(0, -320pt)},
         ]
         \addplot[bicycle, #2] table[
                 ignore chars={\#}, col sep=space,
@@ -311,28 +297,9 @@
     \begin{axis} [
             trajectory plot,
             r zero plot,
-            shift={(210pt, -260pt)},
+            shift={(210pt, -320pt)},
         ]
         \addplot[bicycle, #2] table[ignore chars={\#}, col sep=space, x expr=\coordindex, y=r_zero]
-            {\datapath/data/solution_trajectory_#1.xa};
-    \end{axis}
-    \begin{axis} [
-            trajectory plot,
-            action d plot,
-            shift={(0, -390pt)},
-        ]
-        \addplot[bicycle, #2] table[
-                ignore chars={\#}, col sep=space,
-                x expr=\coordindex,
-                y=action_d,
-            ] {\datapath/data/solution_trajectory_#1.xa};
-    \end{axis}
-    \begin{axis} [
-            trajectory plot,
-            action T plot,
-            shift={(210pt, -390pt)},
-        ]
-        \addplot[bicycle, #2] table[ignore chars={\#}, col sep=space, x expr=\coordindex, y=action_T]
             {\datapath/data/solution_trajectory_#1.xa};
     \end{axis}
 }
