@@ -826,7 +826,8 @@ This communication influences the particle's velocity as particles are  attracte
 The positions and velocities of the particles are defined using dynamic programming.
 The bounded search space allows for a uniform initial distribution of positions and velocities which are, for every particle $i \in \Pe$, defined as
 \begin{align}
-    \Pos_i(0), \Vel_i(0) \sim \mat{x^{\text{min}}} + \Uniform{0, 1} \cdot \left( \mat{x^{\text{max}}} - \mat{x^{\text{min}}} \right),
+    \Pos_i(0) &\sim \mat{x^{\text{min}}} + \Uniform{0, 1} \cdot \left( \mat{x^{\text{max}}} - \mat{x^{\text{min}}} \right), \\
+    \Vel_i(0) &\sim \Uniform{0, 1} \cdot \left( \mat{x^{\text{max}}} - \mat{x^{\text{min}}} \right),
 \end{align}
 where $\Uniform{0, 1}$ denotes the standard uniform distribution.
 The update of the positions only depends on the particle's current state, such that for every $t \in \Tee$ it is defined as
@@ -874,9 +875,10 @@ Since both the cognitive and social components are proportional to the distance 
 A common solution to avoid this is \emph{velocity clamping} which bounds the maximum velocity of a particle to a fraction $\zeta$ of the size of the input space.
 
 Using the update steps for the positions and velocities, the behaviour of the swarm $\Pe$ can be calculated for an arbitrary number of time steps.
-The result of the optimization using PSO is the best position visited by any particle at any time step before the final iteration $t_{\text{final}}$ and is given by
+The result $\mat{x^\ast}$ of the optimization using PSO is the best position visited by any particle at any time step before the final iteration $t_{\text{final}}$ and is given by
 \begin{align}
-    \mat{x^\ast} \in \argmax_{p \in \Pe} f(\Cog_p(t_{\text{final}})).
+    \mat{x^\ast} &= \Pos_{p^\ast}(t_{\text{final}) \\
+    p^\ast &\in \argmax_{p \in \Pe} f(\Cog_p(t_{\text{final}})).
 \end{align}
 Assuming a neighbourhood which transitively connects all particles, an arbitrary amount of time and a unique global optimum which gets visited by a particle at some time, the swarm collapses to this global optimum, since the best particle attracts all other particles.
 While the heuristic is surprisingly successful in practice, the basic PSO algorithm can be shown to not converge to a single point or to the global optimum in some scenarios which are not ideal \cite{engelbrecht_fundamentals_2006}.
