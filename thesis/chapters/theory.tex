@@ -877,8 +877,10 @@ A common solution to avoid this is \emph{velocity clamping} which bounds the max
 Using the update steps for the positions and velocities, the behaviour of the swarm $\Pe$ can be calculated for an arbitrary number of time steps.
 The result $\mat{x^\ast}$ of the optimization using PSO is the best position visited by any particle at any time step before the final iteration $t_{\text{final}}$ and is given by
 \begin{align}
-    \mat{x^\ast} &= \Pos_{p^\ast}(t_{\text{final}})\text{, where} \\
-    p^\ast &\in \argmax_{p \in \Pe} f(\Cog_p(t_{\text{final}})).
+    \begin{split}
+        \mat{x^\ast} &= \Pos_{p^\ast}(t_{\text{final}})\text{, where} \\
+        p^\ast &\in \argmax_{p \in \Pe} f(\Cog_p(t_{\text{final}})).
+    \end{split}
 \end{align}
 Assuming a neighbourhood which transitively connects all particles, an arbitrary amount of time and a unique global optimum which gets visited by a particle at some time, the swarm collapses to this global optimum, since the best particle attracts all other particles.
 While the heuristic is surprisingly successful in practice, the basic PSO algorithm can be shown to not converge to a single point or to the global optimum in some scenarios which are not ideal \cite{engelbrecht_fundamentals_2006}.
@@ -934,7 +936,8 @@ To ensure good coverage, 250 particles were used during the experiments.
 \end{figure}
 The feature separating PSO from other population-based optimization schemes is social interaction.
 Particles in the swarm communicate with their neighbours to obtain additional knowledge and move towards better parts of the search space.
-The structure of this neighbourhood is determined by the constant neighbourhood function $\Neigh$ and the performance of PSO depends strongly on its structure.
+The structure of this neighbourhood is determined by the neighbourhood function $\Neigh$ and the performance of PSO depends strongly on its structure.
+The neighbourhood function is constant and describes a topology which is independent of the actual positions of the particles.
 The information flow through this network is described by the average degree of connectivity and the average distance between two arbitrary particles.
 
 The average degree of connectivity $\lambda_{\Neigh}$ is the average fraction of all available particles a particle is connected to.
