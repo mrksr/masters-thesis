@@ -877,7 +877,7 @@ A common solution to avoid this is \emph{velocity clamping} which bounds the max
 Using the update steps for the positions and velocities, the behaviour of the swarm $\Pe$ can be calculated for an arbitrary number of time steps.
 The result $\mat{x^\ast}$ of the optimization using PSO is the best position visited by any particle at any time step before the final iteration $t_{\text{final}}$ and is given by
 \begin{align}
-    \mat{x^\ast} &= \Pos_{p^\ast}(t_{\text{final}) \\
+    \mat{x^\ast} &= \Pos_{p^\ast}(t_{\text{final}})\text{, where} \\
     p^\ast &\in \argmax_{p \in \Pe} f(\Cog_p(t_{\text{final}})).
 \end{align}
 Assuming a neighbourhood which transitively connects all particles, an arbitrary amount of time and a unique global optimum which gets visited by a particle at some time, the swarm collapses to this global optimum, since the best particle attracts all other particles.
