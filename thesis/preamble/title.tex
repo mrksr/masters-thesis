@@ -1,5 +1,8 @@
 \makeatletter
 
+\newcommand\revisionDateText{}
+\newcommand\RevisionDate[1]{\renewcommand\revisionDateText{#1}}
+
 \newcommand\thesisTypeText{}
 \newcommand\thesisType[1]{\renewcommand\thesisTypeText{#1}}
 
@@ -67,7 +70,8 @@
         \parbox{1.2\linewidth}
         {
             \raggedleft
-            \small \@date
+            \small Submitted on \@date \\
+            \small Last revised on \revisionDateText
         }
         \vspace*{\fill}
         %\vskip 2em%
