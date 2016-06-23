@@ -1,5 +1,6 @@
 \input{preamble.tex}
-\input{tikz_common.tex}
+\input{figures/tikz_common.tex}
+\input{figures/tikz_colors.tex}
 \input{../thesis/preamble/abbreviations.tex}
 
 \title{Incorporating Uncertainty into Reinforcement Learning through Gaussian Processes}
@@ -26,6 +27,21 @@
     \frametitle{BB}
 
     $\Bicycle{\Prob*{\Gaussian{\mu, \Sigma}}}$
+\end{frame}
+
+\begin{frame}
+    \frametitle{Bicycle Pic}
+
+    \begin{columns}
+        \begin{column}[b]{0.5\textwidth}
+            \centering
+            \includestandalone{figures/bicycle_from_above}
+        \end{column}
+        \begin{column}[b]{0.5\textwidth}
+            \centering
+            \includestandalone{figures/bicycle_from_behind}
+        \end{column}
+    \end{columns}
 \end{frame}
 
 \section{Gaussian Processes}
