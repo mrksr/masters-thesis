@@ -1,0 +1,68 @@
+\documentclass[
+    compress,
+    10pt,
+    c,
+    aspectratio=1610
+]{beamer}
+
+%%%%%%%%%%%%%%
+%  Language  %
+%%%%%%%%%%%%%%
+\usepackage[english]{babel}
+\uselanguage{English}
+\languagepath{English}
+
+%%%%%%%%%%%
+%  Fonts  %
+%%%%%%%%%%%
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+
+% You might want to change this
+% See http://www.tug.dk/FontCatalogue
+\usepackage{arev}
+\usepackage{mathpazo}
+\usepackage{microtype}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%  Used by beamer or theme  %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{url}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{xspace}
+
+%%%%%%%%%%
+%  Tikz  %
+%%%%%%%%%%
+\usepackage{tikz}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.12}
+\usetikzlibrary{calc}
+
+%%%%%%%%%%
+%  Math  %
+%%%%%%%%%%
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage{mathtools}
+\usepackage{xfrac}
+\def\hmmax0
+\usepackage{bm}
+
+%%%%%%%%%%
+%  Misc  %
+%%%%%%%%%%
+\usepackage{csquotes}
+\usepackage{siunitx}
+% \usepackage{standalone}
+\usepackage{xstring} % standalone path magic
+
+%%%%%%%%%%%%%%%%%%
+%  Beamer Theme  %
+%%%%%%%%%%%%%%%%%%
+\usepackage{beamerthemeMA}
+\setbeamercovered{invisible}
+% Add slide-circles without subsections
+\AtBeginSection[]{\subsection{}}

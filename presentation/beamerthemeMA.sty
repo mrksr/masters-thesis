@@ -1,0 +1,70 @@
+\ProvidesPackage{beamerthemeMA}
+
+\xdefinecolor{tumblue}     {RGB}{  0,101,189}
+\xdefinecolor{tumgreen}    {RGB}{162,173,  0}
+\xdefinecolor{tumred}      {RGB}{229, 52, 24}
+\xdefinecolor{tumivory}    {RGB}{218,215,203}
+\xdefinecolor{tumorange}   {RGB}{227,114, 34}
+\xdefinecolor{tumlightblue}{RGB}{152,198,234}
+
+%% shadow, font, color, outer, inner
+%% normal text, alerted text, example text, structure
+
+\useoutertheme{split}
+
+\setbeamercolor{normal text}{fg=black,bg=white}
+\setbeamercolor{alerted text}{fg=tumred,bg=white}
+\setbeamercolor{example text}{fg=tumgreen,bg=white}
+\setbeamercolor{structure}{fg=tumblue,bg=white}
+\setbeamercolor{titlelike}{fg=tumblue}
+\setbeamercolor{subtitle}{fg=black}
+\setbeamerfont{title}{series=\bfseries}
+
+\setbeamertemplate{sections/subsections in toc}[square]
+\setbeamertemplate{items}[square]
+\setbeamertemplate{navigation symbols}{}
+
+\setbeamertemplate{blocks}[default]
+
+\setbeamercolor{block title}        {use=normal text, fg=black,bg=tumlightblue}
+\setbeamercolor{block title alerted}{use=alerted text,fg=white,bg=alerted text.fg}
+\setbeamercolor{block title example}{use=example text,fg=white,bg=example text.fg}
+
+\setbeamercolor{block body}        {parent=normal text,use=block title,        bg=block title.bg!25!bg}
+\setbeamercolor{block body alerted}{parent=normal text,use=block title alerted,bg=block title.bg!25!bg}
+\setbeamercolor{block body example}{parent=normal text,use=block title example,bg=block title example.bg!15!bg}
+
+\pgfdeclareimage[height=5mm]{tum}{tum}
+\pgfdeclareimage[height=5mm]{kth}{kth}
+\pgfdeclareimage[height=5mm]{siemens}{siemens}
+\logo{\pgfuseimage{tum}\hspace{2mm}\pgfuseimage{kth}\hspace{2mm}\pgfuseimage{siemens}}
+
+\setbeamertemplate{frametitle}{
+    \begin{beamercolorbox}[wd=\textwidth,leftskip=0mm]{frametitle}
+        \hspace{1mm}\insertframetitle\hfill\parbox{52mm}{\vspace{-1.5mm}\hfill\insertlogo}\hspace{1mm}
+    \end{beamercolorbox}
+    \vspace{-2.5mm}\textcolor{tumblue}{\noindent\rule{\textwidth}{0.6px}}
+}
+
+\setbeamercolor{page numbers}{fg=black,bg=white}
+\setbeamercolor{navigation bar}{fg=tumblue,bg=white}
+\setbeamercolor{section in head/foot}{fg=tumblue,bg=white}
+\setbeamertemplate{mini frames}[circle]
+\setbeamertemplate{footline}{
+    \leavevmode%
+    \hbox{%
+        \tiny%
+        \hspace{.01\paperwidth}%
+        \begin{beamercolorbox}[wd=.05\paperwidth,center]{page numbers}%
+            \insertframenumber{}\,/\,\inserttotalframenumber
+        \end{beamercolorbox}%
+        \begin{beamercolorbox}[wd=.88\paperwidth,center]{navigation bar}%
+            \insertnavigation{\linewidth}
+        \end{beamercolorbox}%
+    }
+    \vspace*{.5em}%
+}
+
+\setbeamertemplate{sidebar right}{}%{\vfill\vskip2pt\llap{\usebeamertemplate***{navigation symbols}\hskip1mm}\vskip2pt}
+\setbeamertemplate{headline}{}
+\setbeamercovered{transparent}
