@@ -5,6 +5,14 @@
     aspectratio=1610
 ]{beamer}
 
+%%%%%%%%%%%%%%%%
+%  Standalone  %
+%%%%%%%%%%%%%%%%
+% We load currfile explicitly and very early to avoid empty stack warnings.
+\usepackage{currfile}
+\usepackage{standalone}
+\usepackage{xstring} % standalone path magic
+
 %%%%%%%%%%%%%%
 %  Language  %
 %%%%%%%%%%%%%%
@@ -48,8 +56,6 @@
 %%%%%%%%%%
 \usepackage{csquotes}
 \usepackage{siunitx}
-\usepackage{standalone}
-\usepackage{xstring} % standalone path magic
 
 %%%%%%%%%%%%%%%%%%
 %  Beamer Theme  %
