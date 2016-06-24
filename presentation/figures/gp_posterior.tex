@@ -1,0 +1,69 @@
+\documentclass[beamer, aspectratio=1610]{standalone}
+\input{tikz_common.tex}
+\input{tikz_colors.tex}
+\input{tikz_standalone.tex}
+\input{tikz_jumping.tex}
+\input{../../thesis/preamble/abbreviations.tex}
+
+\begin{document}
+\begin{standaloneframe}
+    \begin{tikzpicture}[stop jumping]
+        \pgfplotsset{posterior plot/.style = {
+                default plot,
+                ymin=-6.5,
+                ymax=6.5,
+                xmin=-5,
+                xmax=5,
+                xlabel={$x$},
+                ylabel={$f(x)$},
+        }}
+
+        \pgfplotsset{prior sample/.style = {
+                thick,
+                densely dashed
+        }}
+
+        \begin{axis} [
+                posterior plot,
+            ]
+            \only<2-> {
+                \addplot[thin, tumblue, name path=c, domain=-5:5] {5.038};
+                \addplot[thin, tumblue, name path=d, domain=-5:5] {-5.038};
+                \addplot[tumblue!15] fill between[of=c and d, on layer={axis background}];
+            }
+            \addplot[very thick, tumblue, domain=-5:5] {0};
+
+            \only<3-> {
+                \addplot[prior sample, tumviolet] table[x=X, y=y] {\plotdatapath/posterior_prior_sample_0.dat};
+                \addplot[prior sample, tumorange] table[x=X, y=y] {\plotdatapath/posterior_prior_sample_1.dat};
+                \addplot[prior sample, tumgreen] table[x=X, y=y] {\plotdatapath/posterior_prior_sample_2.dat};
+            }
+        \end{axis}
+
+        \only<4-> {
+            \begin{axis} [
+                    posterior plot,
+                    ylabel={},
+                    shift={(190pt, 0)},
+                ]
+                \only<6-> {
+                    \addplot[thin, tumblue, name path=c, restrict x to domain=-5:5] table[x=X, y expr=\thisrow{y} + \thisrow{y_2std}] {\plotdatapath/posterior_gp.dat};
+                    \addplot[thin, tumblue, name path=d, restrict x to domain=-5:5] table[x=X, y expr=\thisrow{y} - \thisrow{y_2std}] {\plotdatapath/posterior_gp.dat};
+                    \addplot[tumblue!15] fill between[of=c and d, on layer={axis background}];
+                }
+                \only<5-> {
+                    \addplot[very thick, tumblue, restrict x to domain=-5:5] table[x=X, y=y] {\plotdatapath/posterior_gp.dat};
+                }
+
+                \only<7-> {
+                    \addplot[prior sample, tumviolet] table[x=X, y=y] {\plotdatapath/posterior_posterior_sample_0.dat};
+                    \addplot[prior sample, tumorange] table[x=X, y=y] {\plotdatapath/posterior_posterior_sample_1.dat};
+                    \addplot[prior sample, tumgreen] table[x=X, y=y] {\plotdatapath/posterior_posterior_sample_2.dat};
+                }
+
+                \addplot[only marks] table[x=X, y=y] {\plotdatapath/posterior_data.dat};
+            \end{axis}
+        }
+    \end{tikzpicture}
+\end{standaloneframe}
+\end{document}
