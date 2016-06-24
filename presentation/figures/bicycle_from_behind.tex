@@ -1,33 +1,35 @@
-\documentclass[beamer]{standalone}
+\documentclass[beamer, aspectratio=1610]{standalone}
 \input{tikz_common.tex}
 \input{tikz_colors.tex}
 \input{tikz_standalone.tex}
 
 \begin{document}
-\begin{tikzpicture}
-    \coordinate (y) at (0, 2.5);
-    \coordinate (xmin) at (-4, 0);
-    \coordinate (xmax) at (2, 0);
-    \coordinate (origin) at (0, 0);
-    \coordinate (frametip) at (110:6);
-    \coordinate (cm) at (125:5);
-    \coordinate (frame) at ($(origin)!(cm)!(frametip)$);
-    \coordinate (omegadot) at ($(frame) + (150:1)$);
-
-    \draw (xmin) -- (xmax);
-    \draw (origin) -- (y);
-    \draw (origin) -- (frametip);
-    \draw (cm) -- node[pos=0.4, above] {$d$} (frame);
-
-    \draw [right angle length=1ex, right angle symbol={origin}{frametip}{cm}];
-    \draw [right angle length=1ex, right angle symbol={xmin}{xmax}{y}];
-
-    \draw pic["$\omega$", draw, angle eccentricity=1.1, angle radius=2cm] {angle=y--origin--frametip};
-    \draw pic["$\dot{\omega}$", draw, arrows={-latex}, angle eccentricity=1.2, angle radius=1cm] {angle=frametip--frame--omegadot};
-
-    \draw[ultra thick, tumgreen] (origin) -- node[pos=0.7, black, above right] {$h$} (frame);
-    \node["CM" above left, very small node] at (cm) {};
-    \node[very small node] at (frame) {};
-    \node[very small node] at (origin) {};
-\end{tikzpicture}
+\begin{standaloneframe}
+    \begin{tikzpicture}
+        \coordinate (y) at (0, 2.5);
+        \coordinate (xmin) at (-4, 0);
+        \coordinate (xmax) at (2, 0);
+        \coordinate (origin) at (0, 0);
+        \coordinate (frametip) at (110:6);
+        \coordinate (cm) at (125:5);
+        \coordinate (frame) at ($(origin)!(cm)!(frametip)$);
+        \coordinate (omegadot) at ($(frame) + (150:1)$);
+    
+        \draw (xmin) -- (xmax);
+        \draw (origin) -- (y);
+        \draw (origin) -- (frametip);
+        \draw (cm) -- node[pos=0.4, above] {$d$} (frame);
+    
+        \draw [right angle length=1ex, right angle symbol={origin}{frametip}{cm}];
+        \draw [right angle length=1ex, right angle symbol={xmin}{xmax}{y}];
+    
+        \draw pic["$\omega$", draw, angle eccentricity=1.1, angle radius=2cm] {angle=y--origin--frametip};
+        \draw pic["$\dot{\omega}$", draw, arrows={-latex}, angle eccentricity=1.2, angle radius=1cm] {angle=frametip--frame--omegadot};
+    
+        \draw[ultra thick, tumgreen] (origin) -- node[pos=0.7, black, above right] {$h$} (frame);
+        \node["CM" above left, very small node] at (cm) {};
+        \node[very small node] at (frame) {};
+        \node[very small node] at (origin) {};
+    \end{tikzpicture}
+\end{standaloneframe}
 \end{document}
