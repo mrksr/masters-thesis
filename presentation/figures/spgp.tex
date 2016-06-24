@@ -1,0 +1,71 @@
+\documentclass[beamer, aspectratio=1610]{standalone}
+\input{tikz_common.tex}
+\input{tikz_colors.tex}
+\input{tikz_standalone.tex}
+\input{tikz_jumping.tex}
+\input{../../thesis/preamble/abbreviations.tex}
+
+\begin{document}
+\begin{standaloneframe}
+    \begin{tikzpicture}[stop jumping]
+        \pgfplotsset{spgp plot/.style = {
+                default plot,
+                ymin=-1.5,
+                ymax=1.5,
+                xmin=-4.5,
+                xmax=4.5,
+                xlabel={$x$},
+                ylabel={$f(x)$},
+        }}
+
+        \begin{axis} [
+                spgp plot,
+                clip mode=individual, % markers behind lines
+            ]
+            \addplot[mark=x, only marks] table[x=X, y=y] {\plotdatapath/spgp_data.dat};
+
+            \only<2-> {
+                \addplot[thin, tumblue, name path=c, restrict x to domain=-5:5] table[x=X, y expr=\thisrow{y} + 2 * \thisrow{y_std}] {\plotdatapath/spgp_full.dat};
+                \addplot[thin, tumblue, name path=d, restrict x to domain=-5:5] table[x=X, y expr=\thisrow{y} - 2 * \thisrow{y_std}] {\plotdatapath/spgp_full.dat};
+                \addplot[tumblue!15] fill between[of=c and d, on layer={axis background}];
+                \addplot[very thick, tumblue] table[x=X, y=y] {\plotdatapath/spgp_full.dat};
+            }
+        \end{axis}
+
+        \only<3-> {
+            \begin{axis} [
+                    spgp plot,
+                    clip mode=individual, % markers behind lines
+                    shift={(190pt,0)},
+                    ylabel={},
+                ]
+                \addplot[mark=x, only marks] table[x=X, y=y] {\plotdatapath/spgp_data.dat};
+
+                \only<4-> {
+                    \coordinate (axisline) at (axis description cs:0,0);
+                    \coordinate (sparse1) at (-1.0563, 0);
+                    \coordinate (sparse2) at (-2.4840, 0);
+                    \coordinate (sparse3) at (1.1261, 0);
+
+                    \tikzstyle{pseudo input} = [
+                        draw, black, semithick,
+                        fill=tumblue,
+                        dart, shape border rotate=90,
+                        inner sep=1.5pt,
+                    yshift=4pt];
+                    \node[pseudo input] at (axisline -| sparse1) {};
+                    \node[pseudo input] at (axisline -| sparse2) {};
+                    \node[pseudo input] at (axisline -| sparse3) {};
+                }
+
+                \only<5-> {
+                    \addplot[thin, tumblue, name path=c, restrict x to domain=-5:5] table[x=X, y expr=\thisrow{y} + 2 * \thisrow{y_std}] {\plotdatapath/spgp_sparse.dat};
+                    \addplot[thin, tumblue, name path=d, restrict x to domain=-5:5] table[x=X, y expr=\thisrow{y} - 2 * \thisrow{y_std}] {\plotdatapath/spgp_sparse.dat};
+                    \addplot[tumblue!15] fill between[of=c and d, on layer={axis background}];
+                    \addplot[very thick, tumblue] table[x=X, y=y] {\plotdatapath/spgp_sparse.dat};
+                }
+            \end{axis}
+        }
+    \end{tikzpicture}
+\end{standaloneframe}
+\end{document}
