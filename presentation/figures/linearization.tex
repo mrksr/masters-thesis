@@ -21,7 +21,7 @@
                 ylabel={$\bm{\Delta_t}$},
                 xlabel={$\bm{s_t}$},
                 ytick={-5, 0, 5},
-                % clip mode=individual, % markers behind lines
+                clip mode=individual, % markers behind lines
             ]
             \addplot[thin, tumblue, name path=c, restrict x to domain=-5:5] table[x=X, y expr=\thisrow{y} + \thisrow{y_2std}] {\plotdatapath/posterior_gp.dat};
             \addplot[thin, tumblue, name path=d, restrict x to domain=-5:5] table[x=X, y expr=\thisrow{y} - \thisrow{y_2std}] {\plotdatapath/posterior_gp.dat};
