@@ -1,0 +1,112 @@
+\documentclass[beamer, aspectratio=1610]{standalone}
+\input{tikz_common.tex}
+\input{tikz_colors.tex}
+\input{tikz_standalone.tex}
+\input{tikz_jumping.tex}
+\input{../../thesis/preamble/abbreviations.tex}
+
+\begin{document}
+\begin{standaloneframe}
+    \begin{tikzpicture}[stop jumping]
+        \begin{axis} [
+                default plot,
+                ymin=-6.5,
+                ymax=6.5,
+                xmin=-5,
+                xmax=5,
+                width=240pt,
+                height=172pt,
+                yticklabel pos=right,
+                xticklabel pos=right,
+                ylabel={$\bm{\Delta_t}$},
+                xlabel={$\bm{s_t}$},
+                ytick={-5, 0, 5},
+                % clip mode=individual, % markers behind lines
+            ]
+            \addplot[thin, tumblue, name path=c, restrict x to domain=-5:5] table[x=X, y expr=\thisrow{y} + \thisrow{y_2std}] {\plotdatapath/posterior_gp.dat};
+            \addplot[thin, tumblue, name path=d, restrict x to domain=-5:5] table[x=X, y expr=\thisrow{y} - \thisrow{y_2std}] {\plotdatapath/posterior_gp.dat};
+            \addplot[tumblue!15] fill between[of=c and d, on layer={axis background}];
+            \addplot[very thick, tumblue] table[x=X, y=y, restrict x to domain=-5:5] {\plotdatapath/posterior_gp.dat};
+
+            \addplot[only marks, mark size=1.5pt] table[x=X, y=y] {\plotdatapath/posterior_data.dat};
+
+            \only<5->{
+                \addplot[tumgreen, very thick, domain=-2.7:0.3] {1.7511410501706364 * (x + 1.2) + 1.57693676};
+            }
+
+            \coordinate (gp intersection) at (-1.2, 1.57693676);
+        \end{axis}
+
+        \only<2-> {
+            \begin{axis} [
+                    default plot,
+                    xmin=-5,
+                    xmax=5,
+                    ymin=-0.1,
+                    ymax=0.9,
+                    shift=({0, -10pt}),
+                    anchor=north west,
+                    height=120pt,
+                    width=240pt,
+                    yticklabel pos=right,
+                    xlabel={},
+                    ylabel={$p(\bm{s_t})$},
+                    extra x ticks={-1.2},
+                    extra x tick labels={$\bm{\mu_t}$},
+                    ytick={0,0.4,0.8},
+                ]
+                \addplot[very thick, tumblue, smooth, samples=300] {
+                        exp(-(x + 1.2)^2 / (2 * 0.25)) / (sqrt(2 * pi * 0.25))
+                    };
+
+                \coordinate (prior mean) at (-1.2, -0.1);
+            \end{axis}
+        }
+
+        \only<3-> {
+            \begin{axis} [
+                    default plot,
+                    ymin=-6.5,
+                    ymax=6.5,
+                    xmin=-0.1,
+                    xmax=0.9,
+                    shift=({-10pt, 0}),
+                    anchor=south east,
+                    width=120pt,
+                    height=172pt,
+                    x dir=reverse,
+                    ylabel={$\bm{\Delta_t}$},
+                    xlabel={$p(\bm{\Delta_t})$},
+                    extra y ticks={1.57693676},
+                    extra y tick labels={\alt<-4>{}{$\bm{\mu_\Delta}$}},
+                    xtick={0,0.4,0.8},
+                    ytick={-5, 0, 5},
+                    set layers,
+                ]
+
+                \only<4-> {
+                    \addplot[thin, tumorange, fill=tumorange!15, on layer=axis background] table[x=y, y=X]
+                        {\plotdatapath/solution_ms_linearization_posterior_kde.dat};
+                    \addplot[thin, tumorange] table[x=y, y=X]
+                        {\plotdatapath/solution_ms_linearization_posterior_kde.dat};
+                }
+
+                \only<6-> {
+                    \addplot[very thick, tumblue, smooth, samples=300, domain=-6:6] (
+                        exp(-(x - 1.57693676)^2 / (2 * 0.3798)) / (sqrt(2 * pi * 0.3798)),
+                        x
+                        );
+                }
+
+                \coordinate (posterior mean) at (0.9, 1.57693676);
+            \end{axis}
+        }
+
+        \only<5-> {
+            \draw[thick, tumgreen, dashed] (prior mean) -- (gp intersection);
+            \draw[thick, tumgreen, dashed] (posterior mean) -- (gp intersection);
+            \node[very small node, tumgreen, fill=tumgreen!15] at (gp intersection) {};
+        }
+    \end{tikzpicture}
+\end{standaloneframe}
+\end{document}

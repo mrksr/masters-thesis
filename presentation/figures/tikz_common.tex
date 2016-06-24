@@ -42,6 +42,7 @@
 \tikzstyle{marked node} = [very thick, draw=tumred, fill=tumred!20]
 \tikzstyle{every text node part} = [align=center, execute at begin node=\setlength{\baselineskip}{2ex}]
 
+\pgfplotsset{unit code/.code 2 args={\si{#1#2}}}
 \pgfplotsset{default plot/.style = {
     grid=major,
     minor y tick num=1,
@@ -49,6 +50,47 @@
     width=200pt,
     height=172pt,
 }}
+\pgfplotsset{xy plot/.style = {
+    default plot,
+    width=220pt,
+    height=220pt,
+    xmin=-26,
+    xmax=26,
+    ymin=-26,
+    ymax=26,
+    xlabel={$x$ position},
+    x unit={\meter},
+    ylabel={$y$ position},
+    y unit={\meter},
+}}
+
+\pgfplotsset{xy trajectory/.style = {
+    ultra thick,
+    smooth,
+}}
+\tikzstyle{success} = [tumgreen]
+\tikzstyle{success node} = [fill=tumgreen!15]
+\tikzstyle{fail} = [tumred]
+\tikzstyle{fail node} = [fill=tumred!15, rectangle]
+\newcommand{\xytrajectory}[2]{
+    \addplot[xy trajectory, #2] table[
+        ignore chars={\#}, col sep=space,
+        x expr={(\thisrow{next_r_zero}) * cos(\thisrow{next_psi_zero} r)},
+        y expr={(\thisrow{next_r_zero}) * sin(\thisrow{next_psi_zero} r)},
+    ] {\plotdatapath/solution_xy_trajectories_#1.xa}
+    % Starting state
+    node[pos=0, very small node, #2 node] {}
+    % Hacky way to make every trajectory just a little bit longer
+    node[pos=1, sloped, fill, inner sep=0, minimum width=1.6pt, minimum height=1.6pt] {};
+}
+\newcommand{\goalarea}{
+    \draw[draw=tumblue, fill=tumblue!15] \pgfextra{
+        \pgfpathellipse{\pgfplotspointaxisxy{0}{0}}
+        {\pgfplotspointaxisdirectionxy{5}{0}}
+        {\pgfplotspointaxisdirectionxy{0}{5}}
+    };
+    \node[tumblue, font=\footnotesize] at (0, 0) {Goal};
+}
 
 % See
 % https://tex.stackexchange.com/a/21759/34265

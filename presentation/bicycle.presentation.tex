@@ -53,21 +53,22 @@
 
 \section{Gaussian Processes}
 \begin{frame}
-    \frametitle{Parametric Models}
+    \frametitle{Gaussian Processes}
 
-    content
+    \begin{definition}[Gaussian Process]
+        A stochastic process $\rv{X}$ is called a \structure{Gaussian process} if for any finite subset $\tau \subseteq T$ of its index set, the random variables $\rv{X}_\tau$ have a joint Gaussian distribution.
+    \end{definition}
 \end{frame}
 
 \begin{frame}
-    \frametitle{Non-Parametric Models}
+    \frametitle{GP Prior and Posterior}
 
-    content
-\end{frame}
-
-\begin{frame}
-    \frametitle{GP Definition and Posterior}
-
-    content
+    \begin{block}{Yoyoyo}
+        Blarghl
+    \end{block}
+    \vfill
+    \centering
+    \includestandalonewithpath{figures/gp_posterior}
 \end{frame}
 
 \begin{frame}
@@ -79,11 +80,12 @@
 \begin{frame}
     \frametitle{Sparse GPs}
 
-    content
+    \centering
+    \includestandalonewithpath{figures/spgp}
 \end{frame}
 
 \section{Uncertainties in Reinforcement Learning}
-\begin{frame}
+\begin{frame}[label=architecture]
     \frametitle{Solution Architecture}
 
     \centering
@@ -93,13 +95,50 @@
 \begin{frame}
     \frametitle{Reward Function}
 
-    content
+    \begin{definition}[Bicycle Reward Function]
+        Given the set $\Es^+$ of possible states of the bicycle benchmark and the sets $\Goal$ and $\Fallen$ of all terminal states where the bicycle has reached the goal or fallen respectively, the \emph{bicycle reward function} is defined as
+        \begin{align}
+            \RwdBicycle \colon \left\{
+                \begin{aligned}
+                    \Es^+ &\to \R \\
+                    \mat{s} &\mapsto \begin{cases}
+                    2 & \text{if $\mat{s} \in \Goal$} \\
+                    0 & \text{if $\mat{s} \in \Fallen$} \\
+                    \sqrt{2\pi\sigma_{\text{angle}}^2}\Gaussian{\Delta^\psi_{\mat{s}} \given 0, \sigma_{\text{angle}}^2} & \text{otherwise}
+                \end{cases}
+            \end{aligned}
+            \right.
+        \end{align}
+    where $\Delta^\psi_{\mat{s}} = \abs{\psi_{\mat{s}} - \varphi_{\mat{s}}} \in (-\pi, \pi]$ denotes the difference between the bicycle's heading and the goal given a state $\mat{s}$ and $\sigma_{\text{angle}}^2$ is a positive real constant.
+    The Gaussian density function $\Norm$ is normalized to a maximum value of 1.
+    \end{definition}
 \end{frame}
 
 \begin{frame}
     \frametitle{Expected Reward and PSO-P}
 
-    content
+    \begin{align}
+        \label{eq:action_value_function}
+        \AVlu_{\mat{s_0}} \colon \left\{
+            \begin{aligned}
+                \Ah^T &\to \R \\
+                \left( \mat{a_0}, \dots, \mat{a_{T-1}} \right) &\mapsto \Moment*{\E}{\sum_{t=1}^T \gamma^t \Rwd(\mat{s_t}) \given f, \mat{s_0}, \mat{a_0}, \dots, \mat{a_{T-1}}}
+            \end{aligned}
+            \right.
+        \end{align}
+
+    \begin{definition}[PSO-P]
+        \label{def:psop}
+        The \emph{Particle Swarm Optimization-Policy (PSO-P)} chooses actions via direct optimization of the action value function $\AVlu$ and is defined as
+        \begin{align}
+            \pi_{\text{PSO-P}} &: \left\{
+            \begin{aligned}
+                \Es &\to \Ah\\
+                \mat{s} &\mapsto \mat{a^\ast}_0 \text{, where } \mat{a^\ast} \in \argmax_{\mat{a} \in \Ah^T} \AVlu_{\mat{s}}(\mat{a}).
+            \end{aligned}
+            \right.
+        \end{align}
+    \end{definition}
 \end{frame}
 
 \begin{frame}
@@ -117,14 +156,23 @@
 \begin{frame}
     \frametitle{Multi-Step Predictions}
 
-    content
+    \centering
+    \includestandalonewithpath{figures/linearization}
 \end{frame}
 
 \section{Results}
 \begin{frame}
     \frametitle{Qualitative}
 
-    content
+    % Center ignoring margins
+    \makebox[\textwidth][c] {
+        \only<1> {
+            \includestandalonewithpath{figures/data_xy_trajectories}
+        }
+        \only<2-> {
+            \includestandalonewithpath{figures/xy_trajectories}
+        }
+    }
 \end{frame}
 
 \begin{frame}
