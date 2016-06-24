@@ -1,0 +1,30 @@
+\documentclass[beamer, aspectratio=1610]{standalone}
+\input{tikz_common.tex}
+\input{tikz_colors.tex}
+\input{tikz_standalone.tex}
+\input{tikz_jumping.tex}
+\input{../../thesis/preamble/abbreviations.tex}
+
+\begin{document}
+\begin{standaloneframe}
+    \begin{tikzpicture}
+        \begin{axis} [
+                default plot,
+                ymin=20,
+                ymax=100,
+                xmin=15,
+                xmax=155,
+                % xtick={20,30,40,50,75,100,150},
+                xlabel={Pseudo Inputs},
+                ylabel={Success Rate},
+                y unit={\percent},
+                legend pos=south east,
+            ]
+
+            \goalpercentageline{means only}{means_only}{MAP}{triangle*}
+            \goalpercentageline{one step}{one_step}{OS}{pentagon*}
+            \goalpercentageline{linearization}{linearization_no_truncation}{MS}{*}
+        \end{axis}
+    \end{tikzpicture}
+\end{standaloneframe}
+\end{document}

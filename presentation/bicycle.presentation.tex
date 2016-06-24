@@ -181,10 +181,33 @@
     content
 \end{frame}
 
-\begin{frame}
+\begin{frame}[label=quantitative_results]
     \frametitle{Quantitative Results}
 
-    content
+    \centering
+    \vfill
+    \begin{columns}
+        \begin{column}[c]{0.5\textwidth}
+            \centering
+            \uncover<2> {
+                \includestandalonewithpath{figures/goal_percentage}
+            }
+        \end{column}
+        \begin{column}[c]{0.5\textwidth}
+            \centering
+            \begin{tabularx}{\textwidth}{X>{\centering\hsize=.4\hsize}X>{\centering\hsize=.4\hsize}X>{\centering\hsize=.4\hsize\arraybackslash}X}
+                \toprule
+                Metric & MAP & OS & MS \\
+                \midrule
+                Success Rate & \SI[mode=text]{53.4}{\percent} & \SI[mode=text]{63.8}{\percent} & \textbf{\SI[mode=text,detect-weight]{75.8}{\percent}} \\
+                \addlinespace
+                Time to Goal \\
+                Mean & \textbf{59.9} & 62.0 & 66.5 \\
+                Median & \textbf{60} & \textbf{60} & 63 \\
+                \bottomrule
+            \end{tabularx}
+        \end{column}
+    \end{columns}
 \end{frame}
 
 \end{document}

@@ -92,6 +92,50 @@
     \node[tumblue, font=\footnotesize] at (0, 0) {Goal};
 }
 
+\pgfplotsset{with error/.style = {
+        error bars/.cd, y dir=both, y explicit,
+}}
+\pgfplotsset{simulation/.style = {
+    black, dashed, thick
+}}
+\pgfplotsset{means only/.style = {
+    tumviolet
+}}
+\pgfplotsset{means only fill/.style = {
+    fill=tumviolet!15
+}}
+\pgfplotsset{one step/.style = {
+    tumgreen
+}}
+\pgfplotsset{one step fill/.style = {
+    fill=tumgreen!15
+}}
+\pgfplotsset{linearization/.style = {
+    tumblue
+}}
+\pgfplotsset{linearization fill/.style = {
+    fill=tumblue!15
+}}
+\newcommand{\goalpercentageline}[4]{
+    \addplot[
+        thick, #1,
+        mark=#4, mark size=1.25pt,
+        only marks,
+        with error,
+        ] table[
+        ignore chars={\#}, col sep=comma,
+        x=M, y=#2_percentage, y error=#2_percentage_sem
+    ] {\plotdatapath/results_goal_percentage.dat};
+    \addplot[forget plot, thin, opacity=0, name path=#1a] table[ignore chars={\#}, col sep=comma, x=M,
+        y expr={\thisrow{#2_percentage} + \thisrow{#2_percentage_sem}}
+    ] {\plotdatapath/results_goal_percentage.dat};
+    \addplot[forget plot, thin, opacity=0, name path=#1b] table[ignore chars={\#}, col sep=comma, x=M,
+        y expr={\thisrow{#2_percentage} - \thisrow{#2_percentage_sem}}
+    ] {\plotdatapath/results_goal_percentage.dat};
+    \addplot[forget plot, #1, opacity=0.15] fill between[of=#1a and #1b, on layer={axis background}];
+    \addlegendentry{#3}
+}
+
 % See
 % https://tex.stackexchange.com/a/21759/34265
 \tikzset{
