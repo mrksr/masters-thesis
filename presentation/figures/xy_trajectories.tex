@@ -6,8 +6,8 @@
 \input{../../thesis/preamble/abbreviations.tex}
 
 \begin{document}
-\begin{standaloneframe}
-    \begin{tikzpicture}
+\begin{standaloneframe}<2-4>
+    \begin{tikzpicture}[stop jumping]
         \begin{axis} [
                 xy plot,
                 title={MAP Predictions},
@@ -31,7 +31,7 @@
             \goalarea
         \end{axis}
 
-        \only<2> {
+        \only<3> {
             \begin{axis} [
                     xy plot,
                     ylabel={},
@@ -60,7 +60,7 @@
             \end{axis}
         }
 
-        \only<3> {
+        \only<4> {
             \begin{axis} [
                     xy plot,
                     ylabel={},
