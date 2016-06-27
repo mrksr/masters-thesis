@@ -119,7 +119,7 @@
 \newcommand{\goalpercentageline}[4]{
     \addplot[
         thick, #1,
-        mark=#4, mark size=1.25pt,
+        mark=#4, mark size=1.5pt,
         only marks,
         with error,
         ] table[
@@ -132,7 +132,7 @@
     \addplot[forget plot, thin, opacity=0, name path=#1b] table[ignore chars={\#}, col sep=comma, x=M,
         y expr={\thisrow{#2_percentage} - \thisrow{#2_percentage_sem}}
     ] {\plotdatapath/results_goal_percentage.dat};
-    \addplot[forget plot, #1, opacity=0.15] fill between[of=#1a and #1b, on layer={axis background}];
+    \addplot[forget plot, #1, opacity=0.25] fill between[of=#1a and #1b, on layer={axis background}];
     \addlegendentry{#3}
 }
 
