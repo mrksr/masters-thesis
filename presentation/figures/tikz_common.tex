@@ -42,6 +42,7 @@
 \tikzstyle{marked node} = [very thick, draw=tumred, fill=tumred!20]
 \tikzstyle{every text node part} = [align=center, execute at begin node=\setlength{\baselineskip}{2ex}]
 
+
 \pgfplotsset{unit code/.code 2 args={\si{#1#2}}}
 \pgfplotsset{default plot/.style = {
     grid=major,
@@ -63,6 +64,7 @@
     ylabel={$y$ position},
     y unit={\meter},
 }}
+
 
 \pgfplotsset{xy trajectory/.style = {
     ultra thick,
@@ -135,6 +137,23 @@
     \addplot[forget plot, #1, opacity=0.25] fill between[of=#1a and #1b, on layer={axis background}];
     \addlegendentry{#3}
 }
+
+
+\pgfplotsset{bicycle/.style = {
+    very thick,
+    tumblue,
+    smooth,
+}}
+\pgfplotsset{omega plot/.style = {
+    ymin=-0.24,
+    ymax=0.24,
+    ytick={-0.20943, -0.1047, 0, 0.1047, 0.20943},
+    yticklabels={-$\frac{\pi}{15}$, -$\frac{\pi}{30}$, $0$, $\frac{\pi}{30}$, $\frac{\pi}{15}$},
+    xlabel={Time step},
+    ylabel={$\omega$},
+    y unit={\radian},
+}}
+
 
 % See
 % https://tex.stackexchange.com/a/21759/34265

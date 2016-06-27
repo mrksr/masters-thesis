@@ -31,32 +31,63 @@
             \goalarea
         \end{axis}
 
-        \begin{axis} [
-                xy plot,
-                ylabel={},
-                y unit={},
-                yticklabels={,,},
-                shift={(180pt, 0)},
-                title={Multi-Step Uncertainties},
-            ]
+        \only<2> {
+            \begin{axis} [
+                    xy plot,
+                    ylabel={},
+                    y unit={},
+                    yticklabels={,,},
+                    shift={(180pt, 0)},
+                    title={One-Step Uncertainties},
+                ]
 
-            \xytrajectory{linearization_0}{success};
-            \xytrajectory{linearization_1}{success};
-            \xytrajectory{linearization_2}{success};
-            \xytrajectory{linearization_3}{success};
-            \xytrajectory{linearization_4}{fail};
-            \xytrajectory{linearization_5}{success};
-            \xytrajectory{linearization_6}{success};
-            \xytrajectory{linearization_7}{success};
-            \xytrajectory{linearization_8}{success};
-            \xytrajectory{linearization_9}{success};
-            \xytrajectory{linearization_10}{fail};
-            \xytrajectory{linearization_11}{success};
-            \xytrajectory{linearization_12}{success};
-            \xytrajectory{linearization_13}{success};
-            \xytrajectory{linearization_14}{success};
-            \goalarea
-        \end{axis}
+                \xytrajectory{one_step_0}{fail};
+                \xytrajectory{one_step_1}{fail};
+                \xytrajectory{one_step_2}{fail};
+                \xytrajectory{one_step_3}{success};
+                \xytrajectory{one_step_4}{fail};
+                \xytrajectory{one_step_5}{success};
+                \xytrajectory{one_step_6}{success};
+                \xytrajectory{one_step_7}{fail};
+                \xytrajectory{one_step_8}{success};
+                \xytrajectory{one_step_9}{success};
+                \xytrajectory{one_step_10}{success};
+                \xytrajectory{one_step_11}{success};
+                \xytrajectory{one_step_12}{success};
+                \xytrajectory{one_step_13}{success};
+                \xytrajectory{one_step_14}{success};
+                \goalarea
+            \end{axis}
+        }
+
+        \only<3> {
+            \begin{axis} [
+                    xy plot,
+                    ylabel={},
+                    y unit={},
+                    yticklabels={,,},
+                    shift={(180pt, 0)},
+                    title={Multi-Step Uncertainties},
+                ]
+
+                \xytrajectory{linearization_0}{success};
+                \xytrajectory{linearization_1}{success};
+                \xytrajectory{linearization_2}{success};
+                \xytrajectory{linearization_3}{success};
+                \xytrajectory{linearization_4}{fail};
+                \xytrajectory{linearization_5}{success};
+                \xytrajectory{linearization_6}{success};
+                \xytrajectory{linearization_7}{success};
+                \xytrajectory{linearization_8}{success};
+                \xytrajectory{linearization_9}{success};
+                \xytrajectory{linearization_10}{fail};
+                \xytrajectory{linearization_11}{success};
+                \xytrajectory{linearization_12}{success};
+                \xytrajectory{linearization_13}{success};
+                \xytrajectory{linearization_14}{success};
+                \goalarea
+            \end{axis}
+        }
     \end{tikzpicture}
 \end{standaloneframe}
 \end{document}

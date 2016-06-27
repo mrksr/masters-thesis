@@ -2,12 +2,13 @@
 \input{tikz_common.tex}
 \input{tikz_colors.tex}
 \input{tikz_standalone.tex}
+\input{tikz_jumping.tex}
 
 \begin{document}
 \begin{standaloneframe}
-    \begin{tikzpicture}[x=0.9cm,y=0.9cm]
-        \tikzstyle{bicycle} = [edge, ultra thick, shorten <=0pt, shorten >=0pt];
-        \tikzstyle{tyre} = [bicycle, very thick];
+    \begin{tikzpicture}[x=0.9cm,y=0.9cm, stop jumping]
+        \tikzstyle{bicycle} = [edge, line width=3pt, shorten <=0pt, shorten >=0pt];
+        \tikzstyle{tyre} = [bicycle, line width=2pt];
         \tikzstyle{help} = [very thin];
 
         \coordinate (front) at (0, 0);
@@ -19,31 +20,41 @@
         \coordinate (center) at (intersection of front--frontperp and back--backperp);
         \coordinate (thetapoint) at (-1, -0.25);
         \coordinate (thetadotpoint) at (0, 1);
+        \coordinate (Tstart) at (-0.5, -0.5);
+        \coordinate (Tstop) at (0, -1);
         \coordinate (psipoint1) at ($(back) - (1, 0)$);
         \coordinate (psipoint2) at ($(back) + (1, 0.25)$);
 
-        \draw[help, dashed]
-            let \p1 = ($(front) - (center)$), \n1 = {veclen(\x1, \y1)}
-            in ([shift=(110:\n1)]center) arc (110:160:\n1);
-        \draw[help, dashed]
-            let \p1 = ($(back) - (center)$), \n1 = {veclen(\x1, \y1)}
-            in ([shift=(95:\n1)]center) arc (95:140:\n1);
+        \only<5-> {
+            \draw[help, dashed]
+                let \p1 = ($(front) - (center)$), \n1 = {veclen(\x1, \y1)}
+                in ([shift=(110:\n1)]center) arc (110:155:\n1);
+            \draw[help, dashed]
+                let \p1 = ($(back) - (center)$), \n1 = {veclen(\x1, \y1)}
+                in ([shift=(95:\n1)]center) arc (95:140:\n1);
+        }
 
-        \draw[help, shorten <=-2cm, shorten >=-2cm] (front) -- (back);
-        \draw[help] ($(back) - (1.5, 0)$) -- ($(back) + (2, 0)$);
-        \draw pic["$\theta$", draw, angle eccentricity=1.3, angle radius=0.75cm] {angle=thetapoint--front--tfront};
-        \draw pic["$\psi$", draw] {angle=psipoint2--back--psipoint1};
-        \draw pic["$\dot{\theta}$", draw, arrows={-latex}, angle eccentricity=1.3, angle radius=0.8cm] {angle=tback--front--thetadotpoint};
+        \only<3-> {
+            \draw[help, shorten <=-2cm, shorten >=-2cm] (front) -- (back);
+            \draw pic["$\theta$", draw, angle eccentricity=1.3, angle radius=0.75cm] {angle=thetapoint--front--tfront};
+            \draw pic["$\dot{\theta}$", draw, arrows={-latex}, angle eccentricity=1.3, angle radius=0.8cm] {angle=tback--front--thetadotpoint};
+        }
 
-        \draw (front) -- node[right] {$r_f$} (center);
-        \draw (back) -- node[right] {$r_b$} (center);
-        \draw [right angle length=1ex, right angle symbol={back}{center}{front}];
-        \draw [right angle length=1ex, right angle symbol={tback}{tfront}{center}];
+        \only<4-> {
+            \draw[help] ($(back) - (1.5, 0)$) -- ($(back) + (2, 0)$);
+            \draw pic["$\psi$", draw] {angle=psipoint2--back--psipoint1};
+        }
 
-        \draw[bicycle, tumgreen] (front) -- node[above, black] {$l$} (back);
-        \draw[tyre, tumblue] (tfront) -- (tback);
-        \node["$C$" below, very small node] at (center) {};
-        \node[label={above left:$(x, y)$}, very small node] at (front) {};
+        \only<6-> {
+            \draw[draw, arrows={-latex}] (Tstart) -- node[pos=1, below] {$T$} (Tstop);
+        }
+
+        \draw[bicycle, tumgreen] (front) -- (back);
+        \only<2-> {
+            \draw[tyre, tumblue] (tfront) -- (tback);
+        }
+
+        \node[onslide={<3-> label={above left:$(x, y)$}}, very small node] at (front) {};
         \node[very small node] at (back) {};
     \end{tikzpicture}
 \end{standaloneframe}

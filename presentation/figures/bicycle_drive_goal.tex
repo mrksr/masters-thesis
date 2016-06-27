@@ -1,0 +1,29 @@
+\documentclass[beamer, aspectratio=1610]{standalone}
+\input{tikz_common.tex}
+\input{tikz_colors.tex}
+\input{tikz_standalone.tex}
+\input{tikz_jumping.tex}
+\input{../../thesis/preamble/abbreviations.tex}
+
+\begin{document}
+\begin{standaloneframe}<1,8,9>
+    \begin{tikzpicture}
+        \tikzstyle{success start} = [opacity=0]
+        \tikzstyle{success start node} = [tumgreen, fill=tumgreen!15, opacity=1]
+
+        \begin{axis} [
+                xy plot,
+                yticklabel pos=right,
+            ]
+
+            \only<8> {
+                \xytrajectory{means_only_9}{success start};
+            }
+            \only<9> {
+                \xytrajectory{means_only_9}{success};
+            }
+            \goalarea
+        \end{axis}
+    \end{tikzpicture}
+\end{standaloneframe}
+\end{document}

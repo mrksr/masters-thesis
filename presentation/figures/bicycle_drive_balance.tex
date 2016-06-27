@@ -1,0 +1,26 @@
+\documentclass[beamer, aspectratio=1610]{standalone}
+\input{tikz_common.tex}
+\input{tikz_colors.tex}
+\input{tikz_standalone.tex}
+\input{tikz_jumping.tex}
+\input{../../thesis/preamble/abbreviations.tex}
+
+\begin{document}
+\begin{standaloneframe}
+    \begin{tikzpicture}
+        \begin{axis} [
+                default plot,
+                omega plot,
+                xmin=0,
+                xmax=63,
+                yticklabel pos=right,
+            ]
+            \addplot[bicycle, means only] table[ignore chars={\#}, col sep=space, x expr=\coordindex, y=omega]
+                {\plotdatapath/solution_trajectory_means_only.xa};
+
+            \addplot[forget plot, very thick, tumred, domain=-10:72] {pi / 15};
+            \addplot[forget plot, very thick, tumred, domain=-10:72] {-pi / 15};
+        \end{axis}
+    \end{tikzpicture}
+\end{standaloneframe}
+\end{document}

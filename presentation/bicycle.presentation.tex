@@ -17,6 +17,8 @@
 }}
 \date{4. July 2016}
 
+% \includeonlyframes{bicycle_balance}
+
 \begin{document}
 
 \begin{frame}[plain]
@@ -30,38 +32,70 @@
 \end{frame}
 
 \section{Bicycle Benchmark}
-\begin{frame}
-    \frametitle{Bicycle Benchmark Definition}
+\begin{frame}[label=bicycle_drive]
+    \frametitle{Bicycle Benchmark -- Driving}
 
     \begin{columns}
-        \begin{column}[b]{0.5\textwidth}
+        \begin{column}[c]{0.5\textwidth}
             \centering
             \includestandalone{figures/bicycle_from_above}
         \end{column}
-        \begin{column}[b]{0.5\textwidth}
+        \begin{column}[c]{0.5\textwidth}
             \centering
-            \includestandalone{figures/bicycle_from_behind}
+            \vspace{1cm}
+            \uncover<7-> {
+                \includestandalonewithpath{figures/bicycle_drive_goal}
+            }
         \end{column}
     \end{columns}
 \end{frame}
 
-\begin{frame}
-    \frametitle{Bicycle Benchmark Goal}
+\begin{frame}[label=bicycle_balance]
+    \frametitle{Bicycle Benchmark -- Balancing}
 
-    Balance and drive to the goal
+    \vfill
+    \begin{columns}
+        \begin{column}{0.45\textwidth}
+            \centering
+            \includestandalone{figures/bicycle_from_behind}
+        \end{column}
+        \begin{column}{0.55\textwidth}
+            \centering
+            \uncover<4-> {
+                \includestandalonewithpath{figures/bicycle_drive_balance}
+            }
+        \end{column}
+    \end{columns}
+\end{frame}
+
+\begin{frame}[label=bicycle_summary]
+    \frametitle{Bicycle Benchmark}
+
+    Some kind of summary?
 \end{frame}
 
 \section{Gaussian Processes}
-\begin{frame}
+\begin{frame}[label=gp_non_parametric_models]
+    \frametitle{Non-Parametric Models}
+
+    \begin{block}{Yoyoyo}
+        Blarghl
+    \end{block}
+    \vfill
+    \centering
+    \includestandalonewithpath{figures/non_parametric_models}
+\end{frame}
+
+\begin{frame}[label=gp_definition]
     \frametitle{Gaussian Processes}
 
     \begin{definition}[Gaussian Process]
-        A stochastic process $\rv{X}$ is called a \structure{Gaussian process} if for any finite subset $\tau \subseteq T$ of its index set, the random variables $\rv{X}_\tau$ have a joint Gaussian distribution.
+        A \structure{Gaussian Process} is a collection of random variables, any finite subset of which has a joint Gaussian distribution.
     \end{definition}
 \end{frame}
 
-\begin{frame}
-    \frametitle{GP Prior and Posterior}
+\begin{frame}[label=gp_kernels]
+    \frametitle{Kernels and Hyperparameters}
 
     \begin{block}{Yoyoyo}
         Blarghl
@@ -71,28 +105,22 @@
     \includestandalonewithpath{figures/gp_posterior}
 \end{frame}
 
-\begin{frame}
-    \frametitle{GP Prior and Hyperparameters}
-
-    content
-\end{frame}
-
-\begin{frame}
-    \frametitle{Sparse GPs}
+\begin{frame}[label=gp_sparse]
+    \frametitle{Sparse Gaussian Processes}
 
     \centering
     \includestandalonewithpath{figures/spgp}
 \end{frame}
 
 \section{Uncertainties in Reinforcement Learning}
-\begin{frame}[label=architecture]
+\begin{frame}[label=solution_architecture]
     \frametitle{Solution Architecture}
 
     \centering
     \includestandalone{figures/agent_environment}
 \end{frame}
 
-\begin{frame}
+\begin{frame}[label=solution_reward]
     \frametitle{Reward Function}
 
     \begin{definition}[Bicycle Reward Function]
@@ -114,7 +142,7 @@
     \end{definition}
 \end{frame}
 
-\begin{frame}
+\begin{frame}[label=solution_psop]
     \frametitle{Expected Reward and PSO-P}
 
     \begin{align}
@@ -141,19 +169,19 @@
     \end{definition}
 \end{frame}
 
-\begin{frame}
+\begin{frame}[label=solution_map]
     \frametitle{MAP predictions}
 
     content
 \end{frame}
 
-\begin{frame}
+\begin{frame}[label=solution_os]
     \frametitle{One-Step Predictions}
 
     content
 \end{frame}
 
-\begin{frame}
+\begin{frame}[label=solution_ms]
     \frametitle{Multi-Step Predictions}
 
     \centering
@@ -161,7 +189,7 @@
 \end{frame}
 
 \section{Results}
-\begin{frame}
+\begin{frame}[label=results_qualitative]
     \frametitle{Qualitative}
 
     % Center ignoring margins
@@ -175,13 +203,13 @@
     }
 \end{frame}
 
-\begin{frame}
+\begin{frame}[label=results_evaluation]
     \frametitle{Evaluation Setup}
 
     content
 \end{frame}
 
-\begin{frame}[label=quantitative_results]
+\begin{frame}[label=results_quantitative]
     \frametitle{Quantitative Results}
 
     \centering
