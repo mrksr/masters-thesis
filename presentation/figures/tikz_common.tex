@@ -144,6 +144,9 @@
     tumblue,
     smooth,
 }}
+\pgfplotsset{prediction plot/.style = {
+    default plot,
+}}
 \pgfplotsset{omega plot/.style = {
     ymin=-0.24,
     ymax=0.24,
@@ -153,6 +156,59 @@
     ylabel={$\omega$},
     y unit={\radian},
 }}
+\pgfplotsset{theta plot/.style = {
+    ymin=-0.6,
+    ymax=0.6,
+    ytick={-0.5236, -0.2618, 0, 0.2618, 0.5236},
+    yticklabels={-$\frac{\pi}{6}$, -$\frac{\pi}{12}$, $0$, $\frac{\pi}{12}$, $\frac{\pi}{6}$},
+    xlabel={Time step},
+    ylabel={$\theta$},
+    y unit={\radian},
+}}
+\newcommand{\predictionvariable}[7][1]{
+    \begin{axis} [
+            prediction plot,
+            #3 plot,
+            shift={#5},
+            yticklabel pos=#7,
+        ]
+        \addplot[bicycle, sharp plot, simulation] table[ignore chars={\#}, col sep=space, x expr=\coordindex, y=#4]
+        {\plotdatapath/solution_predictions_#2_simulation.xa};
+        \ifnum#1=1
+            % Since fill between behaves strangly when you draw on the background,
+            % we explicitly clip with the min and max y values.
+            \addplot[bicycle, #6, sharp plot, thin, name path=#3c] table[
+                ignore chars={\#}, col sep=space,
+                x expr=\coordindex,
+                y expr={
+                    min(
+                    \pgfkeysvalueof{/pgfplots/ymax} + 0.002 * (\pgfkeysvalueof{/pgfplots/ymax} - \pgfkeysvalueof{/pgfplots/ymin}]),
+                    \thisrow{#4} + sqrt(\thisrow{#4_variance})
+                )}
+            ] {\plotdatapath/solution_predictions_#2_model.xa};
+            \addplot[bicycle, #6, sharp plot, thin, name path=#3d] table[
+                ignore chars={\#}, col sep=space,
+                x expr=\coordindex,
+                y expr={
+                    max(
+                    \pgfkeysvalueof{/pgfplots/ymin} - 0.002 * (\pgfkeysvalueof{/pgfplots/ymax} - \pgfkeysvalueof{/pgfplots/ymin}]),
+                    \thisrow{#4} - sqrt(\thisrow{#4_variance})
+                )}
+            ] {\plotdatapath/solution_predictions_#2_model.xa};
+            \addplot[#6 fill] fill between[of=#3c and #3d, on layer={axis background}];
+        \fi
+        \addplot[bicycle, sharp plot, #6] table[
+            ignore chars={\#}, col sep=space,
+            x expr=\coordindex,
+            y=#4
+        ] {\plotdatapath/solution_predictions_#2_model.xa};
+    \end{axis}
+}
+
+\newcommand{\predictions}[3][1]{
+    \predictionvariable[#1]{#2}{theta}{theta}{(0, 0)}{#3}{left}
+    \predictionvariable[#1]{#2}{omega}{omega}{(170pt, 0)}{#3}{right}
+}
 
 
 % See

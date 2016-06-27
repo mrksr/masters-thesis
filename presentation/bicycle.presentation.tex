@@ -17,7 +17,7 @@
 }}
 \date{4. July 2016}
 
-% \includeonlyframes{bicycle_balance}
+\includeonlyframes{solution_ms}
 
 \begin{document}
 
@@ -185,28 +185,25 @@
     \frametitle{Multi-Step Predictions}
 
     \centering
-    \includestandalonewithpath{figures/linearization}
+    \only<-3> {
+        \includestandalonewithpath{figures/linearization}
+    }
+    \only<4> {
+        \includestandalonewithpath{figures/linearization_predictions}
+    }
 \end{frame}
 
 \section{Results}
 \begin{frame}[label=results_qualitative]
     \frametitle{Qualitative}
 
-    % Center ignoring margins
-    \makebox[\textwidth][c] {
-        \only<1> {
-            \includestandalonewithpath{figures/data_xy_trajectories}
-        }
-        \only<2-> {
-            \includestandalonewithpath{figures/xy_trajectories}
-        }
+    \centering
+    \only<1> {
+        \includestandalonewithpath{figures/data_xy_trajectories}
     }
-\end{frame}
-
-\begin{frame}[label=results_evaluation]
-    \frametitle{Evaluation Setup}
-
-    content
+    \only<2-> {
+        \includestandalonewithpath{figures/xy_trajectories}
+    }
 \end{frame}
 
 \begin{frame}[label=results_quantitative]
@@ -227,6 +224,7 @@
                 \toprule
                 Metric & MAP & OS & MS \\
                 \midrule
+                Trajectories & 9660 & 9660 & 9660 \\
                 Success Rate & \SI[mode=text]{53.4}{\percent} & \SI[mode=text]{63.8}{\percent} & \textbf{\SI[mode=text,detect-weight]{75.8}{\percent}} \\
                 \addlinespace
                 Time to Goal \\

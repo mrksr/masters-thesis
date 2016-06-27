@@ -30,14 +30,14 @@
 
             \addplot[only marks, mark size=1.5pt] table[x=X, y=y] {\plotdatapath/posterior_data.dat};
 
-            \only<5->{
+            \only<3->{
                 \addplot[tumgreen, very thick, domain=-2.7:0.3] {1.7511410501706364 * (x + 1.2) + 1.57693676};
             }
 
             \coordinate (gp intersection) at (-1.2, 1.57693676);
         \end{axis}
 
-        \only<2-> {
+        \only<1-> {
             \begin{axis} [
                     default plot,
                     xmin=-5,
@@ -63,7 +63,7 @@
             \end{axis}
         }
 
-        \only<3-> {
+        \only<2-> {
             \begin{axis} [
                     default plot,
                     ymin=-6.5,
@@ -78,20 +78,18 @@
                     ylabel={$\bm{\Delta_t}$},
                     xlabel={$p(\bm{\Delta_t})$},
                     extra y ticks={1.57693676},
-                    extra y tick labels={\alt<-4>{}{$\bm{\mu_\Delta}$}},
+                    extra y tick labels={\alt<-2>{}{$\bm{\mu_\Delta}$}},
                     xtick={0,0.4,0.8},
                     ytick={-5, 0, 5},
                     set layers,
                 ]
 
-                \only<4-> {
-                    \addplot[thin, tumorange, fill=tumorange!15, on layer=axis background] table[x=y, y=X]
-                        {\plotdatapath/solution_ms_linearization_posterior_kde.dat};
-                    \addplot[thin, tumorange] table[x=y, y=X]
-                        {\plotdatapath/solution_ms_linearization_posterior_kde.dat};
-                }
+                \addplot[thin, tumorange, fill=tumorange!15, on layer=axis background] table[x=y, y=X]
+                    {\plotdatapath/solution_ms_linearization_posterior_kde.dat};
+                \addplot[thin, tumorange] table[x=y, y=X]
+                    {\plotdatapath/solution_ms_linearization_posterior_kde.dat};
 
-                \only<6-> {
+                \only<3-> {
                     \addplot[very thick, tumblue, smooth, samples=300, domain=-6:6] (
                         exp(-(x - 1.57693676)^2 / (2 * 0.3798)) / (sqrt(2 * pi * 0.3798)),
                         x
@@ -102,7 +100,7 @@
             \end{axis}
         }
 
-        \only<5-> {
+        \only<3-> {
             \draw[thick, tumgreen, dashed] (prior mean) -- (gp intersection);
             \draw[thick, tumgreen, dashed] (posterior mean) -- (gp intersection);
             \node[very small node, tumgreen, fill=tumgreen!15] at (gp intersection) {};
