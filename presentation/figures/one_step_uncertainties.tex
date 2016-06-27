@@ -1,0 +1,93 @@
+\documentclass[beamer, aspectratio=1610]{standalone}
+\input{tikz_common.tex}
+\input{tikz_colors.tex}
+\input{tikz_standalone.tex}
+\input{tikz_jumping.tex}
+\input{../../thesis/preamble/abbreviations.tex}
+
+\begin{document}
+\begin{standaloneframe}<3->
+    \begin{tikzpicture}[stop jumping]
+        \begin{axis} [
+                prediction plot,
+                omega plot,
+                extra y ticks={-0.04476171372267363493},
+                extra y tick labels={$\omega_5$},
+            ]
+            \addplot[bicycle, sharp plot, simulation] table[ignore chars={\#}, col sep=space, x expr=\coordindex, y=omega]
+                {\plotdatapath/solution_predictions_one_step_simulation.xa};
+
+            \addplot[bicycle, one step, sharp plot, thin, name path=omegac] table[
+                    ignore chars={\#}, col sep=space,
+                    restrict x to domain=0:12,
+                    x expr=\coordindex,
+                    y expr={
+                        min(
+                    \pgfkeysvalueof{/pgfplots/ymax} + 0.002 * (\pgfkeysvalueof{/pgfplots/ymax} - \pgfkeysvalueof{/pgfplots/ymin}]),
+                    \thisrow{omega} + sqrt(\thisrow{omega_variance})
+                )}
+            ] {\plotdatapath/solution_predictions_one_step_model.xa};
+            \addplot[bicycle, one step, sharp plot, thin, name path=omegad] table[
+                    ignore chars={\#}, col sep=space,
+                    restrict x to domain=0:12,
+                    x expr=\coordindex,
+                    y expr={
+                        max(
+                    \pgfkeysvalueof{/pgfplots/ymin} - 0.002 * (\pgfkeysvalueof{/pgfplots/ymax} - \pgfkeysvalueof{/pgfplots/ymin}]),
+                    \thisrow{omega} - sqrt(\thisrow{omega_variance})
+                )}
+            ] {\plotdatapath/solution_predictions_one_step_model.xa};
+            \addplot[one step fill] fill between[of=omegac and omegad, on layer={axis background}];
+
+            \addplot[bicycle, sharp plot, one step] table[
+                    ignore chars={\#}, col sep=space,
+                    x expr=\coordindex,
+                    y=omega
+                ] {\plotdatapath/solution_predictions_one_step_model.xa};
+
+            \only<4> {
+                \node[draw, tumblue, thick, inner sep=1.5pt] (from) at (5, -0.04489171372267363493) {};
+            }
+        \end{axis}
+
+        \only<4> {
+            \begin{axis} [
+                    prediction plot,
+                    % omega plot,
+                    xmin=4.95,
+                    xmax=5.05,
+                    xtick={5},
+                    xlabel={Time step},
+                    yticklabel pos=right,
+                    shift={(175pt, 0)},
+                    extra y ticks={-0.04476171372267363493},
+                    extra y tick labels={$\omega_5$},
+                    name=enlarged,
+                ]
+                \addplot[bicycle, one step, sharp plot, thin, name path=somegac] table[row sep=\\] {
+                        4.95 -0.0483286153251127856 \\
+                        5    -0.04489171372267363493 \\
+                        5.05 -0.04393020025349739428 \\
+                    };
+                \addplot[bicycle, one step, sharp plot, thin, name path=somegad] table[row sep=\\] {
+                        4.95 -0.0479286153251127856 \\
+                        5    -0.04461171372267363493 \\
+                        5.05 -0.04377020025349739428 \\
+                    };
+                \addplot[one step fill] fill between[of=somegac and somegad, on layer={axis background}];
+                \addplot[bicycle, sharp plot, one step] table[row sep=\\] {
+                        4.95 -0.0481286153251127856 \\
+                        5    -0.04476171372267363493 \\
+                        5.05 -0.04385020025349739428 \\
+                    };
+            \end{axis}
+
+            \draw[
+                    bend right, shorten <= 5pt,
+                    arrows={-latex}, line width=3pt,
+                    tumblue,
+                ] (from) edge ([shift={(20pt, -25pt)}]enlarged.outer west);
+        }
+    \end{tikzpicture}
+\end{standaloneframe}
+\end{document}

@@ -17,7 +17,7 @@
 }}
 \date{4. July 2016}
 
-\includeonlyframes{solution_ms}
+% \includeonlyframes{solution_ms}
 
 \begin{document}
 
@@ -172,23 +172,35 @@
 \begin{frame}[label=solution_map]
     \frametitle{MAP predictions}
 
-    content
+    \centering
+    \only<-4> {
+        \includestandalonewithpath{figures/map}
+    }
+    \only<5> {
+        \includestandalonewithpath{figures/map_predictions}
+    }
 \end{frame}
 
 \begin{frame}[label=solution_os]
-    \frametitle{One-Step Predictions}
+    \frametitle{One-Step Uncertainties}
 
-    content
+    \centering
+    \only<-2> {
+        \includestandalonewithpath{figures/one_step}
+    }
+    \only<3-4> {
+        \includestandalonewithpath{figures/one_step_uncertainties}
+    }
 \end{frame}
 
 \begin{frame}[label=solution_ms]
-    \frametitle{Multi-Step Predictions}
+    \frametitle{Multi-Step Uncertainties}
 
     \centering
-    \only<-3> {
+    \only<-4> {
         \includestandalonewithpath{figures/linearization}
     }
-    \only<4> {
+    \only<5> {
         \includestandalonewithpath{figures/linearization_predictions}
     }
 \end{frame}
