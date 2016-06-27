@@ -17,8 +17,6 @@
 }}
 \date{4. July 2016}
 
-% \includeonlyframes{solution_ms}
-
 \begin{document}
 
 \begin{frame}[plain]
@@ -31,7 +29,7 @@
     \tableofcontents
 \end{frame}
 
-\section{Bicycle Benchmark}
+\section{The Bicycle Benchmark}
 \begin{frame}[label=bicycle_drive]
     \frametitle{Bicycle Benchmark -- Driving}
 
@@ -66,12 +64,6 @@
             }
         \end{column}
     \end{columns}
-\end{frame}
-
-\begin{frame}[label=bicycle_summary]
-    \frametitle{Bicycle Benchmark}
-
-    Some kind of summary?
 \end{frame}
 
 \section{Gaussian Processes}
@@ -120,30 +112,8 @@
     \includestandalone{figures/agent_environment}
 \end{frame}
 
-\begin{frame}[label=solution_reward]
-    \frametitle{Reward Function}
-
-    \begin{definition}[Bicycle Reward Function]
-        Given the set $\Es^+$ of possible states of the bicycle benchmark and the sets $\Goal$ and $\Fallen$ of all terminal states where the bicycle has reached the goal or fallen respectively, the \emph{bicycle reward function} is defined as
-        \begin{align}
-            \RwdBicycle \colon \left\{
-                \begin{aligned}
-                    \Es^+ &\to \R \\
-                    \mat{s} &\mapsto \begin{cases}
-                    2 & \text{if $\mat{s} \in \Goal$} \\
-                    0 & \text{if $\mat{s} \in \Fallen$} \\
-                    \sqrt{2\pi\sigma_{\text{angle}}^2}\Gaussian{\Delta^\psi_{\mat{s}} \given 0, \sigma_{\text{angle}}^2} & \text{otherwise}
-                \end{cases}
-            \end{aligned}
-            \right.
-        \end{align}
-    where $\Delta^\psi_{\mat{s}} = \abs{\psi_{\mat{s}} - \varphi_{\mat{s}}} \in (-\pi, \pi]$ denotes the difference between the bicycle's heading and the goal given a state $\mat{s}$ and $\sigma_{\text{angle}}^2$ is a positive real constant.
-    The Gaussian density function $\Norm$ is normalized to a maximum value of 1.
-    \end{definition}
-\end{frame}
-
 \begin{frame}[label=solution_psop]
-    \frametitle{Expected Reward and PSO-P}
+    \frametitle{PSO-P}
 
     \begin{align}
         \label{eq:action_value_function}
@@ -169,40 +139,68 @@
     \end{definition}
 \end{frame}
 
+\begin{frame}[label=solution_reward]
+    \frametitle{Reward Function}
+
+    \begin{definition}[Bicycle Reward Function]
+        Given the set $\Es^+$ of possible states of the bicycle benchmark and the sets $\Goal$ and $\Fallen$ of all terminal states where the bicycle has reached the goal or fallen respectively, the \emph{bicycle reward function} is defined as
+        \begin{align}
+            \RwdBicycle \colon \left\{
+                \begin{aligned}
+                    \Es^+ &\to \R \\
+                    \mat{s} &\mapsto \begin{cases}
+                    2 & \text{if $\mat{s} \in \Goal$} \\
+                    0 & \text{if $\mat{s} \in \Fallen$} \\
+                    \sqrt{2\pi\sigma_{\text{angle}}^2}\Gaussian{\Delta^\psi_{\mat{s}} \given 0, \sigma_{\text{angle}}^2} & \text{otherwise}
+                \end{cases}
+            \end{aligned}
+            \right.
+        \end{align}
+    where $\Delta^\psi_{\mat{s}} = \abs{\psi_{\mat{s}} - \varphi_{\mat{s}}} \in (-\pi, \pi]$ denotes the difference between the bicycle's heading and the goal given a state $\mat{s}$ and $\sigma_{\text{angle}}^2$ is a positive real constant.
+    The Gaussian density function $\Norm$ is normalized to a maximum value of 1.
+    \end{definition}
+\end{frame}
+
 \begin{frame}[label=solution_map]
-    \frametitle{MAP predictions}
+    \frametitle{MAP without Uncertainties}
 
     \centering
-    \only<-4> {
-        \includestandalonewithpath{figures/map}
-    }
-    \only<5> {
-        \includestandalonewithpath{figures/map_predictions}
-    }
+    \includestandalonewithpath{figures/map}
+\end{frame}
+
+\begin{frame}[label=solution_map_predictions]
+    \frametitle{MAP Predictions}
+
+    \centering
+    \includestandalonewithpath{figures/map_predictions}
 \end{frame}
 
 \begin{frame}[label=solution_os]
     \frametitle{One-Step Uncertainties}
 
     \centering
-    \only<-2> {
-        \includestandalonewithpath{figures/one_step}
-    }
-    \only<3-4> {
-        \includestandalonewithpath{figures/one_step_uncertainties}
-    }
+    \includestandalonewithpath{figures/one_step}
+\end{frame}
+
+\begin{frame}[label=solution_os_predictions]
+    \frametitle{One-Step Predictions}
+
+    \centering
+    \includestandalonewithpath{figures/one_step_uncertainties}
 \end{frame}
 
 \begin{frame}[label=solution_ms]
     \frametitle{Multi-Step Uncertainties}
 
     \centering
-    \only<-4> {
-        \includestandalonewithpath{figures/linearization}
-    }
-    \only<5> {
-        \includestandalonewithpath{figures/linearization_predictions}
-    }
+    \includestandalonewithpath{figures/linearization}
+\end{frame}
+
+\begin{frame}[label=solution_ms_predictions]
+    \frametitle{Multi-Step Predictions}
+
+    \centering
+    \includestandalonewithpath{figures/linearization_predictions}
 \end{frame}
 
 \section{Results}
@@ -210,12 +208,7 @@
     \frametitle{Qualitative}
 
     \centering
-    \only<1> {
-        \includestandalonewithpath{figures/data_xy_trajectories}
-    }
-    \only<2-> {
-        \includestandalonewithpath{figures/xy_trajectories}
-    }
+    \includestandalonewithpath{figures/xy_trajectories}
 \end{frame}
 
 \begin{frame}[label=results_quantitative]

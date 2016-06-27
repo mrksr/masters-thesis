@@ -6,7 +6,7 @@
 \input{../../thesis/preamble/abbreviations.tex}
 
 \begin{document}
-\begin{standaloneframe}<3->
+\begin{standaloneframe}
     \begin{tikzpicture}[stop jumping]
         \begin{axis} [
                 prediction plot,
@@ -45,12 +45,12 @@
                     y=omega
                 ] {\plotdatapath/solution_predictions_one_step_model.xa};
 
-            \only<4> {
+            \only<2> {
                 \node[draw, tumblue, thick, inner sep=1.5pt] (from) at (5, -0.04489171372267363493) {};
             }
         \end{axis}
 
-        \only<4> {
+        \only<2> {
             \begin{axis} [
                     prediction plot,
                     % omega plot,
