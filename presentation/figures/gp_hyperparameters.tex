@@ -1,0 +1,99 @@
+\documentclass[beamer, aspectratio=1610]{standalone}
+\input{tikz_common.tex}
+\input{tikz_colors.tex}
+\input{tikz_standalone.tex}
+\input{tikz_jumping.tex}
+\input{../../thesis/preamble/abbreviations.tex}
+
+\begin{document}
+\begin{standaloneframe}
+    \begin{tikzpicture}[stop jumping]
+        \pgfplotsset{posterior plot/.style = {
+                default plot,
+                ymin=-6.5,
+                ymax=6.5,
+                xmin=-2,
+                xmax=7,
+                xlabel={$x$},
+                ylabel={$f(x)$},
+        }}
+
+        \pgfplotsset{prior sample/.style = {
+                semithick,
+                densely dashed,
+                smooth,
+                opacity=0.7,
+        }}
+
+        \begin{axis} [
+                posterior plot,
+            ]
+            \addplot[thin, tumblue, name path=c, domain=-2:7] {4.69};
+            \addplot[thin, tumblue, name path=d, domain=-2:7] {-4.69};
+            \addplot[tumblue!15] fill between[of=c and d, on layer={axis background}];
+            \addplot[very thick, tumblue, domain=-2:7] {0};
+
+            \only<1> {
+                \addplot[prior sample, tumviolet] table[x=X, y=y] {\figurepath/data/gp_presentation_shorty_kern_sample_0.dat};
+                \addplot[prior sample, tumorange] table[x=X, y=y] {\figurepath/data/gp_presentation_shorty_kern_sample_1.dat};
+                \addplot[prior sample, tumgreen] table[x=X, y=y]  {\figurepath/data/gp_presentation_shorty_kern_sample_2.dat};
+            }
+            \only<2> {
+                \addplot[prior sample, tumviolet] table[x=X, y=y] {\figurepath/data/gp_presentation_lengthy_kern_sample_0.dat};
+                \addplot[prior sample, tumorange] table[x=X, y=y] {\figurepath/data/gp_presentation_lengthy_kern_sample_1.dat};
+                \addplot[prior sample, tumgreen] table[x=X, y=y]  {\figurepath/data/gp_presentation_lengthy_kern_sample_2.dat};
+            }
+            \only<3> {
+                \addplot[prior sample, tumviolet] table[x=X, y=y] {\figurepath/data/gp_presentation_proper_kern_sample_0.dat};
+                \addplot[prior sample, tumorange] table[x=X, y=y] {\figurepath/data/gp_presentation_proper_kern_sample_1.dat};
+                \addplot[prior sample, tumgreen] table[x=X, y=y]  {\figurepath/data/gp_presentation_proper_kern_sample_2.dat};
+            }
+        \end{axis}
+
+        \begin{axis} [
+                posterior plot,
+                ylabel={},
+                shift={(190pt, 0)},
+            ]
+            \only<1> {
+                \addplot[thin, tumblue, name path=c, restrict x to domain=-2:7] table[x=X, y expr=\thisrow{y} + \thisrow{y_2std}] {\figurepath/data/gp_presentation_gp_shorty.dat};
+                \addplot[thin, tumblue, name path=d, restrict x to domain=-2:7] table[x=X, y expr=\thisrow{y} - \thisrow{y_2std}] {\figurepath/data/gp_presentation_gp_shorty.dat};
+                \addplot[tumblue!15] fill between[of=c and d, on layer={axis background}];
+                \addplot[very thick, tumblue, restrict x to domain=-2:7] table[x=X, y=y] {\figurepath/data/gp_presentation_gp_shorty.dat};
+
+                \addplot[prior sample, tumviolet] table[x=X, y=y] {\figurepath/data/gp_presentation_shorty_gp_sample_0.dat};
+                \addplot[prior sample, tumorange] table[x=X, y=y] {\figurepath/data/gp_presentation_shorty_gp_sample_1.dat};
+                \addplot[prior sample, tumgreen] table[x=X, y=y]  {\figurepath/data/gp_presentation_shorty_gp_sample_2.dat};
+
+                \addplot[only marks] table[x=X, y=y] {\figurepath/data/gp_presentation_data.dat};
+            }
+
+            \only<2> {
+                \addplot[thin, tumblue, name path=c, restrict x to domain=-2:7] table[x=X, y expr=\thisrow{y} + \thisrow{y_2std}] {\figurepath/data/gp_presentation_gp_lengthy.dat};
+                \addplot[thin, tumblue, name path=d, restrict x to domain=-2:7] table[x=X, y expr=\thisrow{y} - \thisrow{y_2std}] {\figurepath/data/gp_presentation_gp_lengthy.dat};
+                \addplot[tumblue!15] fill between[of=c and d, on layer={axis background}];
+                \addplot[very thick, tumblue, restrict x to domain=-2:7] table[x=X, y=y] {\figurepath/data/gp_presentation_gp_lengthy.dat};
+
+                \addplot[prior sample, tumviolet] table[x=X, y=y] {\figurepath/data/gp_presentation_lengthy_gp_sample_0.dat};
+                \addplot[prior sample, tumorange] table[x=X, y=y] {\figurepath/data/gp_presentation_lengthy_gp_sample_1.dat};
+                \addplot[prior sample, tumgreen] table[x=X, y=y]  {\figurepath/data/gp_presentation_lengthy_gp_sample_2.dat};
+
+                \addplot[only marks] table[x=X, y=y] {\figurepath/data/gp_presentation_data.dat};
+            }
+
+            \only<3> {
+                \addplot[thin, tumblue, name path=c, restrict x to domain=-2:7] table[x=X, y expr=\thisrow{y} + \thisrow{y_2std}] {\figurepath/data/gp_presentation_gp_proper.dat};
+                \addplot[thin, tumblue, name path=d, restrict x to domain=-2:7] table[x=X, y expr=\thisrow{y} - \thisrow{y_2std}] {\figurepath/data/gp_presentation_gp_proper.dat};
+                \addplot[tumblue!15] fill between[of=c and d, on layer={axis background}];
+                \addplot[very thick, tumblue, restrict x to domain=-2:7] table[x=X, y=y] {\figurepath/data/gp_presentation_gp_proper.dat};
+
+                \addplot[prior sample, tumviolet] table[x=X, y=y] {\figurepath/data/gp_presentation_proper_gp_sample_0.dat};
+                \addplot[prior sample, tumorange] table[x=X, y=y] {\figurepath/data/gp_presentation_proper_gp_sample_1.dat};
+                \addplot[prior sample, tumgreen] table[x=X, y=y]  {\figurepath/data/gp_presentation_proper_gp_sample_2.dat};
+
+                \addplot[only marks] table[x=X, y=y] {\figurepath/data/gp_presentation_data.dat};
+            }
+        \end{axis}
+    \end{tikzpicture}
+\end{standaloneframe}
+\end{document}
