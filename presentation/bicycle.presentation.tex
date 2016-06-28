@@ -17,13 +17,15 @@
 }}
 \date{4. July 2016}
 
+% \includeonlyframes{solution_psop,solution_reward}
+
 \begin{document}
 
-\begin{frame}[plain]
+\begin{frame}[plain, noframenumbering]
     \titlepage
 \end{frame}
 
-\begin{frame}
+\begin{frame}[noframenumbering]
     \frametitle{Outline}
 
     \tableofcontents
@@ -83,7 +85,7 @@
             \begin{block}{Non-Bayesian Parametric Models}
                 \begin{itemize}
                     \item Assume \structure{structure} about $f$, such as $f(\mat{x}) = \mat{W}\mat{x}$
-                    \item Find a \structure{single} $\mat{W}$ which is optimal w.r.t. some criterion
+                    \item Find a \structure{single} $\mat{W}$ which is optimal w.r.t.\ some criterion
                     \item Everything is \structure{deterministic}
                 \end{itemize}
             \end{block}
@@ -143,13 +145,6 @@
     \includestandalonewithpath{figures/gp_hyperparameters}
 \end{frame}
 
-% \begin{frame}[label=gp_sparse]
-%     \frametitle{Sparse Gaussian Processes}
-
-%     \centering
-%     \includestandalonewithpath{figures/spgp}
-% \end{frame}
-
 \section{Uncertainties in Reinforcement Learning}
 \begin{frame}[label=solution_architecture]
     \frametitle{Solution Architecture}
@@ -161,50 +156,37 @@
 \begin{frame}[label=solution_psop]
     \frametitle{PSO-P}
 
-    \begin{align}
-        \label{eq:action_value_function}
-        \AVlu_{\mat{s_0}} \colon \left\{
-            \begin{aligned}
-                \Ah^T &\to \R \\
-                \left( \mat{a_0}, \dots, \mat{a_{T-1}} \right) &\mapsto \Moment*{\E}{\sum_{t=1}^T \gamma^t \Rwd(\mat{s_t}) \given f, \mat{s_0}, \mat{a_0}, \dots, \mat{a_{T-1}}}
-            \end{aligned}
-            \right.
-        \end{align}
-
     \begin{definition}[PSO-P]
         \label{def:psop}
-        The \emph{Particle Swarm Optimization-Policy (PSO-P)} chooses actions via direct optimization of the action value function $\AVlu$ and is defined as
+        The \structure{Particle Swarm Optimization-Policy (PSO-P)} chooses actions via optimization of the expected accumulated reward.
         \begin{align}
-            \pi_{\text{PSO-P}} &: \left\{
-            \begin{aligned}
-                \Es &\to \Ah\\
-                \mat{s} &\mapsto \mat{a^\ast}_0 \text{, where } \mat{a^\ast} \in \argmax_{\mat{a} \in \Ah^T} \AVlu_{\mat{s}}(\mat{a}).
-            \end{aligned}
-            \right.
+            \pi_{\text{PSO-P}}(\mat{s}) &\coloneqq \mat{a^\ast}_0\text{, where} \\
+            \mat{a^\ast} &\in \argmax_{\mat{a} \in \Ah^T} \left\{ \Moment*{\E}{\sum_{t=1}^T \gamma^t \Rwd(\mat{s_t}) \given \GP, \mat{s_0} = \mat{s}, \mat{a_0}, \dots, \mat{a_{T-1}}} \right\}
         \end{align}
     \end{definition}
+    \begin{itemize}
+        \item PSO is a gradient-free heuristic
+        \item Directly exploits the transition models
+    \end{itemize}
 \end{frame}
 
 \begin{frame}[label=solution_reward]
     \frametitle{Reward Function}
 
     \begin{definition}[Bicycle Reward Function]
-        Given the set $\Es^+$ of possible states of the bicycle benchmark and the sets $\Goal$ and $\Fallen$ of all terminal states where the bicycle has reached the goal or fallen respectively, the \emph{bicycle reward function} is defined as
+        The \structure{bicycle reward function} is defined as
         \begin{align}
-            \RwdBicycle \colon \left\{
-                \begin{aligned}
-                    \Es^+ &\to \R \\
-                    \mat{s} &\mapsto \begin{cases}
-                    2 & \text{if $\mat{s} \in \Goal$} \\
-                    0 & \text{if $\mat{s} \in \Fallen$} \\
-                    \sqrt{2\pi\sigma_{\text{angle}}^2}\Gaussian{\Delta^\psi_{\mat{s}} \given 0, \sigma_{\text{angle}}^2} & \text{otherwise}
+            \RwdBicycle(\mat{s}) &\coloneqq \begin{cases}
+                    2 & \text{if goal reached} \\
+                    0 & \text{if fallen down} \\
+                    c\cdot\Gaussian{\Delta^\psi_{\mat{s}} \given 0, \sigma_{\text{angle}}^2} & \text{otherwise}
                 \end{cases}
-            \end{aligned}
-            \right.
         \end{align}
-    where $\Delta^\psi_{\mat{s}} = \abs{\psi_{\mat{s}} - \varphi_{\mat{s}}} \in (-\pi, \pi]$ denotes the difference between the bicycle's heading and the goal given a state $\mat{s}$ and $\sigma_{\text{angle}}^2$ is a positive real constant.
-    The Gaussian density function $\Norm$ is normalized to a maximum value of 1.
+    where $\Delta^\psi_{\mat{s}}$ denotes the \structure{angle towards the goal}.
     \end{definition}
+    \vspace{2ex}
+    \centering
+    \includestandalone{figures/saturating_reward}
 \end{frame}
 
 \begin{frame}[label=solution_map]
@@ -251,7 +233,7 @@
 
 \section{Results}
 \begin{frame}[label=results_qualitative]
-    \frametitle{Qualitative}
+    \frametitle{Qualitative Results}
 
     \centering
     \includestandalonewithpath{figures/xy_trajectories}
@@ -290,6 +272,24 @@
             \end{tabularx}
         \end{column}
     \end{columns}
+\end{frame}
+
+\appendix
+\section{Additional Material}
+\begin{frame}[noframenumbering]
+    \vfill
+    \centering
+    \begin{beamercolorbox}[sep=8pt,center]{title}
+        \usebeamerfont{title}Additional Material\par%
+    \end{beamercolorbox}
+    \vfill
+\end{frame}
+
+\begin{frame}[label=gp_sparse, noframenumbering]
+    \frametitle{Sparse Gaussian Processes}
+
+    \centering
+    \includestandalonewithpath{figures/spgp}
 \end{frame}
 
 \end{document}
