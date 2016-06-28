@@ -68,11 +68,45 @@
 
 \section{Gaussian Processes}
 \begin{frame}[label=gp_non_parametric_models]
-    \frametitle{Non-Parametric Models}
+    \frametitle{Bayesian Non-Parametric Models}
 
-    \begin{block}{Yoyoyo}
-        Blarghl
-    \end{block}
+    \begin{overlayarea}{\textwidth}{8\baselineskip}
+        \only<1> {
+            \begin{block}{Data}
+                \begin{itemize}
+                    \item Observe a \structure{noisy} data set $\D = \Set{\left( \mat{x_i}, \mat{y_i} \right)}$
+                    \item Assume that $\mat{y_i} = f(\mat{x_i}) + \Gaussian{0, \sigma_n^2}$
+                \end{itemize}
+            \end{block}
+        }
+        \only<2> {
+            \begin{block}{Non-Bayesian Parametric Models}
+                \begin{itemize}
+                    \item Assume \structure{structure} about $f$, such as $f(\mat{x}) = \mat{W}\mat{x}$
+                    \item Find a \structure{single} $\mat{W}$ which is optimal w.r.t. some criterion
+                    \item Everything is \structure{deterministic}
+                \end{itemize}
+            \end{block}
+        }
+        \only<3-4> {
+            \begin{block}{Bayesian Parametric Models}
+                \begin{itemize}
+                    \item Assume \structure{structure} about $f$, such as $f(\mat{x}) = \mat{W}\mat{x}$
+                    \item Find a \structure{distribution} $\Prob{\mat{W} \given \D}$ of plausible parameters
+                    \item We can consider all parameters at once
+                \end{itemize}
+            \end{block}
+        }
+        \only<5-> {
+            \begin{block}{Bayesian Non-Parametric Models}
+                \begin{itemize}
+                    \item $f$ can be an \structure{arbitrary function}
+                    \item Find a \structure{distribution} $\Prob{f \given \D}$ over functions
+                    \item We can consider all \structure{functions} at once
+                \end{itemize}
+            \end{block}
+        }
+    \end{overlayarea}
     \vfill
     \centering
     \includestandalonewithpath{figures/non_parametric_models}
