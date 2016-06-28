@@ -28,24 +28,29 @@
         \begin{axis} [
                 posterior plot,
                 clip=false,
+                title=Prior,
             ]
-            \addplot[thin, tumblue, name path=c, domain=-2:7] {4.69};
-            \addplot[thin, tumblue, name path=d, domain=-2:7] {-4.69};
-            \addplot[tumblue!15] fill between[of=c and d, on layer={axis background}];
+            \only<2-> {
+                \addplot[thin, tumblue, name path=c, domain=-2:7] {4.69};
+                \addplot[thin, tumblue, name path=d, domain=-2:7] {-4.69};
+                \addplot[tumblue!15] fill between[of=c and d, on layer={axis background}];
+            }
             \addplot[very thick, tumblue, domain=-2:7] {0};
+            \node[tumblue, right=2pt] at (7, 0) {$\mu_f$};
+            \draw[decorate, decoration={brace, mirror, raise=1pt}, thick] (7,0) -- node[right=2pt] {$\sigma_f$} (7,4.69);
 
-            \only<1-2> {
+            \only<2-5> {
+                \draw[decorate, decoration={brace, mirror, raise=1pt}, thick] (0,-5) -- node[below=2pt] {$l$} (3,-5);
+            }
+            \only<3-5> {
                 \addplot[prior sample, tumviolet] table[x=X, y=y, restrict x to domain=-2:7]
                     {\figurepath/data/gp_presentation_lengthy_kern_sample_0.dat};
                 \addplot[prior sample, tumorange] table[x=X, y=y, restrict x to domain=-2:7]
                     {\figurepath/data/gp_presentation_lengthy_kern_sample_1.dat};
                 \addplot[prior sample, tumgreen] table[x=X, y=y, restrict x to domain=-2:7]
                     {\figurepath/data/gp_presentation_lengthy_kern_sample_2.dat};
-
-                \draw[decorate, decoration={brace, mirror, raise=1pt}, thick] (7,0) -- node[right=2pt] {$\sigma_f$} (7,4.69);
-                \draw[decorate, decoration={brace, mirror, raise=1pt}, thick] (0,-5) -- node[below=2pt] {$l$} (3,-5);
             }
-            \only<3> {
+            \only<6> {
                 \draw[decorate, decoration={brace, mirror, raise=1pt, amplitude=1pt}, thick] (0,-5) -- node[below=2pt] {$l$} (0.2,-5);
 
                 \addplot[prior sample, tumviolet] table[x=X, y=y, restrict x to domain=-2:7]
@@ -55,7 +60,7 @@
                 \addplot[prior sample, tumgreen] table[x=X, y=y, restrict x to domain=-2:7]
                     {\figurepath/data/gp_presentation_shorty_kern_sample_2.dat};
             }
-            \only<4> {
+            \only<7> {
                 \draw[decorate, decoration={brace, mirror, raise=1pt}, thick] (0,-5) -- node[below=2pt] {$l$} (0.62,-5);
 
                 \addplot[prior sample, tumviolet] table[x=X, y=y, restrict x to domain=-2:7]
@@ -67,14 +72,17 @@
             }
         \end{axis}
 
-        \only<2-> {
+        \only<4-> {
             \begin{axis} [
                     posterior plot,
                     ylabel={},
                     shift={(190pt, 0)},
+                    title=\alt<4>{Data}{Posterior},
                 ]
 
-                \only<2> {
+                \addplot[only marks] table[x=X, y=y] {\figurepath/data/gp_presentation_data.dat};
+
+                \only<5> {
                     \addplot[thin, tumblue, name path=c, restrict x to domain=-2:7] table[x=X, y expr=\thisrow{y} + \thisrow{y_2std}] {\figurepath/data/gp_presentation_gp_lengthy.dat};
                     \addplot[thin, tumblue, name path=d, restrict x to domain=-2:7] table[x=X, y expr=\thisrow{y} - \thisrow{y_2std}] {\figurepath/data/gp_presentation_gp_lengthy.dat};
                     \addplot[tumblue!15] fill between[of=c and d, on layer={axis background}];
@@ -83,24 +91,20 @@
                     \addplot[prior sample, tumviolet] table[x=X, y=y] {\figurepath/data/gp_presentation_lengthy_gp_sample_0.dat};
                     \addplot[prior sample, tumorange] table[x=X, y=y] {\figurepath/data/gp_presentation_lengthy_gp_sample_1.dat};
                     \addplot[prior sample, tumgreen] table[x=X, y=y]  {\figurepath/data/gp_presentation_lengthy_gp_sample_2.dat};
-
-                    \addplot[only marks] table[x=X, y=y] {\figurepath/data/gp_presentation_data.dat};
                 }
 
-                \only<3> {
+                \only<6> {
                     \addplot[thin, tumblue, name path=c, restrict x to domain=-2:7] table[x=X, y expr=\thisrow{y} + \thisrow{y_2std}] {\figurepath/data/gp_presentation_gp_shorty.dat};
                     \addplot[thin, tumblue, name path=d, restrict x to domain=-2:7] table[x=X, y expr=\thisrow{y} - \thisrow{y_2std}] {\figurepath/data/gp_presentation_gp_shorty.dat};
                     \addplot[tumblue!15] fill between[of=c and d, on layer={axis background}];
                     \addplot[very thick, tumblue, restrict x to domain=-2:7] table[x=X, y=y] {\figurepath/data/gp_presentation_gp_shorty.dat};
 
-                    \addplot[prior sample, tumviolet] table[x=X, y=y] {\figurepath/data/gp_presentation_shorty_gp_sample_0.dat};
-                    \addplot[prior sample, tumorange] table[x=X, y=y] {\figurepath/data/gp_presentation_shorty_gp_sample_1.dat};
+                    % \addplot[prior sample, tumviolet] table[x=X, y=y] {\figurepath/data/gp_presentation_shorty_gp_sample_0.dat};
+                    % \addplot[prior sample, tumorange] table[x=X, y=y] {\figurepath/data/gp_presentation_shorty_gp_sample_1.dat};
                     \addplot[prior sample, tumgreen] table[x=X, y=y]  {\figurepath/data/gp_presentation_shorty_gp_sample_2.dat};
-
-                    \addplot[only marks] table[x=X, y=y] {\figurepath/data/gp_presentation_data.dat};
                 }
 
-                \only<4> {
+                \only<7> {
                     \addplot[thin, tumblue, name path=c, restrict x to domain=-2:7] table[x=X, y expr=\thisrow{y} + \thisrow{y_2std}] {\figurepath/data/gp_presentation_gp_proper.dat};
                     \addplot[thin, tumblue, name path=d, restrict x to domain=-2:7] table[x=X, y expr=\thisrow{y} - \thisrow{y_2std}] {\figurepath/data/gp_presentation_gp_proper.dat};
                     \addplot[tumblue!15] fill between[of=c and d, on layer={axis background}];
@@ -109,8 +113,6 @@
                     \addplot[prior sample, tumviolet] table[x=X, y=y] {\figurepath/data/gp_presentation_proper_gp_sample_0.dat};
                     \addplot[prior sample, tumorange] table[x=X, y=y] {\figurepath/data/gp_presentation_proper_gp_sample_1.dat};
                     \addplot[prior sample, tumgreen] table[x=X, y=y]  {\figurepath/data/gp_presentation_proper_gp_sample_2.dat};
-
-                    \addplot[only marks] table[x=X, y=y] {\figurepath/data/gp_presentation_data.dat};
                 }
             \end{axis}
         }

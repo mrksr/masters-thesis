@@ -116,27 +116,39 @@
     \frametitle{Gaussian Processes}
 
     \begin{definition}[Gaussian Process]
-        A \structure{Gaussian Process} is a collection of random variables, any finite subset of which has a joint Gaussian distribution.
+        A \structure{Gaussian Process (GP)} is a collection of random variables $\Set{\rv{F_x} \with x \in X}$, any finite subset of which has a joint Gaussian distribution.
     \end{definition}
+    \begin{itemize}
+        \item Extension of Gaussians to (infinite) function spaces
+        \item $\rv{F_x}$ models the function value $f(x)$ of some $f : X \to Y$
+    \end{itemize}
+    \vfill
+    \pause
+    \begin{block}{Mean and Kernel Functions}
+        A GP is \structure{completely determined} by
+        \begin{description}[\quad Kernel function]
+            \item[Mean function] \makebox[\widthof{$\K(x, x^\prime)$}][r]{$\mu_f(x)$}${} = \Moment{\E}{f(x)}$
+            \item[Kernel function] $\K(x, x^\prime) = \Moment{\cov}{f(x), f(x^\prime)}$
+        \end{description}
+    \end{block}
+    \begin{itemize}
+        \item The kernel encodes the \structure{prior assumptions} about the function
+    \end{itemize}
 \end{frame}
 
-\begin{frame}[label=gp_kernels]
-    \frametitle{Kernels and Hyperparameters}
+\begin{frame}[label=gp_hyperparameters]
+    \frametitle{Posterior and Hyperparameters}
 
-    \begin{block}{Yoyoyo}
-        Blarghl
-    \end{block}
-    \vfill
     \centering
     \includestandalonewithpath{figures/gp_hyperparameters}
 \end{frame}
 
-\begin{frame}[label=gp_sparse]
-    \frametitle{Sparse Gaussian Processes}
+% \begin{frame}[label=gp_sparse]
+%     \frametitle{Sparse Gaussian Processes}
 
-    \centering
-    \includestandalonewithpath{figures/spgp}
-\end{frame}
+%     \centering
+%     \includestandalonewithpath{figures/spgp}
+% \end{frame}
 
 \section{Uncertainties in Reinforcement Learning}
 \begin{frame}[label=solution_architecture]
