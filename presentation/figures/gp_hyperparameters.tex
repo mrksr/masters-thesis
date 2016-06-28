@@ -37,10 +37,10 @@
             }
             \addplot[very thick, tumblue, domain=-2:7] {0};
             \node[tumblue, right=2pt] at (7, 0) {$\mu_f$};
-            \draw[decorate, decoration={brace, mirror, raise=1pt}, thick] (7,0) -- node[right=2pt] {$\sigma_f$} (7,4.69);
 
             \only<2-5> {
                 \draw[decorate, decoration={brace, mirror, raise=1pt}, thick] (0,-5) -- node[below=2pt] {$l$} (3,-5);
+                \draw[decorate, decoration={brace, mirror, raise=1pt}, thick] (7,0) -- node[right=2pt] {$\sigma_f$} (7,4.69);
             }
             \only<3-5> {
                 \addplot[prior sample, tumviolet] table[x=X, y=y, restrict x to domain=-2:7]
