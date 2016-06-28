@@ -41,7 +41,7 @@
         \begin{column}[c]{0.5\textwidth}
             \centering
             \vspace{1cm}
-            \uncover<7-> {
+            \uncover<6-> {
                 \includestandalonewithpath{figures/bicycle_drive_goal}
             }
         \end{column}
@@ -219,7 +219,7 @@
     \begin{columns}
         \begin{column}[c]{0.5\textwidth}
             \centering
-            \uncover<2> {
+            \uncover<3> {
                 \includestandalonewithpath{figures/goal_percentage}
             }
         \end{column}
@@ -229,13 +229,17 @@
                 \toprule
                 Metric & MAP & OS & MS \\
                 \midrule
-                Trajectories & 9660 & 9660 & 9660 \\
-                \addlinespace
-                Success Rate & \SI[mode=text]{53.4}{\percent} & \SI[mode=text]{63.8}{\percent} & \textbf{\SI[mode=text,detect-weight]{75.8}{\percent}} \\
-                \addlinespace
-                Time to Goal \\
-                Mean & \textbf{59.9} & 62.0 & 66.5 \\
-                Median & \textbf{60} & \textbf{60} & 63 \\
+                Trajectories & 9660 & 9660 & 9660
+                \uncover<2-> {
+                    \\
+                    \addlinespace
+                    Success Rate & \SI[mode=text]{53.4}{\percent} & \SI[mode=text]{63.8}{\percent} & \textbf{\SI[mode=text,detect-weight]{75.8}{\percent}} \\
+                    \addlinespace
+                    Time to Goal \\
+                    Mean & \textbf{59.9} & 62.0 & 66.5 \\
+                    Median & \textbf{60} & \textbf{60} & 63
+                }
+                \\
                 \bottomrule
             \end{tabularx}
         \end{column}

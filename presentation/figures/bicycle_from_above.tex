@@ -25,7 +25,7 @@
         \coordinate (psipoint1) at ($(back) - (1, 0)$);
         \coordinate (psipoint2) at ($(back) + (1, 0.25)$);
 
-        \only<5-> {
+        \only<4-> {
             \draw[help, dashed]
                 let \p1 = ($(front) - (center)$), \n1 = {veclen(\x1, \y1)}
                 in ([shift=(110:\n1)]center) arc (110:155:\n1);
@@ -45,7 +45,7 @@
             \draw pic["$\psi$", draw] {angle=psipoint2--back--psipoint1};
         }
 
-        \only<6-> {
+        \only<5-> {
             \draw[draw, arrows={-latex}] (Tstart) -- node[pos=1, below] {$T$} (Tstop);
         }
 
