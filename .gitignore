@@ -1,3 +1,11 @@
+###############
+#  Own stuff  #
+###############
+**/.ipynb_checkpoints/**
+
+#################
+#  Latex stuff  #
+#################
 ## Core latex/pdflatex auxiliary files:
 *.aux
 *.lof
