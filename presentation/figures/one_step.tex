@@ -105,13 +105,13 @@
             \coordinate (posterior mean) at (0.9, 1.57693676);
         \end{axis}
 
-        \draw[thick, tumgreen, dashed] (prior mean) -- (gp intersection);
-        \draw[thick, tumgreen, dashed] (posterior mean) -- (gp intersection);
-        \node[very small node, tumgreen, fill=tumgreen!15] at (gp intersection) {};
+        \draw[thick, tumorange, dashed] (prior mean) -- (gp intersection);
+        \draw[thick, tumorange, dashed] (posterior mean) -- (gp intersection);
+        \node[very small node, tumorange, fill=tumorange!15] at (gp intersection) {};
 
         \only<2> {
             \begin{pgfonlayer}{axis background}
-                \draw[draw=none, tumgreen, fill=tumgreen!25]
+                \draw[draw=none, tumorange, fill=tumorange!40]
                     ($(gp intersection) + (0, 0.3)$)
                     rectangle
                     ($(posterior mean) + (0, -0.3)$);

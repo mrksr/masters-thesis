@@ -31,7 +31,7 @@
             \addplot[only marks, mark size=1.5pt] table[x=X, y=y] {\plotdatapath/posterior_data.dat};
 
             \only<3->{
-                \addplot[tumgreen, very thick, domain=-2.7:0.3] {1.7511410501706364 * (x + 1.2) + 1.57693676};
+                \addplot[tumorange, very thick, domain=-2.7:0.3] {1.7511410501706364 * (x + 1.2) + 1.57693676};
             }
 
             \coordinate (gp intersection) at (-1.2, 1.57693676);
@@ -84,9 +84,9 @@
                     set layers,
                 ]
 
-                \addplot[thin, tumorange, fill=tumorange!15, on layer=axis background] table[x=y, y=X]
+                \addplot[thin, tumgreen, fill=tumgreen!15, on layer=axis background] table[x=y, y=X]
                     {\plotdatapath/solution_ms_linearization_posterior_kde.dat};
-                \addplot[thin, tumorange] table[x=y, y=X]
+                \addplot[thin, tumgreen] table[x=y, y=X]
                     {\plotdatapath/solution_ms_linearization_posterior_kde.dat};
 
                 \only<4-> {
@@ -101,18 +101,18 @@
         }
 
         \only<3-> {
-            \draw[thick, tumgreen, dashed] (prior mean) -- (gp intersection);
-            \draw[thick, tumgreen, dashed] (posterior mean) -- (gp intersection);
-            \node[very small node, tumgreen, fill=tumgreen!15] at (gp intersection) {};
+            \draw[thick, tumorange, dashed] (prior mean) -- (gp intersection);
+            \draw[thick, tumorange, dashed] (posterior mean) -- (gp intersection);
+            \node[very small node, tumorange, fill=tumorange!15] at (gp intersection) {};
         }
 
         \only<4-> {
             \begin{pgfonlayer}{axis background}
-                \draw[draw=none, fill=tumgreen!25]
+                \draw[draw=none, fill=tumorange!40]
                     ($(prior mean) + (-0.5, 0)$)
                     rectangle
                     ($(gp intersection) + (0.5, 0.45)$);
-                \draw[draw=none, fill=tumgreen!25]
+                \draw[draw=none, fill=tumorange!40]
                     ($(gp intersection) + (0.5, 0.45)$)
                     rectangle
                     ($(posterior mean) + (0, -0.45)$);
