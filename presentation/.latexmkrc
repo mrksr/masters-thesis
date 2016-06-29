@@ -1,2 +1,2 @@
-@default_files = ("bicycle.presentation.tex");
+@default_files = ("thesis_presentation.tex");
 $pdf_mode = 1;
