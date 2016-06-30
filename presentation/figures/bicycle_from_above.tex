@@ -25,27 +25,25 @@
         \coordinate (psipoint1) at ($(back) - (1, 0)$);
         \coordinate (psipoint2) at ($(back) + (1, 0.25)$);
 
-        \only<4-> {
-            \draw[help, dashed]
-                let \p1 = ($(front) - (center)$), \n1 = {veclen(\x1, \y1)}
-                in ([shift=(110:\n1)]center) arc (110:155:\n1);
-            \draw[help, dashed]
-                let \p1 = ($(back) - (center)$), \n1 = {veclen(\x1, \y1)}
-                in ([shift=(95:\n1)]center) arc (95:140:\n1);
-        }
+        % \only<4-> {
+        %     \draw[help, dashed]
+        %         let \p1 = ($(front) - (center)$), \n1 = {veclen(\x1, \y1)}
+        %         in ([shift=(110:\n1)]center) arc (110:155:\n1);
+        %     \draw[help, dashed]
+        %         let \p1 = ($(back) - (center)$), \n1 = {veclen(\x1, \y1)}
+        %         in ([shift=(95:\n1)]center) arc (95:140:\n1);
+        % }
 
         \only<3-> {
             \draw[help, shorten <=-2cm, shorten >=-2cm] (front) -- (back);
-            \draw pic["$\theta$", draw, angle eccentricity=1.3, angle radius=0.75cm] {angle=thetapoint--front--tfront};
-            \draw pic["$\dot{\theta}$", draw, arrows={-latex}, angle eccentricity=1.3, angle radius=0.8cm] {angle=tback--front--thetadotpoint};
-        }
-
-        \only<4-> {
             \draw[help] ($(back) - (1.5, 0)$) -- ($(back) + (2, 0)$);
             \draw pic["$\psi$", draw] {angle=psipoint2--back--psipoint1};
         }
 
-        \only<5-> {
+        \only<4-> {
+            \draw pic["$\theta$", draw, angle eccentricity=1.3, angle radius=0.75cm] {angle=thetapoint--front--tfront};
+            % \draw pic["$\dot{\theta}$", draw, arrows={-latex}, angle eccentricity=1.3, angle radius=0.8cm] {angle=tback--front--thetadotpoint};
+
             \draw[draw, arrows={-latex}] (Tstart) -- node[pos=1, below] {$T$} (Tstop);
         }
 

@@ -25,13 +25,14 @@
             \draw (origin) -- (frametip);
             \draw (origin) -- (y);
             \draw pic["$\omega$", draw, angle eccentricity=1.1, angle radius=2cm] {angle=y--origin--frametip};
-            \draw pic["$\dot{\omega}$", draw, arrows={-latex}, angle eccentricity=1.2, angle radius=1cm] {angle=frametip--frame--omegadot};
+            % \draw pic["$\dot{\omega}$", draw, arrows={-latex}, angle eccentricity=1.2, angle radius=1cm] {angle=frametip--frame--omegadot};
         }
 
         \only<3-> {
             \draw [right angle length=1ex, right angle symbol={origin}{frametip}{cm}];
             \draw (cm) -- node[pos=0.4, above] {$d$} (frame);
-            \node["CM" above left, very small node] at (cm) {};
+            % \node["CM" above left, very small node] at (cm) {};
+            \node[very small node] at (cm) {};
         }
 
         \draw[bicycle, tumgreen] (origin) -- (frame);

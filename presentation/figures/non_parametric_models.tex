@@ -31,13 +31,13 @@
                 \addplot[very thick, tumblue, domain=-2:7] {0.707 * x};
             }
 
-            \only<3-4> {
+            \only<4> {
                 \addplot[thin, tumblue, name path=a, domain=-2:7] {min(6.5, (0.707 + 0.5) * x)};
                 \addplot[thin, tumblue, name path=b, domain=-2:7] {(0.707 - 0.5) * x};
                 \addplot[tumblue!15] fill between[of=a and b, on layer={axis background}];
             }
 
-            \only<4> {
+            \only<3-4> {
                 \addplot[prior sample, tumviolet, domain=-2:7] {0.8 * x};
                 \addplot[prior sample, tumorange, domain=-2:7] {0.4 * x};
                 \addplot[prior sample, tumgreen , domain=-2:7] {1.13 * x};
@@ -48,15 +48,15 @@
             }
 
             \only<6-> {
-                \addplot[thin, tumblue, name path=c, restrict x to domain=-2:7] table[x=X, y expr=\thisrow{y} + \thisrow{y_2std}] {\figurepath/data/gp_presentation_gp.dat};
-                \addplot[thin, tumblue, name path=d, restrict x to domain=-2:7] table[x=X, y expr=\thisrow{y} - \thisrow{y_2std}] {\figurepath/data/gp_presentation_gp.dat};
-                \addplot[tumblue!15] fill between[of=c and d, on layer={axis background}];
-            }
-
-            \only<7-> {
                 \addplot[prior sample, tumviolet] table[x=X, y=y, restrict x to domain=-2:7] {\figurepath/data/gp_presentation_sample_0.dat};
                 \addplot[prior sample, tumorange] table[x=X, y=y, restrict x to domain=-2:7] {\figurepath/data/gp_presentation_sample_1.dat};
                 \addplot[prior sample, tumgreen] table[x=X, y=y, restrict x to domain=-2:7] {\figurepath/data/gp_presentation_sample_2.dat};
+            }
+
+            \only<7-> {
+                \addplot[thin, tumblue, name path=c, restrict x to domain=-2:7] table[x=X, y expr=\thisrow{y} + \thisrow{y_2std}] {\figurepath/data/gp_presentation_gp.dat};
+                \addplot[thin, tumblue, name path=d, restrict x to domain=-2:7] table[x=X, y expr=\thisrow{y} - \thisrow{y_2std}] {\figurepath/data/gp_presentation_gp.dat};
+                \addplot[tumblue!15] fill between[of=c and d, on layer={axis background}];
             }
         \end{axis}
     \end{tikzpicture}

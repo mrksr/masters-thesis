@@ -77,20 +77,19 @@
             \begin{block}{Data}
                 \begin{itemize}
                     \item Observe a \structure{noisy} data set $\D = \Set{\left( \mat{x_i}, \mat{y_i} \right)}$
-                    \item Assume that $\mat{y_i} = f(\mat{x_i}) + \Gaussian{0, \sigma_n^2}$
+                    \item Assume that $\mat{y_i} = f(\mat{x_i}) + \epsilon$
                 \end{itemize}
             \end{block}
         }
-        \only<2> {
-            \begin{block}{Non-Bayesian Parametric Models}
+        \only<2-3> {
+            \begin{block}{Parametric Models}
                 \begin{itemize}
                     \item Assume \structure{structure} about $f$, such as $f(\mat{x}) = \mat{W}\mat{x}$
                     \item Find a \structure{single} $\mat{W}$ which is optimal w.r.t.\ some criterion
-                    \item Everything is \structure{deterministic}
                 \end{itemize}
             \end{block}
         }
-        \only<3-4> {
+        \only<4> {
             \begin{block}{Bayesian Parametric Models}
                 \begin{itemize}
                     \item Assume \structure{structure} about $f$, such as $f(\mat{x}) = \mat{W}\mat{x}$
@@ -118,18 +117,20 @@
     \frametitle{Gaussian Processes}
 
     \begin{definition}[Gaussian Process]
-        A \structure{Gaussian Process (GP)} is a collection of random variables $\Set{\rv{F_x} \with x \in X}$, any finite subset of which has a joint Gaussian distribution.
+        A \structure{Gaussian Process (GP)} is a collection of random variables $\Set{\rv{F_x}}$, any finite subset of which has a joint Gaussian distribution.
     \end{definition}
     \begin{itemize}
         \item Extension of Gaussians to (infinite) function spaces
-        \item $\rv{F_x}$ models the function value $f(x)$ of some $f : X \to Y$
+        \item $\rv{F_x}$ models the function value $f(x)$
     \end{itemize}
     \vfill
     \pause
     \begin{block}{Mean and Kernel Functions}
-        A GP is \structure{completely determined} by
+        A GP is \structure{completely determined} by two functions.
+        \medskip
         \begin{description}[\quad Kernel function]
             \item[Mean function] \makebox[\widthof{$\K(x, x^\prime)$}][r]{$\mu_f(x)$}${} = \Moment{\E}{f(x)}$
+            \medskip
             \item[Kernel function] $\K(x, x^\prime) = \Moment{\cov}{f(x), f(x^\prime)}$
         \end{description}
     \end{block}
@@ -138,8 +139,8 @@
     \end{itemize}
 \end{frame}
 
-\begin{frame}[label=gp_hyperparameters]
-    \frametitle{Posterior and Hyperparameters}
+\begin{frame}<1-5,7>[label=gp_hyperparameters]
+    \frametitle{Hyperparameters and Posterior}
 
     \centering
     \includestandalonewithpath{figures/gp_hyperparameters}
@@ -170,24 +171,7 @@
     \end{itemize}
 \end{frame}
 
-\begin{frame}[label=solution_reward]
-    \frametitle{Reward Function}
-
-    \begin{definition}[Bicycle Reward Function]
-        The \structure{bicycle reward function} is defined as
-        \begin{align}
-            \RwdBicycle(\mat{s}) &\coloneqq \begin{cases}
-                    2 & \text{if goal reached} \\
-                    0 & \text{if fallen down} \\
-                    c\cdot\Gaussian{\Delta^\psi_{\mat{s}} \given 0, \sigma_{\text{angle}}^2} & \text{otherwise}
-                \end{cases}
-        \end{align}
-    where $\Delta^\psi_{\mat{s}}$ denotes the \structure{angle towards the goal}.
-    \end{definition}
-    \vspace{2ex}
-    \centering
-    \includestandalone{figures/saturating_reward}
-\end{frame}
+\againframe<5>{solution_architecture}
 
 \begin{frame}[label=solution_map]
     \frametitle{MAP without Uncertainties}
@@ -276,13 +260,34 @@
 
 \appendix
 \section{Additional Material}
-\begin{frame}[noframenumbering]
+\begin{frame}
     \vfill
     \centering
     \begin{beamercolorbox}[sep=8pt,center]{title}
         \usebeamerfont{title}Additional Material\par%
     \end{beamercolorbox}
     \vfill
+\end{frame}
+
+\againframe<5-7>{gp_hyperparameters}
+
+\begin{frame}[label=solution_reward]
+    \frametitle{Reward Function}
+
+    \begin{definition}[Bicycle Reward Function]
+        The \structure{bicycle reward function} is defined as
+        \begin{align}
+            \RwdBicycle(\mat{s}) &\coloneqq \begin{cases}
+                    2 & \text{if goal reached} \\
+                    0 & \text{if fallen down} \\
+                    c\cdot\Gaussian{\Delta^\psi_{\mat{s}} \given 0, \sigma_{\text{angle}}^2} & \text{otherwise}
+                \end{cases}
+        \end{align}
+    where $\Delta^\psi_{\mat{s}}$ denotes the \structure{angle towards the goal}.
+    \end{definition}
+    \vspace{2ex}
+    \centering
+    \includestandalone{figures/saturating_reward}
 \end{frame}
 
 \begin{frame}[label=gp_sparse, noframenumbering]
