@@ -63,7 +63,7 @@
             \node[entity, onslide={<6> marked node}] (gp) at (0, -1.5) {GP Models};
 
             \only<4->{
-                \draw[edge, directed, thick]
+                \draw[edge, directed, thick, onslide={<5> marked}]
                     ([yshift=-3pt]pso.east) -- ($([yshift=-3pt]pso) + (2, 0)$)
                     |- node[pos=0.25, left] {$a_{t}$\\\vdots\\$a_{t+T-1}$} ([yshift=3pt]gp.east);
 
