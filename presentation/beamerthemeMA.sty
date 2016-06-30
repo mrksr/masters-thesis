@@ -50,13 +50,20 @@
 \setbeamercolor{navigation bar}{fg=tumblue,bg=white}
 \setbeamercolor{section in head/foot}{fg=tumblue,bg=white}
 \setbeamertemplate{mini frames}[circle]
+
+% Only count frames to the appendix for total count
+% See http://tex.stackexchange.com/a/133175
+\def\insertpresentationendframe{\inserttotalframenumber}
+\makeatletter
+\g@addto@macro{\appendix}{\immediate\write\@auxout{\string\@writefile{nav}{\noexpand\headcommand{\noexpand\def\noexpand\insertpresentationendframe{\the\c@framenumber}}}}}
+\makeatother
 \setbeamertemplate{footline}{
     \leavevmode%
     \hbox{%
         \tiny%
         \hspace{.01\paperwidth}%
         \begin{beamercolorbox}[wd=.05\paperwidth,center]{page numbers}%
-            \insertframenumber{}\,/\,\inserttotalframenumber
+            \insertframenumber{}\,/\,\insertpresentationendframe
         \end{beamercolorbox}%
         \begin{beamercolorbox}[wd=.88\paperwidth,center]{navigation bar}%
             \insertnavigation{\linewidth}
