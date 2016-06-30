@@ -43,7 +43,7 @@
         \begin{column}[c]{0.5\textwidth}
             \centering
             \vspace{1cm}
-            \uncover<6-> {
+            \uncover<5-> {
                 \includestandalonewithpath{figures/bicycle_drive_goal}
             }
         \end{column}
@@ -76,7 +76,7 @@
         \only<1> {
             \begin{block}{Data}
                 \begin{itemize}
-                    \item Observe a \structure{noisy} data set $\D = \Set{\left( \mat{x_i}, \mat{y_i} \right)}$
+                    \item Observe a \structure{noisy} data set $\Set{\left( \mat{x_i}, \mat{y_i} \right)}$
                     \item Assume that $\mat{y_i} = f(\mat{x_i}) + \epsilon$
                 \end{itemize}
             \end{block}
@@ -93,8 +93,7 @@
             \begin{block}{Bayesian Parametric Models}
                 \begin{itemize}
                     \item Assume \structure{structure} about $f$, such as $f(\mat{x}) = \mat{W}\mat{x}$
-                    \item Find a \structure{distribution} $\Prob{\mat{W} \given \D}$ of plausible parameters
-                    \item We can consider all parameters at once
+                    \item Find a \structure{distribution} $\Prob{\mat{W} \given \mat{X}, \mat{y}}$ of plausible parameters
                 \end{itemize}
             \end{block}
         }
@@ -102,8 +101,7 @@
             \begin{block}{Bayesian Non-Parametric Models}
                 \begin{itemize}
                     \item $f$ can be an \structure{arbitrary function}
-                    \item Find a \structure{distribution} $\Prob{f \given \D}$ over functions
-                    \item We can consider all \structure{functions} at once
+                    \item Find a \structure{distribution} $\Prob{f \given \mat{X}, \mat{y}}$ over functions
                 \end{itemize}
             \end{block}
         }
@@ -130,7 +128,7 @@
         \medskip
         \begin{description}[\quad Kernel function]
             \item[Mean function] \makebox[\widthof{$\K(x, x^\prime)$}][r]{$\mu_f(x)$}${} = \Moment{\E}{f(x)}$
-            \medskip
+            \smallskip
             \item[Kernel function] $\K(x, x^\prime) = \Moment{\cov}{f(x), f(x^\prime)}$
         \end{description}
     \end{block}
@@ -146,8 +144,8 @@
     \includestandalonewithpath{figures/gp_hyperparameters}
 \end{frame}
 
-\section{Uncertainties in Reinforcement Learning}
-\begin{frame}[label=solution_architecture]
+\section{Model-Uncertainties in Reinforcement Learning}
+\begin{frame}<1-5>[label=solution_architecture]
     \frametitle{Solution Architecture}
 
     \centering
@@ -171,7 +169,7 @@
     \end{itemize}
 \end{frame}
 
-\againframe<5>{solution_architecture}
+\againframe<6>{solution_architecture}
 
 \begin{frame}[label=solution_map]
     \frametitle{MAP without Uncertainties}

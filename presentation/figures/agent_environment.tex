@@ -22,6 +22,12 @@
         \tikzstyle{outer} = [
             onslide={<3-> black!50},
         ];
+        \tikzstyle{marked} = [
+            tumred,
+        ];
+        \tikzstyle{marked node} = [
+            tumred, fill=tumred!20,
+        ];
 
         \node[agent] (agent) at (0, 0)
             {\alt<1-2>{Agent}{}};
@@ -53,19 +59,18 @@
             -- node[above] {$\Rwd(s_{t+1})$} ($([yshift=3pt]env) + (-4, 0)$);
 
         \only<3->{
-            \node[entity] (pso) at (0, 1.5) {PSO-Policy};
-            \node[entity] (gp) at (0, -1.5) {GP Models};
+            \node[entity, onslide={<5> marked node}] (pso) at (0, 1.5) {PSO-Policy};
+            \node[entity, onslide={<6> marked node}] (gp) at (0, -1.5) {GP Models};
 
             \only<4->{
                 \draw[edge, directed, thick]
                     ([yshift=-3pt]pso.east) -- ($([yshift=-3pt]pso) + (2, 0)$)
                     |- node[pos=0.25, left] {$a_{t}$\\\vdots\\$a_{t+T-1}$} ([yshift=3pt]gp.east);
 
-                \draw[edge, inverse directed, thick]
+                \draw[edge, inverse directed, thick, onslide={<6> marked}]
                     ([yshift=-3pt]pso.west) -- ($([yshift=-3pt]pso) + (-2, 0)$)
                     |-
                     node[pos=0.25, right] {$\rv{s_{t+1}}$\\$\vdots$\\$\rv{s_{t+T}}$}
-                    % node[pos=0.25, right] {$\Rwd(s_{t+1})$\\$\vdots$\\$\Rwd(s_{t+T+1})$}
                     ([yshift=3pt]gp.west);
 
                 \draw[edge, directed, very thick]
@@ -74,7 +79,7 @@
             }
 
             \only<5->{
-                \draw[edge, directed, very thick]
+                \draw[edge, directed, very thick, onslide={<5> marked}]
                     ([yshift=3pt]pso.east) -- ($([yshift=3pt]pso) + (2.5, 0)$)
                     |- node[pos=0.25, right] {$a^\ast_t$} (agent.east);
             }

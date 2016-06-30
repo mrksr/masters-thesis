@@ -36,7 +36,7 @@
                 \addplot[tumblue!15] fill between[of=c and d, on layer={axis background}];
             }
             \addplot[very thick, tumblue, domain=-2:7] {0};
-            \node[tumblue, right=2pt] at (7, 0) {$\mu_f$};
+            \node[tumblue, right=2pt] (muf) at (7, 0) {$\mu_f$};
 
             \only<2-5> {
                 \draw[decorate, decoration={brace, mirror, raise=1pt}, thick] (0,-5) -- node[below=2pt] {$l$} (3,-5);
@@ -71,6 +71,17 @@
                     {\figurepath/data/gp_presentation_proper_kern_sample_2.dat};
             }
         \end{axis}
+
+        \only<-3> {
+            \node[right=20pt of muf] {
+                    $\begin{aligned}
+                        \mu_f(x) &= 0 \\
+                        \uncover<2-> {
+                            \K(x, x^\prime) &= \sigma_f \cdot \exp\left( -\frac{(x - x^\prime)^2}{2\cdot l^2} \right)
+                        }
+                    \end{aligned}$
+                };
+        }
 
         \only<4-> {
             \begin{axis} [
