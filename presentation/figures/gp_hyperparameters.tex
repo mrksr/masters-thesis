@@ -34,13 +34,13 @@
                 \addplot[thin, tumblue, name path=c, domain=-2:7] {4.69};
                 \addplot[thin, tumblue, name path=d, domain=-2:7] {-4.69};
                 \addplot[tumblue!15] fill between[of=c and d, on layer={axis background}];
+                \draw[decorate, decoration={brace, mirror, raise=1pt}, thick] (7,0) -- node[right=2pt] {$\sigma_f$} (7,4.69);
             }
             \addplot[very thick, tumblue, domain=-2:7] {0};
             \node[tumblue, right=2pt] (muf) at (7, 0) {$\mu_f$};
 
             \only<2-5> {
                 \draw[decorate, decoration={brace, mirror, raise=1pt}, thick] (0,-5) -- node[below=2pt] {$l$} (3,-5);
-                \draw[decorate, decoration={brace, mirror, raise=1pt}, thick] (7,0) -- node[right=2pt] {$\sigma_f$} (7,4.69);
             }
             \only<3-5> {
                 \addplot[prior sample, tumviolet] table[x=X, y=y, restrict x to domain=-2:7]
