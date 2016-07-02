@@ -323,6 +323,76 @@
     \end{columns}
 \end{frame}
 
+\section*{}
+\begin{frame}[label=summary, t]
+    \frametitle{Summary}
+
+    \centering
+    \begin{columns}[t]
+        \begin{column}{0.4\textwidth}
+            \begin{itemize}
+                \item \structure{Sparse GPs}
+                    \begin{itemize}
+                        \item Scale to large data sets
+                        \item First test at LSY
+                    \end{itemize}
+                    \vspace{9ex}
+                \item \structure{Combination of GP and PSO}
+                    \begin{itemize}
+                        \item Directly exploit models
+                        \item Fully non-parametric
+                    \end{itemize}
+                    \vspace{7ex}
+                \item \structure{Bayesian Models in RL}
+                    \begin{itemize}
+                        \item Reduce model-bias
+                        \item Improve performance
+                    \end{itemize}
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \centering
+            \begin{figure}
+                \centering
+                \includestandalonewithpath{figures/spgp_tiny}
+            \end{figure}
+            \vspace{-3ex}
+            \begin{figure}
+                \centering
+                \begin{tikzpicture}
+                    \tikzstyle{entity} = [
+                        inner sep=6pt,
+                        text height=1.5ex, text depth=0ex,
+                        draw, fill=tumblue!20, thick,
+                    ];
+
+                    \node[entity] (pso) at (0, 0) {PSO-Policy};
+                    \node[entity] (gp) at (0, -1.5) {GP Models};
+
+                    \draw[edge, directed, very thick]
+                        (pso.east) -- ($(pso) + (2, 0)$)
+                        |- (gp.east);
+
+                    \draw[edge, inverse directed, very thick]
+                        (pso.west) -- ($(pso) + (-2, 0)$)
+                        |- (gp.west);
+                \end{tikzpicture}
+            \end{figure}
+            \vspace{-1ex}
+            \begin{table}
+                \centering
+                \begin{tabularx}{\textwidth}{X>{\centering\hsize=.4\hsize}X>{\centering\hsize=.4\hsize}X>{\centering\hsize=.4\hsize\arraybackslash}X}
+                    \toprule
+                    Metric & MAP & OS & MS \\
+                    \midrule
+                    Success Rate & \SI[mode=text]{53.4}{\percent} & \SI[mode=text]{63.8}{\percent} & \textbf{\SI[mode=text,detect-weight]{75.8}{\percent}} \\
+                    \bottomrule
+                \end{tabularx}
+            \end{table}
+        \end{column}
+    \end{columns}
+\end{frame}
+
 \appendix
 \section{Additional Material}
 \begin{frame}
