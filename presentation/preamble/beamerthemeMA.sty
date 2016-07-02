@@ -34,10 +34,13 @@
 \setbeamercolor{block body alerted}{parent=normal text,use=block title alerted,bg=block title.bg!25!bg}
 \setbeamercolor{block body example}{parent=normal text,use=block title example,bg=block title example.bg!15!bg}
 
-\pgfdeclareimage[height=5mm]{tum}{tum}
-\pgfdeclareimage[height=5mm]{kth}{kth}
-\pgfdeclareimage[height=5mm]{siemens}{siemens}
-\logo{\pgfuseimage{tum}\hspace{2mm}\pgfuseimage{kth}\hspace{2mm}\pgfuseimage{siemens}}
+\logo{%
+    \includegraphics[height=5mm]{tum}%
+    \hspace{2mm}%
+    \includegraphics[height=5mm]{kth}%
+    \hspace{2mm}%
+    \includegraphics[height=5mm]{siemens}%
+}
 
 \setbeamertemplate{frametitle}{
     \begin{beamercolorbox}[wd=\textwidth,leftskip=0mm]{frametitle}
