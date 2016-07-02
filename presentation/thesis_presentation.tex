@@ -179,6 +179,32 @@
     \includestandalonewithpath{figures/gp_hyperparameters}
 \end{frame}
 
+\begin{frame}[label=gp_sparse]
+    \frametitle{Sparse Gaussian Processes}
+
+    \begin{overlayarea}{\textwidth}{7\baselineskip}
+        \only<-2> {
+            \begin{block}{Full Gaussian Processes}
+                \begin{itemize}
+                    \item Calculation of the posterior in $\Oh(N^3)$
+                    \item Not feasible for large data sets
+                \end{itemize}
+            \end{block}
+        }
+        \only<3-> {
+            \begin{block}{Sparse Gaussian Processes}
+                \begin{itemize}
+                    \item Find a set of $M$ \structure{Pseudo Inputs}
+                    \item Calculation of the posterior in $\Oh(NM^2)$
+                \end{itemize}
+            \end{block}
+        }
+    \end{overlayarea}
+    \vfill
+    \centering
+    \includestandalonewithpath{figures/spgp}
+\end{frame}
+
 \section{Model-Uncertainties in Reinforcement Learning}
 \begin{frame}<1-5>[label=solution_architecture]
     \frametitle{Solution Architecture}
@@ -327,13 +353,6 @@
     \vspace{2ex}
     \centering
     \includestandalone{figures/saturating_reward}
-\end{frame}
-
-\begin{frame}[label=gp_sparse]
-    \frametitle{Sparse Gaussian Processes}
-
-    \centering
-    \includestandalonewithpath{figures/spgp}
 \end{frame}
 
 \end{document}
