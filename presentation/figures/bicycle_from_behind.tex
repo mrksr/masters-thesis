@@ -13,11 +13,12 @@
         \coordinate (xmin) at (-4, 0);
         \coordinate (xmax) at (1, 0);
         \coordinate (origin) at (0, 0);
-        \coordinate (frametip) at (110:6);
-        \coordinate (cm) at (125:5);
+        \coordinate (frametip) at (110:5);
+        \coordinate (cm) at (125:4);
         \coordinate (frame) at ($(origin)!(cm)!(frametip)$);
         \coordinate (omegadot) at ($(frame) + (150:1)$);
 
+        \draw[draw=none, pattern=north west lines] (xmin) rectangle ($(xmax) + (0, -6pt)$);
         \draw (xmin) -- (xmax);
 
         \only<2-> {
@@ -35,7 +36,7 @@
             \node[very small node] at (cm) {};
         }
 
-        \draw[bicycle, tumgreen] (origin) -- (frame);
+        \draw[bicycle, tumviolet] (origin) -- (frame);
         \node[very small node] at (frame) {};
         \node[very small node] at (origin) {};
     \end{tikzpicture}
