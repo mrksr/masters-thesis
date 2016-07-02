@@ -18,7 +18,7 @@
                 height=172pt,
                 yticklabel pos=right,
                 xticklabel pos=right,
-                ylabel={$\bm{\Delta_t}$},
+                ylabel={$\bm{\Delta s_t}$},
                 xlabel={$\bm{s_t}$},
                 ytick={-5, 0, 5},
                 clip mode=individual, % markers behind lines
@@ -74,8 +74,8 @@
                 width=120pt,
                 height=172pt,
                 x dir=reverse,
-                ylabel={$\bm{\Delta_t}$},
-                xlabel={$p(\bm{\Delta_t})$},
+                ylabel={$\bm{\Delta s_t}$},
+                xlabel={$p(\bm{\Delta s_t})$},
                 extra y ticks={1.57693676},
                 extra y tick labels={$\bm{\mu_\Delta}$},
                 xtick={0,0.4,0.8},
@@ -97,7 +97,8 @@
 
             \only<2> {
                     \addplot[very thick, tumblue, smooth, samples=300, domain=-6:6] (
-                        exp(-(x - 1.57693676)^2 / (0.4)) / (sqrt(2 * pi * 0.3798)),
+                        % We cheat a little with the normalization here
+                        exp(-(x - 1.57693676)^2 / (2 * 0.2)) / (sqrt(2 * pi * 0.4)),
                         x
                     );
             }

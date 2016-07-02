@@ -18,7 +18,7 @@
                 height=172pt,
                 yticklabel pos=right,
                 xticklabel pos=right,
-                ylabel={$\bm{\Delta_t}$},
+                ylabel={$\bm{\Delta s_t}$},
                 xlabel={$\bm{s_t}$},
                 ytick={-5, 0, 5},
                 clip mode=individual, % markers behind lines
@@ -75,8 +75,8 @@
                     width=120pt,
                     height=172pt,
                     x dir=reverse,
-                    ylabel={$\bm{\Delta_t}$},
-                    xlabel={$p(\bm{\Delta_t})$},
+                    ylabel={$\bm{\Delta s_t}$},
+                    xlabel={$p(\bm{\Delta s_t})$},
                     extra y ticks={1.57693676},
                     extra y tick labels={\alt<-2>{}{$\bm{\mu_\Delta}$}},
                     xtick={0,0.4,0.8},
@@ -89,9 +89,15 @@
                 \addplot[thin, tumgreen] table[x=y, y=X]
                     {\plotdatapath/solution_ms_linearization_posterior_kde.dat};
 
-                \only<4-> {
+                \only<4> {
                     \addplot[very thick, tumblue, smooth, samples=300, domain=-6:6] (
                         exp(-(x - 1.57693676)^2 / (2 * 0.3798)) / (sqrt(2 * pi * 0.3798)),
+                        x
+                        );
+                }
+                \only<5-> {
+                    \addplot[very thick, tumblue, smooth, samples=300, domain=-6:6] (
+                        exp(-(x - 1.57693676)^2 / (2 * 0.7)) / (sqrt(2 * pi * 0.7)),
                         x
                         );
                 }
@@ -116,6 +122,14 @@
                     ($(gp intersection) + (0.5, 0.45)$)
                     rectangle
                     ($(posterior mean) + (0, -0.45)$);
+            \end{pgfonlayer}
+        }
+        \only<5-> {
+            \begin{pgfonlayer}{axis background}
+                \draw[draw=none, tumorange, fill=tumorange!75]
+                    ($(gp intersection) + (0, 0.3)$)
+                    rectangle
+                    ($(posterior mean) + (0, -0.3)$);
             \end{pgfonlayer}
         }
     \end{tikzpicture}
