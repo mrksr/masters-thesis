@@ -64,6 +64,45 @@
     \end{columns}
 \end{frame}
 
+\begin{frame}[label=bicycle_summary]
+    \frametitle{Bicycle Benchmark -- Summary}
+
+    \centering
+    \begin{columns}[t]
+        \begin{column}{.4\textwidth}
+            \begin{table}
+                \caption{State Variables}
+                \begin{tabularx}{\textwidth}{cX}
+                    \toprule
+                    Notation & Description \\
+                    \midrule
+                    $\theta$ & Steering Angle \\
+                    $\dot{\theta}$ &  \\
+                    $\omega$ & Leaning Angle \\
+                    $\dot{\omega}$ &  \\
+                    $x$ & Front tyre position \\
+                    $y$ & Front tyre position \\
+                    $\psi$ & Bicycle orientation \\
+                    \bottomrule
+                \end{tabularx}
+            \end{table}
+        \end{column}
+        \begin{column}{.4\textwidth}
+            \begin{table}
+                \caption{Actions}
+                \begin{tabularx}{\textwidth}{cX}
+                    \toprule
+                    Notation & Description \\
+                    \midrule
+                    $d$ & Lean distance \\
+                    $T$ & Steering force \\
+                    \bottomrule
+                \end{tabularx}
+            \end{table}
+        \end{column}
+    \end{columns}
+\end{frame}
+
 \section{Gaussian Processes}
 \begin{frame}[label=gp_non_parametric_models]
     \frametitle{Bayesian Non-Parametric Models}
