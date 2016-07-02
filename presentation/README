@@ -1,0 +1,2 @@
+Use latexmk to build the presentation:
+    ./latexmk -silent
