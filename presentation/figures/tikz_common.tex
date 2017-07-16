@@ -170,7 +170,8 @@
     \begin{axis} [
             prediction plot,
             #3 plot,
-            shift={#5},
+            % shift={#5}, % use with older pgfplots
+            at={#5},
             yticklabel pos=#7,
         ]
         \addplot[bicycle, sharp plot, simulation] table[ignore chars={\#}, col sep=space, x expr=\coordindex, y=#4]
